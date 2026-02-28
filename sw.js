@@ -1,6 +1,6 @@
 // sw.js — 5D PWA
-// IMPORTANT: bump CACHE_NAME every time you update index.html
-const CACHE_NAME = "5d-cache-v14";
+// Bump CACHE_NAME every deploy
+const CACHE_NAME = "5d-cache-v15";
 
 const ASSETS = [
   "./",
@@ -13,37 +13,65 @@ const ASSETS = [
 
 // Install: pre-cache core assets
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // Use { cache: "reload" } to bypass HTTP cache when precaching
+    await cache.addAll(ASSETS.map((u) => new Request(u, { cache: "reload" })));
+  })());
   self.skipWaiting();
 });
 
 // Activate: remove old caches
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k === CACHE_NAME ? null : caches.delete(k))))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => (k === CACHE_NAME ? Promise.resolve() : caches.delete(k))));
+    await self.clients.claim();
+  })());
 });
 
-// Fetch: cache-first for same-origin requests
+// Fetch strategy:
+// - ALWAYS network-first for manifest + icons (so updates show up)
+// - Cache-first for everything else same-origin
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
   if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
+  const pathname = url.pathname.toLowerCase();
 
-      return fetch(req).then((res) => {
-        if (!res || res.status !== 200 || res.type !== "basic") return res;
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-        return res;
-      });
-    })
-  );
+  const isIcon =
+    pathname.endsWith("/manifest.json") ||
+    pathname.includes("/icons/") ||
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".ico");
+
+  if (isIcon) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req, { cache: "no-store" });
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, fresh.clone());
+        return fresh;
+      } catch (e) {
+        const cached = await caches.match(req);
+        return cached || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // Cache-first for app shell
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+
+    const res = await fetch(req);
+    if (res && res.status === 200 && res.type === "basic") {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(req, res.clone());
+    }
+    return res;
+  })());
 });
