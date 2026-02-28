@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- iPhone: lock viewport (no zoom) -->
+
+  <!-- iPhone: lock viewport / reduce zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 
   <title>5D</title>
-  <meta name="description" content="5D — MTT big-hand logger. Quick Log + Wizard Log. Offline-first." />
+  <meta name="description" content="5D — tournament hand logger and analysis capture. Quick Log + Wizard Log. Offline-first." />
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
@@ -18,23 +19,34 @@
   <meta name="apple-mobile-web-app-title" content="5D" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
+  <!-- Optional favicon -->
+  <link rel="icon" href="icons/icon-192.png" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
     :root{
       --bg0:#03060c;
       --bg1:#02040a;
+
       --text:#f5f7ff;
       --muted:#8b93b1;
+
       --border: rgba(255,255,255,0.11);
-      --shadow: 0 12px 34px rgba(0,0,0,0.55);
+      --border2: rgba(255,255,255,0.16);
+
       --chip: rgba(255,255,255,0.07);
       --input: rgba(255,255,255,0.06);
       --input2: rgba(255,255,255,0.10);
+
       --danger:#ff5c6c;
+      --ok:#22c55e;
+
       --accentA: rgba(110,168,255,0.92);
       --accentB: rgba(34,197,94,0.78);
       --accentC: rgba(168,85,247,0.70);
+
+      --shadow: 0 12px 34px rgba(0,0,0,0.55);
     }
 
     html, body { height:100%; }
@@ -48,18 +60,77 @@
         radial-gradient(900px 560px at 70% 10%, rgba(34,197,94,0.10), transparent 60%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       -webkit-font-smoothing: antialiased;
-      touch-action: manipulation; /* reduces double-tap zoom */
+      touch-action: manipulation;
     }
 
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 16px 14px 44px; overflow-x: hidden; }
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 14px 64px;
+      overflow-x: hidden;
+    }
 
-    h1{ margin:0; font-size: 28px; letter-spacing:-0.8px; }
-    h2{ margin:0 0 10px; font-size: 18px; letter-spacing:-0.2px; }
-    h3{ margin:0 0 8px; font-size: 14px; letter-spacing:-0.1px; }
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding: 10px 0 10px;
+      background: linear-gradient(180deg, rgba(3,6,12,0.96), rgba(3,6,12,0.72));
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 10px;
+    }
+
+    .topHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+      box-shadow: 0 12px 34px rgba(0,0,0,0.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .logo svg{ width: 28px; height: 28px; opacity: 0.95; }
+
+    h1{
+      margin:0;
+      font-size: 26px;
+      letter-spacing:-0.8px;
+      line-height: 1.05;
+    }
+    h2{
+      margin:0 0 10px;
+      font-size: 18px;
+      letter-spacing:-0.2px;
+    }
+    h3{
+      margin:0 0 8px;
+      font-size: 14px;
+      letter-spacing:-0.1px;
+    }
     .muted{ color: var(--muted); font-size: 12px; line-height: 1.35; }
 
     .pill{
-      display:inline-flex; align-items:center; gap:6px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
       padding: 4px 10px;
       border-radius: 999px;
       background: var(--chip);
@@ -67,6 +138,20 @@
       font-size: 12px;
       color: var(--muted);
       white-space: nowrap;
+    }
+
+    .modeRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .utilRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
     }
 
     .card{
@@ -79,6 +164,7 @@
       backdrop-filter: blur(10px);
       overflow: hidden;
     }
+
     .subcard{
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.10);
@@ -88,7 +174,20 @@
       overflow: hidden;
     }
 
-    label{ display:block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+    .rowBetween{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
 
     /* iOS: prevent zoom on input focus by using >=16px */
     input, textarea, select{
@@ -113,6 +212,7 @@
     }
 
     .btns{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
     button{
       padding: 12px 14px;
       border-radius: 14px;
@@ -122,7 +222,10 @@
       font-weight: 900;
       cursor: pointer;
       letter-spacing: 0.2px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
+
     button.primary{
       background: linear-gradient(90deg, var(--accentA), var(--accentB));
       border-color: rgba(255,255,255,0.14);
@@ -146,32 +249,8 @@
     .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-    .topbar{
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      padding: 10px 0 10px;
-      background: linear-gradient(180deg, rgba(3,6,12,0.96), rgba(3,6,12,0.70));
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      margin-bottom: 10px;
-    }
-
-    .topHead{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; }
-    .modeRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .utilRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
     .list{ display:grid; gap: 10px; margin-top: 10px; }
+
     .item{
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -192,6 +271,8 @@
       overflow:auto;
       font-size: 13px;
       line-height: 1.35;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     .miniRow{
@@ -202,9 +283,13 @@
       overflow: hidden;
     }
     .miniHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .miniGrid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top: 10px; }
 
-    .cardsWrap{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+    .cardsWrap{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
     .cardPick{
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 16px;
@@ -231,8 +316,65 @@
     .suit-red{ color: #ff6b6b; }
     .suit-white{ color: #f3f4ff; }
 
+    /* Wizard tabs */
+    .tabs{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .tab{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-weight: 900;
+      cursor:pointer;
+      user-select: none;
+    }
+    .tab.active{
+      color: var(--text);
+      border-color: rgba(110,168,255,0.45);
+      background: rgba(110,168,255,0.12);
+      box-shadow: 0 0 0 4px rgba(110,168,255,0.08);
+    }
+
+    .streetGrid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .badgeOk{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.35);
+      background: rgba(34,197,94,0.10);
+      color: rgba(220,255,235,0.95);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .badgeWarn{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
     @media (max-width: 860px){
-      .grid2, .grid3, .cardsWrap{ grid-template-columns: 1fr; }
+      .grid2, .grid3, .cardsWrap, .streetGrid{ grid-template-columns: 1fr; }
       .modeRow{ grid-template-columns: 1fr; }
       .card{ padding: 12px; }
     }
@@ -245,11 +387,22 @@
     <!-- STICKY TOP -->
     <div class="topbar">
       <div class="topHead">
-        <div>
-          <h1>5D <span class="pill">Quick • Wizard • History</span></h1>
-          <div class="muted">Solver-meets-notes. Fast capture. Offline-first. Built for tournament grinders.</div>
+        <div class="brand">
+          <div class="logo" aria-label="5D logo">
+            <!-- minimal techy mark -->
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M10 18h26v8H18v12h16v8H18v10h18v8H10V18Z" fill="rgba(110,168,255,0.95)"/>
+              <path d="M40 18h7c10 0 17 7 17 17s-7 17-17 17h-7V18Z" fill="rgba(168,85,247,0.85)"/>
+              <path d="M48 26h-4v20h4c6 0 10-4 10-10s-4-10-10-10Z" fill="rgba(34,197,94,0.8)"/>
+            </svg>
+          </div>
+          <div>
+            <h1>5D <span class="pill">Quick • Wizard • History</span></h1>
+            <div class="muted">Solver meets Notion meets trading terminal — fast capture, clean logic, offline-first.</div>
+          </div>
         </div>
-        <div class="pill" id="sessionPill" style="align-self:flex-end;">No session</div>
+
+        <div class="pill" id="sessionPill">No session</div>
       </div>
 
       <!-- BIG TOP OPTIONS -->
@@ -261,18 +414,20 @@
 
       <!-- SMALL UTILITIES -->
       <div class="utilRow">
-        <button class="ghost" id="exportText" type="button">Copy Latest</button>
+        <button class="ghost" id="copyLatest" type="button">Copy Latest</button>
         <button class="ghost" id="exportJson" type="button">Export JSON</button>
-        <button class="danger" id="wipeAll" type="button">Delete All</button>
+        <button class="danger" id="deleteAll" type="button">Delete All</button>
       </div>
     </div>
 
     <!-- SESSION -->
     <div class="card" id="sessionCard">
-      <div class="miniHeader">
+      <div class="rowBetween">
         <div>
           <h2>Session</h2>
-          <div class="muted">A tournament = one session. Levels/blinds are saved per hand (no more history overwrite).</div>
+          <div class="muted">
+            A tournament = one session. <b>Levels & blinds are saved per hand</b> (history will never overwrite again).
+          </div>
         </div>
         <button class="secondary" id="toggleSession" type="button">Collapse</button>
       </div>
@@ -300,17 +455,6 @@
         <label>Notes (optional)</label>
         <input id="sessionNotes" placeholder="e.g., 2 tables left, avg 28bb" />
 
-        <div class="subcard">
-          <div class="miniHeader">
-            <div>
-              <h3>Next Levels (optional)</h3>
-              <div class="muted">Just context. Hands store their own level/blinds independently.</div>
-            </div>
-            <button class="secondary" id="addLevelBtn" type="button">+ Add level</button>
-          </div>
-          <div id="levelsList" class="list"></div>
-        </div>
-
         <div class="btns">
           <button class="secondary" id="saveSession" type="button">Save Session</button>
         </div>
@@ -319,18 +463,18 @@
 
     <!-- QUICK LOG -->
     <div class="card" id="quickCard">
-      <h2>Quick Log</h2>
-      <div class="muted">Fast capture between hands. Level/blinds are stored on this hand.</div>
-
-      <!-- Hand meta (per-hand!) -->
-      <div class="subcard">
-        <div class="miniHeader">
-          <div>
-            <h3>Hand Meta</h3>
-            <div class="muted">This is saved with the hand (not the session).</div>
-          </div>
+      <div class="rowBetween">
+        <div>
+          <h2>Quick Log</h2>
+          <div class="muted">Fast capture between hands. Meta (level/blinds/stacks) is stored on this hand.</div>
         </div>
-        <div class="grid3" style="margin-top:10px;">
+        <span class="badgeWarn" id="quickStatus">Ready</span>
+      </div>
+
+      <div class="subcard">
+        <h3>Hand Meta</h3>
+
+        <div class="grid3">
           <div>
             <label>Level</label>
             <select id="qLevel"></select>
@@ -347,60 +491,58 @@
             <select id="qAnte"></select>
           </div>
         </div>
-      </div>
 
-      <div class="grid3" style="margin-top:12px;">
-        <div>
-          <label>Hero Position</label>
-          <select id="qHeroPos">
-            <option>UTG</option><option>UTG+1</option><option>LJ</option><option>HJ</option><option>CO</option>
-            <option selected>BTN</option><option>SB</option><option>BB</option>
-          </select>
+        <div class="grid3" style="margin-top:10px;">
+          <div>
+            <label>Hero Position</label>
+            <select id="qHeroPos"></select>
+          </div>
+          <div>
+            <label>Hero Stack (bb)</label>
+            <input id="qHeroStack" inputmode="decimal" placeholder="e.g., 32" />
+          </div>
+          <div>
+            <label>Result</label>
+            <select id="qResult">
+              <option selected>Won</option>
+              <option>Lost</option>
+              <option>Chopped</option>
+              <option>Busted</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label>Hero Stack (bb)</label>
-          <input id="qHeroStack" inputmode="decimal" placeholder="e.g., 32" />
-        </div>
-        <div>
-          <label>Result</label>
-          <select id="qResult">
-            <option selected>Won</option><option>Lost</option><option>Chopped</option><option>Busted</option>
-          </select>
-        </div>
-      </div>
 
-      <label>Hero Cards</label>
-      <div class="cardsWrap">
-        <div class="cardPick">
-          <div class="cardLine">
-            <b>Card 1</b>
-            <div class="bigCard" id="qCard1Face">A♠</div>
+        <label>Hero Cards</label>
+        <div class="cardsWrap">
+          <div class="cardPick">
+            <div class="cardLine">
+              <b>Card 1</b>
+              <div class="bigCard suit-white" id="qCard1Face">A♠</div>
+            </div>
+            <div class="grid2">
+              <select id="qC1Rank"></select>
+              <select id="qC1Suit"></select>
+            </div>
           </div>
-          <div class="grid2">
-            <select id="qC1Rank"></select>
-            <select id="qC1Suit"></select>
+          <div class="cardPick">
+            <div class="cardLine">
+              <b>Card 2</b>
+              <div class="bigCard suit-white" id="qCard2Face">K♣</div>
+            </div>
+            <div class="grid2">
+              <select id="qC2Rank"></select>
+              <select id="qC2Suit"></select>
+            </div>
           </div>
         </div>
-        <div class="cardPick">
-          <div class="cardLine">
-            <b>Card 2</b>
-            <div class="bigCard" id="qCard2Face">K♣</div>
-          </div>
-          <div class="grid2">
-            <select id="qC2Rank"></select>
-            <select id="qC2Suit"></select>
-          </div>
-        </div>
-      </div>
-      <div class="pill" style="margin-top:10px;">
-        Shorthand: <b id="qHeroCardsText">AsKc</b>
+        <div class="pill" style="margin-top:10px;">Shorthand: <b id="qHeroCardsText">AsKc</b></div>
       </div>
 
       <div class="subcard">
-        <div class="miniHeader">
+        <div class="rowBetween">
           <div>
             <h3>Villains</h3>
-            <div class="muted">Add involved villains.</div>
+            <div class="muted">Add involved villains. (Position + stack)</div>
           </div>
           <button class="secondary" id="qAddVillainBtn" type="button">+ Add villain</button>
         </div>
@@ -425,7 +567,7 @@
         </div>
         <div>
           <label>Pot Size (bb, optional)</label>
-          <input id="qPot" inputmode="decimal" placeholder="e.g., 18" />
+          <input id="qPotBb" inputmode="decimal" placeholder="e.g., 18" />
         </div>
         <div>
           <label>Turning Point</label>
@@ -443,22 +585,28 @@
       </div>
     </div>
 
-    <!-- WIZARD LOG (kept close to your current flow; meta moved per-hand + session collapses) -->
+    <!-- WIZARD LOG -->
     <div class="card" id="wizardCard" style="display:none;">
-      <h2>Wizard Log</h2>
-      <div class="muted">This is the “structured” capture. (Action-tree upgrade comes next.)</div>
+      <div class="rowBetween">
+        <div>
+          <h2>Wizard Log</h2>
+          <div class="muted">Structured capture with action list + auto pot + jam sizing. (Action-tree foundation)</div>
+        </div>
+        <span class="badgeWarn" id="wizStatus">Meta not started</span>
+      </div>
 
+      <!-- META (collapsible after start) -->
       <div class="subcard" id="wizMetaCard">
-        <div class="miniHeader">
+        <div class="rowBetween">
           <div>
             <h3>Hand Meta</h3>
-            <div class="muted">Saved with this hand. After start, this collapses.</div>
+            <div class="muted">After you start the hand, this collapses to reduce scrolling.</div>
           </div>
           <button class="secondary" id="wizMetaToggle" type="button">Collapse</button>
         </div>
 
         <div id="wizMetaBody">
-          <div class="grid3" style="margin-top:10px;">
+          <div class="grid3">
             <div>
               <label>Level</label>
               <select id="wLevel"></select>
@@ -479,10 +627,7 @@
           <div class="grid2" style="margin-top:10px;">
             <div>
               <label>Hero Position</label>
-              <select id="wHeroPos">
-                <option>UTG</option><option>UTG+1</option><option>LJ</option><option>HJ</option><option>CO</option>
-                <option selected>BTN</option><option>SB</option><option>BB</option>
-              </select>
+              <select id="wHeroPos"></select>
             </div>
             <div>
               <label>Hero Stack (bb)</label>
@@ -495,7 +640,7 @@
             <div class="cardPick">
               <div class="cardLine">
                 <b>Card 1</b>
-                <div class="bigCard" id="wCard1Face">A♠</div>
+                <div class="bigCard suit-white" id="wCard1Face">A♠</div>
               </div>
               <div class="grid2">
                 <select id="wC1Rank"></select>
@@ -505,7 +650,7 @@
             <div class="cardPick">
               <div class="cardLine">
                 <b>Card 2</b>
-                <div class="bigCard" id="wCard2Face">K♣</div>
+                <div class="bigCard suit-white" id="wCard2Face">K♣</div>
               </div>
               <div class="grid2">
                 <select id="wC2Rank"></select>
@@ -513,15 +658,13 @@
               </div>
             </div>
           </div>
-          <div class="pill" style="margin-top:10px;">
-            Shorthand: <b id="wHeroCardsText">AsKc</b>
-          </div>
+          <div class="pill" style="margin-top:10px;">Shorthand: <b id="wHeroCardsText">AsKc</b></div>
 
           <div class="subcard">
-            <div class="miniHeader">
+            <div class="rowBetween">
               <div>
                 <h3>Villains</h3>
-                <div class="muted">These become “Villain 1 (UTG)”, “Villain 2 (CO)”, etc.</div>
+                <div class="muted">These become V1/V2... in the action builder.</div>
               </div>
               <button class="secondary" id="wAddVillainBtn" type="button">+ Add villain</button>
             </div>
@@ -530,44 +673,281 @@
 
           <div class="btns">
             <button class="primaryAlt" id="wStartHand" type="button">Start Hand</button>
-            <button class="secondary" id="wReset" type="button">Reset Wizard</button>
+            <button class="secondary" id="wReset" type="button">Reset</button>
           </div>
         </div>
 
         <div class="pill" id="wizMetaSummary" style="margin-top:10px; display:none;"></div>
       </div>
 
-      <!-- Keep your existing wizard sections minimal here; we’ll rebuild action-tree next -->
-      <div class="subcard">
-        <div class="muted">
-          Wizard streets/actions are still using your current structure.
-          Next step: replace linear “one action per player” with an action-tree engine.
+      <!-- Wizard tabs -->
+      <div class="tabs" id="wizTabs">
+        <div class="tab active" data-tab="preflop">Preflop</div>
+        <div class="tab" data-tab="flop">Flop</div>
+        <div class="tab" data-tab="turn">Turn</div>
+        <div class="tab" data-tab="river">River</div>
+        <div class="tab" data-tab="result">Result</div>
+      </div>
+
+      <!-- Streets -->
+      <div class="subcard" id="street_preflop">
+        <div class="rowBetween">
+          <div>
+            <h3>Preflop Actions</h3>
+            <div class="muted">Add actions in order. Raise sequences supported.</div>
+          </div>
+          <div class="pill" id="potPillPre">Pot: —</div>
+        </div>
+
+        <div class="streetGrid">
+          <div>
+            <label>Actor</label>
+            <select id="actActorPre"></select>
+          </div>
+          <div>
+            <label>Action</label>
+            <select id="actTypePre">
+              <option value="FOLD">Fold</option>
+              <option value="CHECK">Check</option>
+              <option value="CALL">Call</option>
+              <option value="BET">Bet</option>
+              <option value="RAISE">Raise</option>
+              <option value="JAM">Jam / All-in</option>
+            </select>
+          </div>
+          <div>
+            <label>Bet/Raise To (bb)</label>
+            <input id="actToBbPre" inputmode="decimal" placeholder="e.g., 8" />
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="addActionPre" type="button">+ Add Action</button>
+          <button class="ghost" id="undoActionPre" type="button">Undo Last</button>
+          <button class="ghost" id="clearActionsPre" type="button">Clear Street</button>
+        </div>
+
+        <div id="actionsListPre" class="list"></div>
+
+        <div class="btns" style="margin-top:12px;">
+          <button class="primary" id="nextToFlop" type="button">Next Flop</button>
         </div>
       </div>
 
-      <div class="btns">
-        <button class="secondary" id="wReset2" type="button">New Wizard Hand</button>
+      <div class="subcard" id="street_flop" style="display:none;">
+        <div class="rowBetween">
+          <div>
+            <h3>Flop</h3>
+            <div class="muted">Board + actions.</div>
+          </div>
+          <div class="pill" id="potPillFlop">Pot: —</div>
+        </div>
+
+        <div class="grid3">
+          <div>
+            <label>Flop (e.g., Kd 7s 2c)</label>
+            <input id="flopBoard" placeholder="e.g., Kd 7s 2c" />
+          </div>
+          <div>
+            <label>Turn (optional)</label>
+            <input id="turnCard" placeholder="e.g., 9h" />
+          </div>
+          <div>
+            <label>River (optional)</label>
+            <input id="riverCard" placeholder="e.g., 2d" />
+          </div>
+        </div>
+
+        <div class="streetGrid">
+          <div>
+            <label>Actor</label>
+            <select id="actActorFlop"></select>
+          </div>
+          <div>
+            <label>Action</label>
+            <select id="actTypeFlop">
+              <option value="FOLD">Fold</option>
+              <option value="CHECK">Check</option>
+              <option value="CALL">Call</option>
+              <option value="BET">Bet</option>
+              <option value="RAISE">Raise</option>
+              <option value="JAM">Jam / All-in</option>
+            </select>
+          </div>
+          <div>
+            <label>Bet/Raise To (bb)</label>
+            <input id="actToBbFlop" inputmode="decimal" placeholder="e.g., 6" />
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="addActionFlop" type="button">+ Add Action</button>
+          <button class="ghost" id="undoActionFlop" type="button">Undo Last</button>
+          <button class="ghost" id="clearActionsFlop" type="button">Clear Street</button>
+        </div>
+
+        <div id="actionsListFlop" class="list"></div>
+
+        <div class="btns" style="margin-top:12px;">
+          <button class="primary" id="nextToTurn" type="button">Next Turn</button>
+        </div>
       </div>
 
-      <div class="muted" id="wizardEditHint" style="margin-top:10px; display:none;">
-        Editing a saved hand: press “Save wizard hand” to update it.
+      <div class="subcard" id="street_turn" style="display:none;">
+        <div class="rowBetween">
+          <div>
+            <h3>Turn Actions</h3>
+            <div class="muted">Actions on turn.</div>
+          </div>
+          <div class="pill" id="potPillTurn">Pot: —</div>
+        </div>
+
+        <div class="streetGrid">
+          <div>
+            <label>Actor</label>
+            <select id="actActorTurn"></select>
+          </div>
+          <div>
+            <label>Action</label>
+            <select id="actTypeTurn">
+              <option value="FOLD">Fold</option>
+              <option value="CHECK">Check</option>
+              <option value="CALL">Call</option>
+              <option value="BET">Bet</option>
+              <option value="RAISE">Raise</option>
+              <option value="JAM">Jam / All-in</option>
+            </select>
+          </div>
+          <div>
+            <label>Bet/Raise To (bb)</label>
+            <input id="actToBbTurn" inputmode="decimal" placeholder="e.g., 12" />
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="addActionTurn" type="button">+ Add Action</button>
+          <button class="ghost" id="undoActionTurn" type="button">Undo Last</button>
+          <button class="ghost" id="clearActionsTurn" type="button">Clear Street</button>
+        </div>
+
+        <div id="actionsListTurn" class="list"></div>
+
+        <div class="btns" style="margin-top:12px;">
+          <button class="primary" id="nextToRiver" type="button">Next River</button>
+        </div>
+      </div>
+
+      <div class="subcard" id="street_river" style="display:none;">
+        <div class="rowBetween">
+          <div>
+            <h3>River Actions</h3>
+            <div class="muted">Actions on river.</div>
+          </div>
+          <div class="pill" id="potPillRiver">Pot: —</div>
+        </div>
+
+        <div class="streetGrid">
+          <div>
+            <label>Actor</label>
+            <select id="actActorRiver"></select>
+          </div>
+          <div>
+            <label>Action</label>
+            <select id="actTypeRiver">
+              <option value="FOLD">Fold</option>
+              <option value="CHECK">Check</option>
+              <option value="CALL">Call</option>
+              <option value="BET">Bet</option>
+              <option value="RAISE">Raise</option>
+              <option value="JAM">Jam / All-in</option>
+            </select>
+          </div>
+          <div>
+            <label>Bet/Raise To (bb)</label>
+            <input id="actToBbRiver" inputmode="decimal" placeholder="e.g., 18" />
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="addActionRiver" type="button">+ Add Action</button>
+          <button class="ghost" id="undoActionRiver" type="button">Undo Last</button>
+          <button class="ghost" id="clearActionsRiver" type="button">Clear Street</button>
+        </div>
+
+        <div id="actionsListRiver" class="list"></div>
+      </div>
+
+      <div class="subcard" id="street_result" style="display:none;">
+        <div class="rowBetween">
+          <div>
+            <h3>Result / Reflection</h3>
+            <div class="muted">End the hand and capture the key thought.</div>
+          </div>
+          <div class="pill" id="potPillResult">Pot: —</div>
+        </div>
+
+        <div class="grid3">
+          <div>
+            <label>Result</label>
+            <select id="wResult">
+              <option selected>Won</option>
+              <option>Lost</option>
+              <option>Chopped</option>
+              <option>Busted</option>
+            </select>
+          </div>
+          <div>
+            <label>Showdown?</label>
+            <select id="wShowdown">
+              <option value="no" selected>No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+          <div>
+            <label>Win/Loss (bb, optional)</label>
+            <input id="wNetBb" inputmode="decimal" placeholder="e.g., +24 or -18" />
+          </div>
+        </div>
+
+        <label>Reflection</label>
+        <textarea id="wReflection" placeholder="What mattered? What would you do differently?"></textarea>
+
+        <div class="btns">
+          <button class="primaryAlt" id="saveWizardHand" type="button">Save Wizard Hand</button>
+          <button class="danger" id="endHandReflection" type="button">End Hand / Reflection</button>
+        </div>
+
+        <div class="muted" id="wizardEditHint" style="margin-top:10px; display:none;">
+          Editing a saved hand: press “Save Wizard Hand” to update it.
+        </div>
       </div>
     </div>
 
     <!-- HISTORY -->
     <div id="historyCard" class="card" style="display:none;">
-      <h2>Saved Hands</h2>
-      <div class="muted">Tap a hand to view/copy/edit/send. Newest first.</div>
+      <div class="rowBetween">
+        <div>
+          <h2>History</h2>
+          <div class="muted">Newest first. Each hand keeps its own level/blinds.</div>
+        </div>
+        <span class="badgeWarn" id="histCount">0 hands</span>
+      </div>
+
       <div id="handsList" class="list"></div>
 
       <div class="card" id="detailCard" style="display:none; margin-top:12px;">
-        <h2>Hand Detail</h2>
+        <div class="rowBetween">
+          <h2 style="margin:0;">Hand Detail</h2>
+          <span class="pill" id="detailMetaPill">—</span>
+        </div>
+
         <div class="btns">
           <button class="secondary" id="copyDetail" type="button">Copy as text</button>
           <button class="secondary" id="editHandBtn" type="button">Edit</button>
           <button class="danger" id="deleteOne" type="button">Delete</button>
           <button class="ghost" id="closeDetail" type="button">Close</button>
         </div>
+
         <pre id="detailText"></pre>
       </div>
     </div>
@@ -575,35 +955,122 @@
   </div>
 
 <script>
-  // Offline
+  // ---- Service Worker ----
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
   }
 
-  // NEW KEY (prevents mixing old schema with new per-hand meta)
+  // ---- Storage keys ----
+  // New schema: per-hand meta
   const KEY = "5d_pwa_data_v1";
+  // Old schema (your current)
+  const OLD_KEY = "freeroll_pwa_data_v8";
 
+  // ---- Helpers ----
   function byId(id){ return document.getElementById(id); }
   function nowIso(){ return new Date().toISOString(); }
+  function uuid(){
+    try { return crypto.randomUUID(); }
+    catch { return "id_" + Math.random().toString(16).slice(2) + "_" + Date.now(); }
+  }
+
+  function safeParse(s){
+    try { return JSON.parse(s); } catch { return null; }
+  }
 
   function load(){
-    try { return JSON.parse(localStorage.getItem(KEY)) || { session:{}, hands:[], friends:[] }; }
-    catch { return { session:{}, hands:[], friends:[] }; }
-  }
-  function save(data){ localStorage.setItem(KEY, JSON.stringify(data)); }
-  function ensure(data){
-    if (!data.session) data.session = {};
-    if (!data.hands) data.hands = [];
-    if (!data.friends) data.friends = [];
-    return data;
+    const raw = localStorage.getItem(KEY);
+    if (raw) return safeParse(raw) || baseState();
+
+    // migrate from old
+    const oldRaw = localStorage.getItem(OLD_KEY);
+    if (!oldRaw) return baseState();
+
+    const old = safeParse(oldRaw);
+    if (!old) return baseState();
+
+    const migrated = migrateOldToNew(old);
+    localStorage.setItem(KEY, JSON.stringify(migrated));
+    return migrated;
   }
 
-  // Editing state
-  let editingHandId = null;
+  function save(data){
+    localStorage.setItem(KEY, JSON.stringify(data));
+  }
 
-  // ---------- Blind options ----------
+  function baseState(){
+    return {
+      app: { name: "5D", version: "1.0.0" },
+      session: { sessionName:"", sessionDate:"", gameType:"NLH", sessionNotes:"" },
+      hands: []
+    };
+  }
+
+  function migrateOldToNew(old){
+    const d = baseState();
+
+    // Old app stored more in session; keep what’s valid
+    d.session.sessionName = old.sessionName || old.session?.sessionName || "";
+    d.session.sessionDate = old.sessionDate || old.session?.sessionDate || "";
+    d.session.gameType = old.gameType || old.session?.gameType || "NLH";
+    d.session.sessionNotes = old.sessionNotes || old.session?.sessionNotes || "";
+
+    const sLevel = Number(old.level || old.session?.level || 1);
+    const sSb = Number(old.sb || old.session?.sb || 200);
+    const sBb = Number(old.bb || old.session?.bb || 400);
+    const sAnte = Number(old.ante || old.session?.ante || 0);
+
+    const oldHands = Array.isArray(old.hands) ? old.hands : [];
+    d.hands = oldHands.map(h => {
+      const meta = {
+        level: Number(h.level || h.meta?.level || sLevel || 1),
+        sb: Number(h.sb || h.meta?.sb || sSb || 200),
+        bb: Number(h.bb || h.meta?.bb || sBb || 400),
+        bbAnte: Number(h.ante || h.meta?.bbAnte || sAnte || 0)
+      };
+      return {
+        id: h.id || uuid(),
+        mode: h.mode || "quick",
+        createdAt: h.createdAt || nowIso(),
+        updatedAt: h.updatedAt || null,
+        meta,
+        heroPos: h.heroPos || h.position || "BTN",
+        heroStackBb: h.heroStackBb || h.heroStack || "",
+        heroCards: h.heroCards || h.cards || "",
+        villains: Array.isArray(h.villains) ? h.villains : [],
+        quick: h.quick || {
+          preflop: h.preflop || "",
+          postflop: h.postflop || "",
+          board: h.board || "",
+          potBb: h.potBb || h.pot || "",
+        },
+        wizard: h.wizard || null,
+        result: h.result || "Won",
+        turningPoint: h.turningPoint || "",
+        reflection: h.reflection || ""
+      };
+    });
+
+    return d;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function toNum(x){
+    const n = Number(String(x || "").trim());
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // ---- Blind options ----
   const BLIND_VALUES = [
-    100,200,300,400,500,600,800,
+    25,50,75,100,125,150,200,250,300,400,500,600,800,
     1000,1200,1500,2000,2500,3000,4000,5000,6000,8000,
     10000,12000,15000,20000,25000,30000,40000,50000,60000,80000,
     100000,120000,150000,200000,250000,300000,400000,500000,600000,800000,
@@ -611,7 +1078,7 @@
   ];
 
   function fmtBlind(n){
-    if (!n && n !== 0) return "?";
+    if (n === null || n === undefined || Number.isNaN(n)) return "?";
     if (n >= 1000000) return (n/1000000) + "M";
     if (n >= 1000) return (n/1000) + "K";
     return String(n);
@@ -638,7 +1105,13 @@
     sel.innerHTML = uniq.map(o => `<option value="${o.v}" ${o.v===defAnte ? "selected":""}>${o.label}</option>`).join("");
   }
 
-  // ---------- Cards ----------
+  // ---- Positions ----
+  const POSITIONS = ["UTG","UTG+1","LJ","HJ","CO","BTN","SB","BB"];
+  function fillPosSelect(sel, selected){
+    sel.innerHTML = POSITIONS.map(p => `<option ${p===selected?"selected":""}>${p}</option>`).join("");
+  }
+
+  // ---- Cards ----
   const RANKS = ["A","K","Q","J","T","9","8","7","6","5","4","3","2"];
   const SUITS = [
     { code:"s", sym:"♠", cls:"suit-white" },
@@ -661,85 +1134,33 @@
     const update = () => {
       const r1 = byId(prefix+"C1Rank").value, s1 = byId(prefix+"C1Suit").value;
       const r2 = byId(prefix+"C2Rank").value, s2 = byId(prefix+"C2Suit").value;
-      const m1 = suitMeta(s1), m2 = suitMeta(s2);
 
+      const m1 = suitMeta(s1), m2 = suitMeta(s2);
       const f1 = byId(prefix+"Card1Face");
       const f2 = byId(prefix+"Card2Face");
+
       f1.classList.remove("suit-red","suit-white");
       f2.classList.remove("suit-red","suit-white");
-      f1.classList.add(m1.cls); f2.classList.add(m2.cls);
+      f1.classList.add(m1.cls);
+      f2.classList.add(m2.cls);
 
       f1.textContent = cardPretty(r1, s1);
       f2.textContent = cardPretty(r2, s2);
+
       byId(prefix+"HeroCardsText").textContent = shorthand(r1,s1) + shorthand(r2,s2);
     };
 
-    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"].forEach(id => byId(id).addEventListener("change", update));
+    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"]
+      .forEach(id => byId(id).addEventListener("change", update));
     update();
   }
 
-  // ---------- Positions ----------
-  function posOptionsHtml(selected){
-    const positions = ["UTG","UTG+1","LJ","HJ","CO","BTN","SB","BB"];
-    return positions.map(p => `<option ${p===selected?"selected":""}>${p}</option>`).join("");
-  }
-
-  // ---------- UI helpers ----------
+  // ---- Villains UI ----
   function clearContainer(id){ byId(id).innerHTML = ""; }
 
-  // ---------- Next levels UI ----------
-  function addLevelRow(level = { sb: 200, bb: 400, note:"" }) {
-    const container = byId("levelsList");
-    const id = crypto.randomUUID();
-
-    const div = document.createElement("div");
-    div.className = "miniRow";
-    div.dataset.lid = id;
-
-    div.innerHTML = `
-      <div class="miniHeader">
-        <b>Level</b>
-        <button class="danger" type="button" data-remove="${id}">Remove</button>
-      </div>
-      <div class="miniGrid3">
-        <div>
-          <label>SB</label>
-          <select data-sb="${id}"></select>
-        </div>
-        <div>
-          <label>BB</label>
-          <select data-bb="${id}"></select>
-        </div>
-        <div>
-          <label>Note (optional)</label>
-          <input data-note="${id}" placeholder="e.g., break / ante change" value="${level.note || ""}" />
-        </div>
-      </div>
-    `;
-    container.appendChild(div);
-
-    fillBlindSelect(div.querySelector(`[data-sb="${id}"]`), level.sb || 200);
-    fillBlindSelect(div.querySelector(`[data-bb="${id}"]`), level.bb || 400);
-
-    div.querySelector(`[data-remove="${id}"]`).onclick = () => div.remove();
-  }
-
-  function getLevelsFromUI(){
-    const rows = Array.from(byId("levelsList").querySelectorAll(".miniRow"));
-    return rows.map(r => {
-      const id = r.dataset.lid;
-      return {
-        sb: Number(r.querySelector(`[data-sb="${id}"]`).value),
-        bb: Number(r.querySelector(`[data-bb="${id}"]`).value),
-        note: r.querySelector(`[data-note="${id}"]`).value.trim()
-      };
-    });
-  }
-
-  // ---------- Villains UI ----------
   function addVillainRow(containerId, v = { pos:"BB", stackBb:"", note:"" }) {
     const container = byId(containerId);
-    const id = crypto.randomUUID();
+    const id = uuid();
 
     const div = document.createElement("div");
     div.className = "miniRow";
@@ -750,22 +1171,23 @@
         <b>Villain</b>
         <button class="danger" type="button" data-remove="${id}">Remove</button>
       </div>
-      <div class="miniGrid3">
+      <div class="grid3" style="margin-top:10px;">
         <div>
           <label>Position</label>
-          <select data-pos="${id}">${posOptionsHtml(v.pos || "BB")}</select>
+          <select data-pos="${id}">${POSITIONS.map(p => `<option ${p=== (v.pos||"BB") ? "selected":""}>${p}</option>`).join("")}</select>
         </div>
         <div>
           <label>Stack (bb)</label>
-          <input data-stack="${id}" inputmode="decimal" placeholder="e.g., 41" value="${v.stackBb || ""}" />
+          <input data-stack="${id}" inputmode="decimal" placeholder="e.g., 41" value="${escapeHtml(v.stackBb || "")}" />
         </div>
         <div>
           <label>Note (optional)</label>
-          <input data-note="${id}" placeholder="e.g., chip leader / reg" value="${v.note || ""}" />
+          <input data-note="${id}" placeholder="e.g., chip leader / reg" value="${escapeHtml(v.note || "")}" />
         </div>
       </div>
     `;
     container.appendChild(div);
+
     div.querySelector(`[data-remove="${id}"]`).onclick = () => div.remove();
   }
 
@@ -781,44 +1203,12 @@
     return villains.filter(v => v.pos || v.stackBb || v.note);
   }
 
-  // ---------- Session ----------
-  function setSessionPill(){
-    const data = ensure(load());
-    const s = data.session || {};
-    const pill = byId("sessionPill");
-    if (!s.sessionName && !s.sessionDate){
-      pill.textContent = "No session";
-      return;
-    }
-    const date = s.sessionDate ? ` • ${s.sessionDate}` : "";
-    const game = s.gameType ? ` • ${s.gameType}` : "";
-    pill.textContent = `${s.sessionName || "Session"}${date}${game}`;
-  }
-
-  function renderSession(){
-    const data = ensure(load());
-    byId("sessionName").value = data.session.sessionName || "";
-    byId("sessionDate").value = data.session.sessionDate || "";
-    byId("sessionNotes").value = data.session.sessionNotes || "";
-    byId("sessionGame").value = data.session.gameType || "NLH";
-
-    clearContainer("levelsList");
-    (data.session.nextLevels || []).forEach(l => addLevelRow(l));
-
-    setSessionPill();
-  }
-
-  // ---------- Per-hand meta helpers ----------
-  function initHandMeta(prefix, defaults){
-    const levelSel = byId(prefix+"Level");
-    const sbSel = byId(prefix+"Sb");
-    const bbSel = byId(prefix+"Bb");
-    const anteSel = byId(prefix+"Ante");
-
+  // ---- Per-hand meta (Quick/Wizard) ----
+  function initHandMeta(levelSel, sbSel, bbSel, anteSel, defaults){
     fillLevelSelect(levelSel, defaults.level || 1);
     fillBlindSelect(sbSel, defaults.sb || 200);
     fillBlindSelect(bbSel, defaults.bb || 400);
-    fillAnteSelect(anteSel, Number(bbSel.value), defaults.ante || 0);
+    fillAnteSelect(anteSel, Number(bbSel.value), defaults.bbAnte || 0);
 
     sbSel.addEventListener("change", () => {
       const sb = Number(sbSel.value);
@@ -826,31 +1216,32 @@
       if (BLIND_VALUES.includes(target)) bbSel.value = String(target);
       fillAnteSelect(anteSel, Number(bbSel.value), Number(anteSel.value || 0));
     });
-    bbSel.addEventListener("change", () => fillAnteSelect(anteSel, Number(bbSel.value), Number(anteSel.value || 0)));
+
+    bbSel.addEventListener("change", () => {
+      fillAnteSelect(anteSel, Number(bbSel.value), Number(anteSel.value || 0));
+    });
   }
 
-  function readHandMeta(prefix){
+  function readHandMeta(levelSel, sbSel, bbSel, anteSel){
     return {
-      level: Number(byId(prefix+"Level").value),
-      sb: Number(byId(prefix+"Sb").value),
-      bb: Number(byId(prefix+"Bb").value),
-      bbAnte: Number(byId(prefix+"Ante").value || 0)
+      level: Number(levelSel.value),
+      sb: Number(sbSel.value),
+      bb: Number(bbSel.value),
+      bbAnte: Number(anteSel.value || 0)
     };
   }
 
   function formatBlinds(meta){
-    if (!meta || !meta.sb || !meta.bb) return "?/?";
     const ante = meta.bbAnte ? ` + ante ${fmtBlind(meta.bbAnte)}` : "";
     return `${fmtBlind(meta.sb)}/${fmtBlind(meta.bb)}${ante}`;
   }
 
-  // ---------- Modes (top) ----------
+  // ---- Views ----
   function showView(view){
     byId("quickCard").style.display = (view === "quick") ? "" : "none";
     byId("wizardCard").style.display = (view === "wizard") ? "" : "none";
     byId("historyCard").style.display = (view === "history") ? "" : "none";
 
-    // slight visual state (optional)
     byId("topQuick").className = (view === "quick") ? "primary" : "secondary";
     byId("topWizard").className = (view === "wizard") ? "primaryAlt" : "secondary";
     byId("topHistory").className = (view === "history") ? "primary" : "secondary";
@@ -862,50 +1253,435 @@
   byId("topWizard").onclick = () => showView("wizard");
   byId("topHistory").onclick = () => showView("history");
 
-  // ---------- Formatting ----------
-  function formatHand(session, h){
-    const sName = session.sessionName || "Session";
-    const sDate = session.sessionDate || "";
-    const game = session.gameType || "NLH";
-    const meta = h.meta || {};
-    const header = `${sName}${sDate ? " ("+sDate+")" : ""} | ${game} | L${meta.level || "?"} | Blinds ${formatBlinds(meta)}`;
+  // ---- Session ----
+  function setSessionPill(){
+    const data = load();
+    const s = data.session || {};
+    const pill = byId("sessionPill");
 
-    const heroLine = `Hero (${h.heroPos}) ${h.heroStack || "?"}bb | Cards: ${h.heroCards || "?"}`;
+    if (!s.sessionName && !s.sessionDate){
+      pill.textContent = "No session";
+      return;
+    }
+    const date = s.sessionDate ? ` • ${s.sessionDate}` : "";
+    const game = s.gameType ? ` • ${s.gameType}` : "";
+    pill.textContent = `${s.sessionName || "Session"}${date}${game}`;
+  }
+
+  function renderSession(){
+    const data = load();
+    const s = data.session || {};
+    byId("sessionName").value = s.sessionName || "";
+    byId("sessionDate").value = s.sessionDate || "";
+    byId("sessionGame").value = s.gameType || "NLH";
+    byId("sessionNotes").value = s.sessionNotes || "";
+    setSessionPill();
+  }
+
+  byId("saveSession").onclick = () => {
+    const data = load();
+    data.session = {
+      sessionName: byId("sessionName").value.trim(),
+      sessionDate: byId("sessionDate").value,
+      gameType: byId("sessionGame").value,
+      sessionNotes: byId("sessionNotes").value.trim()
+    };
+    save(data);
+    renderSession();
+    alert("Session saved.");
+  };
+
+  // collapse session
+  byId("toggleSession").onclick = () => {
+    const body = byId("sessionBody");
+    const collapsed = body.style.display === "none";
+    body.style.display = collapsed ? "" : "none";
+    byId("toggleSession").textContent = collapsed ? "Collapse" : "Expand";
+  };
+
+  // ---- Quick log state ----
+  let editingHandId = null;
+
+  function resetQuick(){
+    byId("qResult").value = "Won";
+    byId("qHeroStack").value = "";
+    byId("qPreflop").value = "";
+    byId("qPostflop").value = "";
+    byId("qBoard").value = "";
+    byId("qPotBb").value = "";
+    byId("qTurningPoint").value = "";
+    byId("quickEditHint").style.display = "none";
+    byId("quickStatus").textContent = "Ready";
+    byId("quickStatus").className = "badgeWarn";
+    editingHandId = null;
+
+    clearContainer("qVillainsList");
+    addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+  }
+
+  // ---- Wizard engine (foundation) ----
+  let wizActive = null; // current wizard hand draft
+
+  const STREET_ORDER = ["preflop","flop","turn","river"];
+
+  function emptyStreet(){
+    return { actions: [] };
+  }
+
+  function newWizardDraft(meta, hero, villains){
+    const players = [{ id:"hero", label:"Hero", pos: hero.pos, stackBb: hero.stackBb, note:"" }]
+      .concat(villains.map((v, idx) => ({
+        id: "v" + (idx+1),
+        label: "V" + (idx+1),
+        pos: v.pos || "?",
+        stackBb: v.stackBb || "",
+        note: v.note || ""
+      })));
+
+    return {
+      id: uuid(),
+      createdAt: nowIso(),
+      updatedAt: null,
+      mode: "wizard",
+      meta,
+      heroPos: hero.pos,
+      heroStackBb: hero.stackBb,
+      heroCards: hero.cards,
+      villains,
+      wizard: {
+        players,
+        board: { flop:"", turn:"", river:"" },
+        streets: {
+          preflop: emptyStreet(),
+          flop: emptyStreet(),
+          turn: emptyStreet(),
+          river: emptyStreet()
+        },
+        result: { result:"Won", showdown:false, netBb:"", reflection:"" }
+      }
+    };
+  }
+
+  function calcStateForStreet(wiz, street){
+    // chips-first to prevent “400bb shows 600bb” type bugs
+    const bb = Number(wiz.meta.bb);
+    const sb = Number(wiz.meta.sb);
+    const ante = Number(wiz.meta.bbAnte || 0);
+
+    const players = wiz.wizard.players.map(p => ({
+      id: p.id,
+      label: p.label,
+      pos: p.pos,
+      stackChips: (toNum(p.stackBb) ?? 0) * bb
+    }));
+
+    // total contributions across all streets so far
+    const contribTotal = {};
+    const contribThisStreet = {};
+    players.forEach(p => { contribTotal[p.id] = 0; contribThisStreet[p.id] = 0; });
+
+    // base pot (preflop: SB/BB + ante if provided)
+    // If ante is BB ante: usually only one player posts (but we don’t know who), so treat as "table contributes ante once".
+    // We add SB + BB + BBante (if set) as the baseline.
+    let pot = 0;
+    pot += sb + bb;
+    if (ante > 0) pot += ante;
+
+    // Apply all actions on all streets up to and including current street for pot calculation
+    const streetsToApply = STREET_ORDER.slice(0, STREET_ORDER.indexOf(street)+1);
+
+    function applyAction(act){
+      const pid = act.actorId;
+      if (!(pid in contribTotal)) return;
+
+      // act.investChips is incremental (computed at add-time)
+      const inc = Number(act.investChips || 0);
+      if (inc > 0){
+        pot += inc;
+        contribTotal[pid] += inc;
+        contribThisStreet[pid] += inc;
+      }
+    }
+
+    for (const st of streetsToApply){
+      // reset street contributions when moving streets
+      Object.keys(contribThisStreet).forEach(k => contribThisStreet[k] = 0);
+      const acts = wiz.wizard.streets[st].actions || [];
+      for (const a of acts) applyAction(a);
+    }
+
+    // Determine current street betting state (toCall logic)
+    const currentActs = wiz.wizard.streets[street].actions || [];
+    const invested = {};
+    players.forEach(p => invested[p.id] = 0);
+
+    // rebuild invested-on-this-street from actions
+    for (const a of currentActs){
+      if (!invested.hasOwnProperty(a.actorId)) continue;
+      invested[a.actorId] += Number(a.investChips || 0);
+    }
+
+    const maxInvested = Math.max(...Object.values(invested));
+    return {
+      potChips: pot,
+      potBb: bb > 0 ? (pot / bb) : 0,
+      bb, sb, ante,
+      players,
+      invested,
+      maxInvested
+    };
+  }
+
+  function canActionType(state, actorId, type){
+    // minimal legality
+    const invested = state.invested[actorId] ?? 0;
+    const toCall = state.maxInvested - invested;
+
+    if (type === "CHECK") return toCall === 0;
+    if (type === "CALL") return toCall > 0;
+    if (type === "FOLD") return toCall > 0; // folding when no bet is nonsensical here
+    if (type === "BET") return toCall === 0;
+    if (type === "RAISE") return true; // validated further with amount
+    if (type === "JAM") return true;
+    return true;
+  }
+
+  function computeInvestForAction(state, actorId, type, toAmountBb){
+    const bb = state.bb;
+    const invested = state.invested[actorId] ?? 0;
+    const toCall = state.maxInvested - invested;
+
+    const actor = state.players.find(p => p.id === actorId);
+    const stackBehind = Math.max(0, (actor?.stackChips ?? 0) - invested);
+
+    if (type === "CHECK") return { ok: (toCall===0), investChips: 0, note:"" };
+    if (type === "FOLD") return { ok: (toCall>0), investChips: 0, note:"" };
+
+    if (type === "CALL"){
+      const call = Math.min(toCall, stackBehind);
+      return { ok: (toCall>0), investChips: call, note: call < toCall ? "call (all-in)" : "call" };
+    }
+
+    if (type === "JAM"){
+      // invest remaining stack (all-in)
+      const jam = stackBehind;
+      return { ok: jam > 0, investChips: jam, note:"jam" };
+    }
+
+    // BET/RAISE: user inputs "toAmountBb" meaning "total invested this street becomes toAmount"
+    const toBb = toNum(toAmountBb);
+    if (toBb === null || toBb <= 0) return { ok:false, investChips: 0, note:"Enter a valid amount" };
+
+    const toChips = toBb * bb;
+    const desiredIncrement = toChips - invested;
+    if (desiredIncrement <= 0) return { ok:false, investChips: 0, note:"Must be greater than current invested" };
+
+    const inc = Math.min(desiredIncrement, stackBehind);
+    const note = inc < desiredIncrement ? "bet/raise (all-in cap)" : (type==="BET" ? "bet" : "raise");
+    // BET requires toCall=0
+    if (type === "BET" && toCall !== 0) return { ok:false, investChips: 0, note:"Bet only allowed when toCall = 0" };
+    return { ok:true, investChips: inc, note };
+  }
+
+  function renderPotPills(){
+    if (!wizActive) return;
+    const st = wizActive.ui.activeStreet;
+    const state = calcStateForStreet(wizActive.hand, st);
+    const txt = `Pot: ${state.potBb.toFixed(1)}bb (${fmtBlind(Math.round(state.potChips))} chips)`;
+    byId("potPillPre").textContent = txt;
+    byId("potPillFlop").textContent = txt;
+    byId("potPillTurn").textContent = txt;
+    byId("potPillRiver").textContent = txt;
+    byId("potPillResult").textContent = txt;
+  }
+
+  function renderActionList(street){
+    if (!wizActive) return;
+    const listId = {
+      preflop: "actionsListPre",
+      flop: "actionsListFlop",
+      turn: "actionsListTurn",
+      river: "actionsListRiver"
+    }[street];
+
+    const list = byId(listId);
+    list.innerHTML = "";
+
+    const acts = wizActive.hand.wizard.streets[street].actions || [];
+    if (!acts.length){
+      list.innerHTML = `<div class="muted">No actions yet.</div>`;
+      return;
+    }
+
+    acts.forEach((a, idx) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="rowBetween">
+          <b>${idx+1}. ${escapeHtml(a.actorLabel)} (${escapeHtml(a.actorPos)}) — ${escapeHtml(a.type)}</b>
+          <span class="pill">${a.investBb.toFixed(1)}bb</span>
+        </div>
+        <div class="muted" style="margin-top:6px;">
+          Invest: ${fmtBlind(Math.round(a.investChips))} chips • Note: ${escapeHtml(a.note || "")}
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function fillWizardActorSelects(){
+    const opts = wizActive.hand.wizard.players.map(p =>
+      `<option value="${p.id}">${escapeHtml(p.label)} • ${escapeHtml(p.pos)}</option>`
+    ).join("");
+
+    ["Pre","Flop","Turn","River"].forEach(suffix => {
+      byId("actActor"+suffix).innerHTML = opts;
+    });
+  }
+
+  function addWizardAction(street, actorSelId, typeSelId, toInputId){
+    if (!wizActive) return;
+
+    const actorId = byId(actorSelId).value;
+    const type = byId(typeSelId).value;
+    const toBb = byId(toInputId).value;
+
+    const state = calcStateForStreet(wizActive.hand, street);
+
+    if (!canActionType(state, actorId, type)){
+      alert("Illegal action for current to-call state.");
+      return;
+    }
+
+    const computed = computeInvestForAction(state, actorId, type, toBb);
+    if (!computed.ok){
+      alert(computed.note || "Invalid action.");
+      return;
+    }
+
+    const p = wizActive.hand.wizard.players.find(x => x.id === actorId);
+    const act = {
+      actorId,
+      actorLabel: p?.label || actorId,
+      actorPos: p?.pos || "?",
+      type,
+      investChips: computed.investChips,
+      investBb: state.bb > 0 ? (computed.investChips / state.bb) : 0,
+      note: computed.note || "",
+      ts: Date.now()
+    };
+
+    wizActive.hand.wizard.streets[street].actions.push(act);
+
+    // clear amount input after bet/raise
+    byId(toInputId).value = "";
+
+    renderActionList(street);
+    renderPotPills();
+    byId("wizStatus").textContent = "In progress";
+    byId("wizStatus").className = "badgeOk";
+  }
+
+  function undoWizardAction(street){
+    if (!wizActive) return;
+    const acts = wizActive.hand.wizard.streets[street].actions || [];
+    acts.pop();
+    renderActionList(street);
+    renderPotPills();
+  }
+
+  function clearWizardStreet(street){
+    if (!wizActive) return;
+    wizActive.hand.wizard.streets[street].actions = [];
+    renderActionList(street);
+    renderPotPills();
+  }
+
+  function switchWizardTab(tab){
+    if (!wizActive) return;
+
+    const all = ["preflop","flop","turn","river","result"];
+    all.forEach(t => {
+      byId("street_"+t).style.display = (t === tab) ? "" : "none";
+    });
+
+    Array.from(byId("wizTabs").querySelectorAll(".tab")).forEach(el => {
+      el.classList.toggle("active", el.dataset.tab === tab);
+    });
+
+    wizActive.ui.activeStreet = tab === "result" ? "river" : tab; // pot calc uses streets; result uses latest
+    renderPotPills();
+  }
+
+  // ---- Formatting for History ----
+  function handHeader(data, h){
+    const s = data.session || {};
+    const meta = h.meta || {};
+    const game = s.gameType || "NLH";
+    const date = s.sessionDate ? ` (${s.sessionDate})` : "";
+    return `${s.sessionName || "Session"}${date} | ${game} | L${meta.level || "?"} | ${formatBlinds(meta)}`;
+  }
+
+  function formatHandText(data, h){
+    const header = handHeader(data, h);
+    const heroLine = `Hero: ${h.heroPos || "?"} • ${h.heroStackBb || "?"}bb • ${h.heroCards || "??"}`;
     const villainsLine = (h.villains && h.villains.length)
       ? "Villains: " + h.villains.map((v, idx) => {
-          const tag = `V${idx+1} (${v.pos})`;
+          const tag = `V${idx+1} (${v.pos||"?"})`;
           const st = v.stackBb || "?";
           return `${tag} ${st}bb${v.note ? " ("+v.note+")" : ""}`;
         }).join(" | ")
-      : "Villains: ?";
+      : "Villains: —";
 
-    const updated = h.updatedAt ? `Updated: ${new Date(h.updatedAt).toLocaleString()}` : "";
+    const lines = [header, heroLine, villainsLine];
 
-    const lines = [
-      header,
-      session.sessionNotes ? `Session note: ${session.sessionNotes}` : "",
-      heroLine,
-      villainsLine,
-      h.quick?.preflop ? `Preflop: ${h.quick.preflop.trim()}` : "",
-      h.quick?.postflop ? `Postflop: ${h.quick.postflop.trim()}` : "",
-      h.quick?.board ? `Board: ${h.quick.board}` : "",
-      h.quick?.pot ? `Pot: ${h.quick.pot}bb` : "",
-      `Result: ${h.result}`,
-      h.turningPoint ? `Turning point: ${h.turningPoint}` : "",
-      `Logged: ${new Date(h.createdAt).toLocaleString()}`,
-      updated
-    ].filter(Boolean);
+    if (h.mode === "quick"){
+      const q = h.quick || {};
+      if (q.preflop) lines.push("Preflop: " + q.preflop.trim());
+      if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
+      if (q.board) lines.push("Board: " + q.board.trim());
+      if (q.potBb) lines.push("Pot: " + q.potBb + "bb");
+      lines.push("Result: " + (h.result || "—"));
+      if (h.turningPoint) lines.push("Turning point: " + h.turningPoint.trim());
+    } else {
+      const w = h.wizard || {};
+      const board = w.board || {};
+      if (board.flop) lines.push("Flop: " + board.flop);
+      if (board.turn) lines.push("Turn: " + board.turn);
+      if (board.river) lines.push("River: " + board.river);
 
+      const streets = (w.streets || {});
+      ["preflop","flop","turn","river"].forEach(st => {
+        const acts = streets[st]?.actions || [];
+        if (acts.length){
+          lines.push(st.toUpperCase() + ":");
+          acts.forEach((a, i) => {
+            lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`);
+          });
+        }
+      });
+
+      const res = w.result || {};
+      lines.push("Result: " + (res.result || h.result || "—"));
+      if (res.showdown) lines.push("Showdown: Yes");
+      if (res.netBb) lines.push("Net: " + res.netBb + "bb");
+      if (res.reflection) lines.push("Reflection: " + res.reflection.trim());
+    }
+
+    lines.push("Logged: " + new Date(h.createdAt).toLocaleString());
+    if (h.updatedAt) lines.push("Edited: " + new Date(h.updatedAt).toLocaleString());
     return lines.join("\n");
   }
 
-  // ---------- Hands list + detail ----------
+  // ---- History render ----
   function renderHands(){
-    const data = ensure(load());
+    const data = load();
     const list = byId("handsList");
     list.innerHTML = "";
 
-    const hands = [...data.hands].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    const hands = [...(data.hands || [])].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    byId("histCount").textContent = hands.length + " hands";
+
     if (!hands.length){
       list.innerHTML = `<div class="muted">No hands yet.</div>`;
       return;
@@ -915,14 +1691,13 @@
       const div = document.createElement("div");
       div.className = "item";
 
-      const vCount = (h.villains && h.villains.length) ? h.villains.length : 0;
-      const title = `${h.result} • ${h.heroPos} • ${h.heroCards || "??"}`;
-      const sub = `Quick • Hero ${h.heroStack || "?"}bb • ${vCount} villain${vCount===1?"":"s"} • ${data.session.gameType || "NLH"}`;
-      const small = new Date(h.createdAt).toLocaleString();
       const meta = h.meta || {};
+      const title = `${(h.result || "—")} • ${h.heroPos || "?"} • ${h.heroCards || "??"}`;
+      const sub = `${h.mode === "wizard" ? "Wizard" : "Quick"} • Hero ${h.heroStackBb || "?"}bb • ${(h.villains||[]).length} villain(s)`;
+      const small = new Date(h.createdAt).toLocaleString();
 
       div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div class="rowBetween">
           <b>${escapeHtml(title)}</b>
           <span class="pill">L${meta.level || "?"} • ${escapeHtml(formatBlinds(meta))}</span>
         </div>
@@ -934,87 +1709,23 @@
     });
   }
 
-  function escapeHtml(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
   function openDetail(id){
-    const data = ensure(load());
-    const h = data.hands.find(x => x.id === id);
-    if(!h) return;
+    const data = load();
+    const h = (data.hands || []).find(x => x.id === id);
+    if (!h) return;
 
     showView("history");
 
-    byId("detailText").textContent = formatHand(data.session, h);
+    byId("detailText").textContent = formatHandText(data, h);
     byId("detailCard").style.display = "";
     byId("detailCard").dataset.id = id;
 
-    byId("detailCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    byId("detailMetaPill").textContent = `L${h.meta?.level || "?"} • ${formatBlinds(h.meta||{sb:0,bb:0,bbAnte:0})}`;
+
+    byId("detailCard").scrollIntoView({ behavior:"smooth", block:"start" });
   }
 
-  // ---------- Quick log ----------
-  initHeroCards("q");
-
-  function resetQuick(){
-    byId("qHeroPos").value = "BTN";
-    byId("qHeroStack").value = "";
-    byId("qPreflop").value = "";
-    byId("qPostflop").value = "";
-    byId("qBoard").value = "";
-    byId("qPot").value = "";
-    byId("qResult").value = "Won";
-    byId("qTurningPoint").value = "";
-
-    clearContainer("qVillainsList");
-    addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
-
-    byId("qC1Rank").value = "A"; byId("qC1Suit").value = "s";
-    byId("qC2Rank").value = "K"; byId("qC2Suit").value = "c";
-    byId("qC1Rank").dispatchEvent(new Event("change"));
-
-    byId("quickEditHint").style.display = "none";
-    editingHandId = null;
-  }
-
-  // ---------- Wizard (minimal placeholder wiring for now) ----------
-  initHeroCards("w");
-
-  function resetWizard(){
-    byId("wHeroPos").value = "BTN";
-    byId("wHeroStack").value = "";
-
-    clearContainer("wVillainsList");
-    addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
-
-    byId("wC1Rank").value = "A"; byId("wC1Suit").value = "s";
-    byId("wC2Rank").value = "K"; byId("wC2Suit").value = "c";
-    byId("wC1Rank").dispatchEvent(new Event("change"));
-
-    byId("wizardEditHint").style.display = "none";
-    editingHandId = null;
-
-    // expand meta
-    byId("wizMetaBody").style.display = "";
-    byId("wizMetaSummary").style.display = "none";
-    byId("wizMetaToggle").textContent = "Collapse";
-  }
-
-  function collapseWizardMetaSummary(){
-    const meta = readHandMeta("w");
-    const heroPos = byId("wHeroPos").value;
-    const heroStack = byId("wHeroStack").value.trim() || "?";
-    byId("wizMetaSummary").textContent = `L${meta.level} • ${formatBlinds(meta)} • Hero ${heroStack}bb ${heroPos}`;
-    byId("wizMetaSummary").style.display = "";
-    byId("wizMetaBody").style.display = "none";
-    byId("wizMetaToggle").textContent = "Expand";
-  }
-
-  // ---------- History detail actions ----------
+  // ---- Detail actions ----
   byId("closeDetail").onclick = () => {
     byId("detailCard").style.display = "none";
     byId("detailCard").dataset.id = "";
@@ -1027,28 +1738,41 @@
 
   byId("deleteOne").onclick = () => {
     const id = byId("detailCard").dataset.id;
-    const data = ensure(load());
-    data.hands = data.hands.filter(h => h.id !== id);
+    const data = load();
+    data.hands = (data.hands || []).filter(h => h.id !== id);
     save(data);
     byId("detailCard").style.display = "none";
     renderHands();
   };
 
+  // Edit loads back into quick/wizard
   byId("editHandBtn").onclick = () => {
-    alert("Edit flow will be re-wired after wizard refactor (next step).");
+    const id = byId("detailCard").dataset.id;
+    const data = load();
+    const h = (data.hands || []).find(x => x.id === id);
+    if (!h) return;
+
+    if (h.mode === "quick"){
+      loadQuickForEdit(h);
+      showView("quick");
+    } else {
+      loadWizardForEdit(h);
+      showView("wizard");
+    }
+    alert("Loaded for edit. Save to update.");
   };
 
-  // ---------- Utilities ----------
-  byId("exportText").onclick = async () => {
-    const data = ensure(load());
-    if (!data.hands.length) return alert("No hands yet.");
-    const latest = [...data.hands].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""))[0];
-    await navigator.clipboard.writeText(formatHand(data.session || {}, latest));
+  // ---- Utilities ----
+  byId("copyLatest").onclick = async () => {
+    const data = load();
+    const hands = [...(data.hands || [])].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    if (!hands.length) return alert("No hands yet.");
+    await navigator.clipboard.writeText(formatHandText(data, hands[0]));
     alert("Latest hand copied.");
   };
 
   byId("exportJson").onclick = () => {
-    const data = ensure(load());
+    const data = load();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1058,9 +1782,9 @@
     URL.revokeObjectURL(url);
   };
 
-  byId("wipeAll").onclick = () => {
+  byId("deleteAll").onclick = () => {
     if (!confirm("Delete ALL hands? This cannot be undone.")) return;
-    const data = ensure(load());
+    const data = load();
     data.hands = [];
     save(data);
     byId("detailCard").style.display = "none";
@@ -1068,82 +1792,123 @@
     alert("All hands deleted.");
   };
 
-  // ---------- Session collapse ----------
-  byId("toggleSession").onclick = () => {
-    const body = byId("sessionBody");
-    const collapsed = body.style.display === "none";
-    body.style.display = collapsed ? "" : "none";
-    byId("toggleSession").textContent = collapsed ? "Collapse" : "Expand";
-  };
-
-  // ---------- Wire buttons ----------
-  byId("addLevelBtn").onclick = () => addLevelRow({ sb: 200, bb: 400, note:"" });
-
-  byId("saveSession").onclick = () => {
-    const data = ensure(load());
-    data.session = {
-      sessionName: byId("sessionName").value.trim(),
-      sessionDate: byId("sessionDate").value,
-      gameType: byId("sessionGame").value,
-      sessionNotes: byId("sessionNotes").value.trim(),
-      nextLevels: getLevelsFromUI()
-    };
-    save(data);
-    renderSession();
-    alert("Session saved.");
-  };
-
-  // Quick
+  // ---- Quick save ----
   byId("qAddVillainBtn").onclick = () => addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
   byId("qClear").onclick = resetQuick;
 
-  byId("qSaveHand").onclick = () => {
-    const data = ensure(load());
-    const meta = readHandMeta("q");
+  function loadQuickForEdit(h){
+    editingHandId = h.id;
+    byId("quickEditHint").style.display = "";
+    byId("quickStatus").textContent = "Editing";
+    byId("quickStatus").className = "badgeOk";
 
-    const h = {
-      id: crypto.randomUUID(),
-      createdAt: nowIso(),
+    // meta
+    byId("qLevel").value = String(h.meta?.level ?? 1);
+    byId("qSb").value = String(h.meta?.sb ?? 200);
+    byId("qBb").value = String(h.meta?.bb ?? 400);
+    fillAnteSelect(byId("qAnte"), Number(byId("qBb").value), Number(h.meta?.bbAnte ?? 0));
+    byId("qAnte").value = String(h.meta?.bbAnte ?? 0);
+
+    byId("qHeroPos").value = h.heroPos || "BTN";
+    byId("qHeroStack").value = h.heroStackBb || "";
+    byId("qResult").value = h.result || "Won";
+
+    const q = h.quick || {};
+    byId("qPreflop").value = q.preflop || "";
+    byId("qPostflop").value = q.postflop || "";
+    byId("qBoard").value = q.board || "";
+    byId("qPotBb").value = q.potBb || "";
+    byId("qTurningPoint").value = h.turningPoint || "";
+
+    // cards (best-effort)
+    // expects like "AsKc"
+    const cards = (h.heroCards || "").trim();
+    if (cards.length >= 4){
+      byId("qC1Rank").value = cards[0].toUpperCase();
+      byId("qC1Suit").value = cards[1].toLowerCase();
+      byId("qC2Rank").value = cards[2].toUpperCase();
+      byId("qC2Suit").value = cards[3].toLowerCase();
+      byId("qC1Rank").dispatchEvent(new Event("change"));
+    }
+
+    // villains
+    clearContainer("qVillainsList");
+    (h.villains || []).forEach(v => addVillainRow("qVillainsList", v));
+    if (!(h.villains || []).length) addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+  }
+
+  byId("qSaveHand").onclick = () => {
+    const data = load();
+    const meta = readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"));
+
+    const hand = {
+      id: editingHandId || uuid(),
       mode: "quick",
-      meta, // ✅ per-hand
+      createdAt: editingHandId ? (data.hands.find(x => x.id === editingHandId)?.createdAt || nowIso()) : nowIso(),
+      updatedAt: editingHandId ? nowIso() : null,
+      meta,
       heroPos: byId("qHeroPos").value,
-      heroStack: byId("qHeroStack").value.trim(),
+      heroStackBb: byId("qHeroStack").value.trim(),
       heroCards: byId("qHeroCardsText").textContent,
       villains: getVillains("qVillainsList"),
       quick: {
         preflop: byId("qPreflop").value,
         postflop: byId("qPostflop").value,
         board: byId("qBoard").value.trim(),
-        pot: byId("qPot").value.trim()
+        potBb: byId("qPotBb").value.trim()
       },
       result: byId("qResult").value,
-      turningPoint: byId("qTurningPoint").value.trim()
+      turningPoint: byId("qTurningPoint").value.trim(),
+      reflection: ""
     };
 
-    if (editingHandId){
-      const idx = data.hands.findIndex(x => x.id === editingHandId);
-      if (idx >= 0){
-        h.id = editingHandId;
-        h.createdAt = data.hands[idx].createdAt;
-        h.updatedAt = nowIso();
-        data.hands[idx] = h;
-      }
-      editingHandId = null;
-      byId("quickEditHint").style.display = "none";
-    } else {
-      data.hands.push(h);
-    }
+    const idx = (data.hands || []).findIndex(x => x.id === hand.id);
+    if (idx >= 0) data.hands[idx] = hand;
+    else data.hands.push(hand);
 
     save(data);
     renderHands();
     resetQuick();
-    openDetail(h.id);
+    openDetail(hand.id);
   };
 
-  // Wizard (for now: start just collapses meta; full wizard engine comes next)
+  // ---- Wizard start/reset/save/edit ----
   byId("wAddVillainBtn").onclick = () => addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
-  byId("wReset").onclick = resetWizard;
-  byId("wReset2").onclick = resetWizard;
+
+  function resetWizardUI(){
+    byId("wizStatus").textContent = "Meta not started";
+    byId("wizStatus").className = "badgeWarn";
+    byId("wizardEditHint").style.display = "none";
+
+    // expand meta
+    byId("wizMetaBody").style.display = "";
+    byId("wizMetaSummary").style.display = "none";
+    byId("wizMetaToggle").textContent = "Collapse";
+
+    // clear draft
+    wizActive = null;
+
+    // clear street lists
+    ["Pre","Flop","Turn","River"].forEach(suffix => {
+      const listId = "actionsList" + suffix;
+      if (byId(listId)) byId(listId).innerHTML = `<div class="muted">No actions yet.</div>`;
+    });
+
+    byId("flopBoard").value = "";
+    byId("turnCard").value = "";
+    byId("riverCard").value = "";
+    byId("wResult").value = "Won";
+    byId("wShowdown").value = "no";
+    byId("wNetBb").value = "";
+    byId("wReflection").value = "";
+
+    switchWizardTab("preflop");
+  }
+
+  byId("wReset").onclick = () => {
+    editingHandId = null;
+    resetWizardUI();
+  };
 
   byId("wizMetaToggle").onclick = () => {
     const body = byId("wizMetaBody");
@@ -1151,26 +1916,234 @@
     body.style.display = collapsed ? "" : "none";
     byId("wizMetaSummary").style.display = collapsed ? "none" : "";
     byId("wizMetaToggle").textContent = collapsed ? "Collapse" : "Expand";
-    if (!collapsed) collapseWizardMetaSummary();
   };
+
+  function setWizardMetaSummary(meta, heroPos, heroStackBb){
+    byId("wizMetaSummary").textContent = `L${meta.level} • ${formatBlinds(meta)} • Hero ${heroStackBb || "?"}bb ${heroPos}`;
+    byId("wizMetaSummary").style.display = "";
+  }
 
   byId("wStartHand").onclick = () => {
-    // collapse meta and keep focus on hand input (next step is streets)
-    collapseWizardMetaSummary();
-    alert("Wizard action-tree refactor is next. For now, use Quick Log (or paste your remaining wizard sections and I’ll wire them into the new per-hand meta).");
+    const meta = readHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"));
+    const heroPos = byId("wHeroPos").value;
+    const heroStackBb = byId("wHeroStack").value.trim();
+    const heroCards = byId("wHeroCardsText").textContent;
+
+    if (!heroStackBb){
+      alert("Enter Hero stack (bb) to start wizard.");
+      return;
+    }
+
+    const villains = getVillains("wVillainsList");
+
+    const hand = newWizardDraft(meta, { pos: heroPos, stackBb: heroStackBb, cards: heroCards }, villains);
+
+    wizActive = {
+      hand,
+      ui: { activeStreet: "preflop" }
+    };
+
+    fillWizardActorSelects();
+
+    // collapse meta
+    setWizardMetaSummary(meta, heroPos, heroStackBb);
+    byId("wizMetaBody").style.display = "none";
+    byId("wizMetaToggle").textContent = "Expand";
+
+    byId("wizStatus").textContent = "In progress";
+    byId("wizStatus").className = "badgeOk";
+
+    // render
+    renderActionList("preflop");
+    renderActionList("flop");
+    renderActionList("turn");
+    renderActionList("river");
+    renderPotPills();
+    switchWizardTab("preflop");
   };
 
-  // ---------- Init ----------
-  (function init(){
-    // defaults for meta fields
-    initHandMeta("q", { level: 1, sb: 200, bb: 400, ante: 0 });
-    initHandMeta("w", { level: 1, sb: 200, bb: 400, ante: 0 });
+  function loadWizardForEdit(h){
+    editingHandId = h.id;
+    byId("wizardEditHint").style.display = "";
 
+    // set meta fields
+    byId("wLevel").value = String(h.meta?.level ?? 1);
+    byId("wSb").value = String(h.meta?.sb ?? 200);
+    byId("wBb").value = String(h.meta?.bb ?? 400);
+    fillAnteSelect(byId("wAnte"), Number(byId("wBb").value), Number(h.meta?.bbAnte ?? 0));
+    byId("wAnte").value = String(h.meta?.bbAnte ?? 0);
+
+    byId("wHeroPos").value = h.heroPos || "BTN";
+    byId("wHeroStack").value = h.heroStackBb || "";
+
+    // cards
+    const cards = (h.heroCards || "").trim();
+    if (cards.length >= 4){
+      byId("wC1Rank").value = cards[0].toUpperCase();
+      byId("wC1Suit").value = cards[1].toLowerCase();
+      byId("wC2Rank").value = cards[2].toUpperCase();
+      byId("wC2Suit").value = cards[3].toLowerCase();
+      byId("wC1Rank").dispatchEvent(new Event("change"));
+    }
+
+    // villains
+    clearContainer("wVillainsList");
+    (h.villains || []).forEach(v => addVillainRow("wVillainsList", v));
+    if (!(h.villains || []).length) addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
+
+    // create active draft from saved wizard object if exists
+    if (h.wizard && h.wizard.players && h.wizard.streets){
+      wizActive = {
+        hand: JSON.parse(JSON.stringify(h)),
+        ui: { activeStreet: "preflop" }
+      };
+      fillWizardActorSelects();
+
+      // collapse meta summary
+      setWizardMetaSummary(h.meta, h.heroPos, h.heroStackBb);
+      byId("wizMetaBody").style.display = "none";
+      byId("wizMetaToggle").textContent = "Expand";
+      byId("wizStatus").textContent = "Editing";
+      byId("wizStatus").className = "badgeOk";
+
+      // boards
+      byId("flopBoard").value = h.wizard.board?.flop || "";
+      byId("turnCard").value = h.wizard.board?.turn || "";
+      byId("riverCard").value = h.wizard.board?.river || "";
+
+      // result
+      byId("wResult").value = h.wizard.result?.result || h.result || "Won";
+      byId("wShowdown").value = (h.wizard.result?.showdown ? "yes" : "no");
+      byId("wNetBb").value = h.wizard.result?.netBb || "";
+      byId("wReflection").value = h.wizard.result?.reflection || h.reflection || "";
+
+      // render lists
+      renderActionList("preflop");
+      renderActionList("flop");
+      renderActionList("turn");
+      renderActionList("river");
+      renderPotPills();
+      switchWizardTab("preflop");
+      return;
+    }
+
+    // otherwise ask to start hand again
+    resetWizardUI();
+    alert("This wizard hand is missing structured streets. Press Start Hand then re-enter actions.");
+  }
+
+  // ---- Wizard tab click ----
+  Array.from(byId("wizTabs").querySelectorAll(".tab")).forEach(el => {
+    el.onclick = () => switchWizardTab(el.dataset.tab);
+  });
+
+  // ---- Street buttons ----
+  byId("addActionPre").onclick = () => addWizardAction("preflop","actActorPre","actTypePre","actToBbPre");
+  byId("undoActionPre").onclick = () => undoWizardAction("preflop");
+  byId("clearActionsPre").onclick = () => clearWizardStreet("preflop");
+
+  byId("addActionFlop").onclick = () => addWizardAction("flop","actActorFlop","actTypeFlop","actToBbFlop");
+  byId("undoActionFlop").onclick = () => undoWizardAction("flop");
+  byId("clearActionsFlop").onclick = () => clearWizardStreet("flop");
+
+  byId("addActionTurn").onclick = () => addWizardAction("turn","actActorTurn","actTypeTurn","actToBbTurn");
+  byId("undoActionTurn").onclick = () => undoWizardAction("turn");
+  byId("clearActionsTurn").onclick = () => clearWizardStreet("turn");
+
+  byId("addActionRiver").onclick = () => addWizardAction("river","actActorRiver","actTypeRiver","actToBbRiver");
+  byId("undoActionRiver").onclick = () => undoWizardAction("river");
+  byId("clearActionsRiver").onclick = () => clearWizardStreet("river");
+
+  byId("nextToFlop").onclick = () => {
+    switchWizardTab("flop");
+  };
+  byId("nextToTurn").onclick = () => {
+    switchWizardTab("turn");
+  };
+  byId("nextToRiver").onclick = () => {
+    switchWizardTab("river");
+  };
+
+  // Save wizard hand
+  byId("saveWizardHand").onclick = () => {
+    if (!wizActive) return alert("Start a wizard hand first.");
+
+    // board
+    wizActive.hand.wizard.board.flop = byId("flopBoard").value.trim();
+    wizActive.hand.wizard.board.turn = byId("turnCard").value.trim();
+    wizActive.hand.wizard.board.river = byId("riverCard").value.trim();
+
+    // result
+    wizActive.hand.wizard.result.result = byId("wResult").value;
+    wizActive.hand.wizard.result.showdown = (byId("wShowdown").value === "yes");
+    wizActive.hand.wizard.result.netBb = byId("wNetBb").value.trim();
+    wizActive.hand.wizard.result.reflection = byId("wReflection").value;
+
+    wizActive.hand.result = wizActive.hand.wizard.result.result;
+    wizActive.hand.reflection = wizActive.hand.wizard.result.reflection;
+
+    // persist
+    const data = load();
+    const existingIdx = (data.hands || []).findIndex(x => x.id === (editingHandId || wizActive.hand.id));
+
+    if (existingIdx >= 0){
+      const keepId = data.hands[existingIdx].id;
+      wizActive.hand.id = keepId;
+      wizActive.hand.createdAt = data.hands[existingIdx].createdAt || wizActive.hand.createdAt;
+      wizActive.hand.updatedAt = nowIso();
+      data.hands[existingIdx] = wizActive.hand;
+    } else {
+      data.hands.push(wizActive.hand);
+    }
+
+    save(data);
+    renderHands();
+    openDetail(wizActive.hand.id);
+
+    alert("Wizard hand saved.");
+  };
+
+  byId("endHandReflection").onclick = () => {
+    // per your spec: reflection below street progress. This button just switches to result tab.
+    switchWizardTab("result");
+  };
+
+  // ---- Init selects and forms ----
+  function init(){
+    // session
     renderSession();
+
+    // fill position selects
+    fillPosSelect(byId("qHeroPos"), "BTN");
+    fillPosSelect(byId("wHeroPos"), "BTN");
+
+    // meta selects
+    initHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"), { level:1, sb:200, bb:400, bbAnte:0 });
+    initHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"), { level:1, sb:200, bb:400, bbAnte:0 });
+
+    // hero cards compact UI
+    initHeroCards("q");
+    initHeroCards("w");
+
+    // villains defaults
     resetQuick();
-    resetWizard();
+    clearContainer("wVillainsList");
+    addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
+
+    // wizard defaults
+    resetWizardUI();
+
+    // show quick by default
     showView("quick");
-  })();
+    setSessionPill();
+  }
+
+  // ---- History/Detail controls wired earlier ----
+  // (already set)
+
+  // ---- Start ----
+  init();
+
 </script>
 
 </body>
