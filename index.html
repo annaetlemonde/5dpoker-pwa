@@ -74,11 +74,15 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      padding: 10px 0 10px;
-      background: linear-gradient(180deg, rgba(3,6,12,0.96), rgba(3,6,12,0.72));
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      margin-bottom: 10px;
+      padding: 14px 0 10px;
+      /* Blend into background — no rigid slab */
+      background:
+        radial-gradient(700px 240px at 20% 0%, rgba(110,168,255,0.16), transparent 60%),
+        radial-gradient(620px 220px at 85% 5%, rgba(168,85,247,0.12), transparent 55%),
+        linear-gradient(180deg, rgba(3,6,12,0.82), rgba(3,6,12,0.25), rgba(3,6,12,0));
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 8px;
     }
 
     .topHead{
@@ -95,28 +99,22 @@
     }
 
     .logo{
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px; /* square with soft corners */
       border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
-      box-shadow: 0 12px 34px rgba(0,0,0,0.35);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
       display:flex;
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      flex: 0 0 auto;
     }
 
-    .logo img{
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: center;
-      opacity: 1;
-    }
-
-    h1{
+    
+    .logo img{ width:100%; height:100%; display:block; object-fit:cover; object-position:center; opacity:1; }
+h1{
       margin:0;
       font-size: 26px;
       letter-spacing:-0.8px;
@@ -161,7 +159,24 @@
       margin-top: 10px;
     }
 
-    .card{
+    
+
+    /* smaller utility buttons */
+    button.util{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+    }
+    button.util.danger{
+      border-color: rgba(255,92,108,0.30);
+      background: rgba(255,92,108,0.14);
+      color: #ffe5e8;
+    }
+
+.card{
       background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
       border: 1px solid var(--border);
       border-radius: 18px;
@@ -295,16 +310,19 @@
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
-    .cardPick{
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 16px;
-      padding: 10px;
-      background: rgba(255,255,255,0.03);
+.cardPick{
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 12px;
+      background:
+        radial-gradient(420px 120px at 30% 0%, rgba(110,168,255,0.10), transparent 55%),
+        rgba(255,255,255,0.03);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.28);
       overflow: hidden;
     }
-    .cardLine{
+.cardLine{
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -312,18 +330,22 @@
       margin-bottom: 8px;
     }
     .bigCard{
-      width: 54px; height: 66px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+      width: 64px;
+      height: 78px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
       display:flex; align-items:center; justify-content:center;
-      font-weight: 900;
-      letter-spacing: 0.2px;
+      font-weight: 950;
+      font-size: 18px;
+      letter-spacing: 0.4px;
     }
-    .suit-red{ color: #ff6b6b; }
+.suit-red{ color: #ff6b6b; }
     .suit-white{ color: #f3f4ff; }
 
-    /* Wizard tabs */
+    
+    .cardPick select{ padding: 10px; border-radius: 14px; font-size: 15px; }
+/* Wizard tabs */
     .tabs{
       display:flex;
       gap: 8px;
@@ -382,7 +404,7 @@
 
     @media (max-width: 860px){
       .grid2, .grid3, .cardsWrap, .streetGrid{ grid-template-columns: 1fr; }
-      .modeRow{ grid-template-columns: 1fr; }
+      .modeRow{ grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
       .card{ padding: 12px; }
     }
   </style>
@@ -396,8 +418,8 @@
       <div class="topHead">
         <div class="brand">
           <div class="logo" aria-label="5D logo">
-            <img src="icons/icon-192.png" alt="5D" />
-          </div>
+            <img src="icons/icon-192.png" alt="5D logo" />
+            </div>
           <div>
             <h1>5D <span class="pill">Quick • Wizard • History</span></h1>
             <div class="muted">Solver meets Notion meets trading terminal — fast capture, clean logic, offline-first.</div>
@@ -416,9 +438,9 @@
 
       <!-- SMALL UTILITIES -->
       <div class="utilRow">
-        <button class="ghost" id="copyLatest" type="button">Copy Latest</button>
-        <button class="ghost" id="exportJson" type="button">Export JSON</button>
-        <button class="danger" id="deleteAll" type="button">Delete All</button>
+        <button class="util" id="copyLatest" type="button">Copy Latest</button>
+        <button class="util" id="exportJson" type="button">Export JSON</button>
+        <button class="util danger" id="deleteAll" type="button">Delete All</button>
       </div>
     </div>
 
