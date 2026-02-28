@@ -107,7 +107,14 @@
       overflow:hidden;
     }
 
-    .logo svg{ width: 28px; height: 28px; opacity: 0.95; }
+    .logo img{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      opacity: 1;
+    }
 
     h1{
       margin:0;
@@ -389,12 +396,7 @@
       <div class="topHead">
         <div class="brand">
           <div class="logo" aria-label="5D logo">
-            <!-- minimal techy mark -->
-            <svg viewBox="0 0 64 64" fill="none">
-              <path d="M10 18h26v8H18v12h16v8H18v10h18v8H10V18Z" fill="rgba(110,168,255,0.95)"/>
-              <path d="M40 18h7c10 0 17 7 17 17s-7 17-17 17h-7V18Z" fill="rgba(168,85,247,0.85)"/>
-              <path d="M48 26h-4v20h4c6 0 10-4 10-10s-4-10-10-10Z" fill="rgba(34,197,94,0.8)"/>
-            </svg>
+            <img src="icons/icon-192.png" alt="5D" />
           </div>
           <div>
             <h1>5D <span class="pill">Quick • Wizard • History</span></h1>
