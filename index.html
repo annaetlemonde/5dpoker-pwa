@@ -18,21 +18,19 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     :root{
       --bg0:#070a12;
       --bg1:#0b0f19;
-      --card: rgba(255,255,255,0.06);
-      --card2: rgba(255,255,255,0.04);
       --text:#eef2ff;
       --muted:#a8b0c2;
       --border: rgba(255,255,255,0.12);
       --shadow: 0 10px 30px rgba(0,0,0,0.35);
-      --accent:#8b5cf6;
-      --accent2:#22c55e;
-      --danger:#ef4444;
       --chip: rgba(255,255,255,0.08);
       --input: rgba(255,255,255,0.06);
       --input2: rgba(255,255,255,0.10);
+      --danger:#ef4444;
     }
 
     html, body { height:100%; }
@@ -46,11 +44,13 @@
         linear-gradient(180deg, var(--bg0), var(--bg1));
     }
 
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 18px 16px 44px; }
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 18px 16px 44px; overflow-x: hidden; }
+
     h1{ margin:0; font-size: 28px; letter-spacing:-0.6px; }
     h2{ margin:0 0 10px; font-size: 18px; letter-spacing:-0.2px; }
     h3{ margin:0 0 8px; font-size: 14px; letter-spacing:-0.1px; }
     .muted{ color: var(--muted); font-size: 12px; line-height: 1.35; }
+
     .topbar{
       display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom: 14px;
     }
@@ -64,6 +64,7 @@
       border: 1px solid var(--border);
       font-size: 12px;
       color: var(--muted);
+      white-space: nowrap;
     }
 
     .card{
@@ -74,6 +75,7 @@
       padding: 14px;
       margin: 12px 0;
       backdrop-filter: blur(10px);
+      overflow: hidden;
     }
     .subcard{
       background: rgba(255,255,255,0.03);
@@ -81,13 +83,16 @@
       border-radius: 16px;
       padding: 12px;
       margin-top: 12px;
+      overflow: hidden;
     }
 
     .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
     .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .grid4{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
 
     label{ display:block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+
     input, textarea, select{
       width: 100%;
       padding: 12px;
@@ -97,6 +102,9 @@
       color: var(--text);
       font-size: 14px;
       outline: none;
+      max-width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
     }
     textarea{ min-height: 88px; resize: vertical; }
     input::placeholder, textarea::placeholder{ color: rgba(168,176,194,0.55); }
@@ -127,23 +135,20 @@
       border-color: rgba(239,68,68,0.35);
       color: #ffe5e5;
     }
+    button:disabled{
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
     button:active{ transform: translateY(1px); }
 
-    .seg{
-      display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;
-    }
-    .seg button{
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 800;
-    }
+    .seg{ display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px; }
+    .seg button{ padding: 10px 12px; border-radius: 999px; font-weight: 800; }
     .seg button.active{
       border-color: rgba(139,92,246,0.55);
       box-shadow: 0 0 0 4px rgba(139,92,246,0.16);
       background: rgba(139,92,246,0.14);
     }
 
-    /* list items */
     .list{ display:grid; gap: 10px; margin-top: 10px; }
     .item{
       border: 1px solid var(--border);
@@ -151,6 +156,7 @@
       padding: 12px;
       background: rgba(255,255,255,0.04);
       cursor:pointer;
+      overflow: hidden;
     }
     .item:hover{ border-color: rgba(255,255,255,0.22); }
 
@@ -166,37 +172,27 @@
       line-height: 1.35;
     }
 
-    /* rows used by levels, villains, street actions */
     .miniRow{
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 16px;
       padding: 12px;
       background: rgba(255,255,255,0.03);
+      overflow: hidden;
     }
-    .miniHeader{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-    }
-    .miniGrid3{
-      display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top: 10px;
-    }
-    .miniGrid2{
-      display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top: 10px;
-    }
+    .miniHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .miniGrid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top: 10px; }
+    .miniGrid2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top: 10px; }
 
-    /* Card picker (hero + board) */
-    .cardsWrap{
-      display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;
-    }
+    /* Card picker */
+    .cardsWrap{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
     .cardPick{
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 16px;
       padding: 12px;
       background: rgba(255,255,255,0.03);
+      overflow: hidden;
     }
-    .cardFace{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 8px;
-    }
+    .cardFace{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 8px; }
     .bigCard{
       width: 54px; height: 72px;
       border-radius: 12px;
@@ -209,25 +205,16 @@
     .suit-red{ color: #ff6b6b; }
     .suit-white{ color: #f3f4ff; }
 
-    .streetBar{
-      display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;
-    }
-    .streetBar .pill{
-      padding: 6px 10px;
-      font-weight: 800;
-      color: var(--text);
-      background: rgba(255,255,255,0.06);
-    }
-    .streetBar .pill.active{
-      background: rgba(139,92,246,0.18);
-      border-color: rgba(139,92,246,0.45);
-    }
+    .streetBar{ display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px; }
+    .streetBar .pill{ padding: 6px 10px; font-weight: 800; color: var(--text); background: rgba(255,255,255,0.06); }
+    .streetBar .pill.active{ background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.45); }
 
     @media (max-width: 860px){
       .topbar{ flex-direction: column; align-items:flex-start; }
-      .row, .grid3, .cardsWrap{ grid-template-columns: 1fr; }
+      .row, .grid2, .grid3, .grid4, .cardsWrap{ grid-template-columns: 1fr; }
       .miniGrid3{ grid-template-columns: 1fr; }
       .miniGrid2{ grid-template-columns: 1fr; }
+      .card{ padding: 12px; }
     }
   </style>
 </head>
@@ -237,7 +224,7 @@
     <div class="topbar">
       <div>
         <h1>Freeroll Poker <span class="pill">Quick + Wizard</span></h1>
-        <div class="muted">Default to speed. Use Wizard when you need accuracy + clean shareable hands.</div>
+        <div class="muted">Quick for speed. Wizard for accurate streets + board + pot math (SB + BB + BB Ante).</div>
       </div>
       <div class="right">
         <button class="ghost" id="exportText" type="button">Copy latest</button>
@@ -261,11 +248,12 @@
         </div>
       </div>
 
-      <div class="grid3">
+      <div class="grid4">
         <div>
           <label>Current Level</label>
           <select id="levelSelect"></select>
         </div>
+
         <div>
           <label>Current Blinds (SB / BB)</label>
           <div class="grid2">
@@ -274,6 +262,13 @@
           </div>
           <div class="muted" style="margin-top:6px;">SB change suggests BB ≈ 2×SB (you can override).</div>
         </div>
+
+        <div>
+          <label>BB Ante</label>
+          <select id="bbAnteSelect"></select>
+          <div class="muted" style="margin-top:6px;">Used for pot math: base pot = SB + BB + BB Ante.</div>
+        </div>
+
         <div>
           <label>Notes (optional)</label>
           <input id="sessionNotes" placeholder="e.g., 2 tables left, avg 28bb" />
@@ -284,7 +279,7 @@
         <div class="miniHeader">
           <div>
             <h3>Next Levels</h3>
-            <div class="muted">Optional. Add upcoming levels for context.</div>
+            <div class="muted">Optional context (structure).</div>
           </div>
           <button class="secondary" id="addLevelBtn" type="button">+ Add level</button>
         </div>
@@ -304,7 +299,7 @@
     <!-- QUICK LOG -->
     <div class="card" id="quickCard">
       <h2>Quick Log</h2>
-      <div class="muted">Fast capture. Great between hands. (Wizard is for structured street-by-street.)</div>
+      <div class="muted">Fast capture between hands. (Wizard is structured street-by-street.)</div>
 
       <div class="grid3" style="margin-top:10px;">
         <div>
@@ -357,7 +352,7 @@
         <div class="miniHeader">
           <div>
             <h3>Villains</h3>
-            <div class="muted">Add involved villains (multiway supported).</div>
+            <div class="muted">Add involved villains.</div>
           </div>
           <button class="secondary" id="qAddVillainBtn" type="button">+ Add villain</button>
         </div>
@@ -404,7 +399,7 @@
     <!-- WIZARD LOG -->
     <div class="card" id="wizardCard" style="display:none;">
       <h2>Wizard Log</h2>
-      <div class="muted">Structured street-by-street. Better accuracy + clean hand history + pot math.</div>
+      <div class="muted">Only active players continue to next street. Folded villains disappear.</div>
 
       <div class="streetBar" id="streetBar"></div>
 
@@ -461,7 +456,7 @@
           <div class="miniHeader">
             <div>
               <h3>Villains</h3>
-              <div class="muted">Add villains before preflop actions.</div>
+              <div class="muted">These become “Villain 1 (UTG)”, “Villain 2 (CO)”, etc.</div>
             </div>
             <button class="secondary" id="wAddVillainBtn" type="button">+ Add villain</button>
           </div>
@@ -480,7 +475,7 @@
           <div class="miniHeader">
             <div>
               <h3>Preflop Actions</h3>
-              <div class="muted">Enter amount each player put in this street (in bb). Fold = 0.</div>
+              <div class="muted">Enter amount each player put in this street (bb). Fold = 0.</div>
             </div>
             <span class="pill">Pot: <b id="pfPot">0</b> bb</span>
           </div>
@@ -500,7 +495,7 @@
           <div class="miniHeader">
             <div>
               <h3>Flop</h3>
-              <div class="muted">Pick 3 cards + actions. Amounts are added to pot (bb).</div>
+              <div class="muted">Pick 3 cards + actions. Only active players show.</div>
             </div>
             <span class="pill">Pot: <b id="flPot">0</b> bb</span>
           </div>
@@ -546,7 +541,7 @@
           <div class="miniHeader">
             <div>
               <h3>Turn</h3>
-              <div class="muted">Pick turn card + actions.</div>
+              <div class="muted">Pick turn card + actions. Only active players show.</div>
             </div>
             <span class="pill">Pot: <b id="tuPot">0</b> bb</span>
           </div>
@@ -581,7 +576,7 @@
           <div class="miniHeader">
             <div>
               <h3>River</h3>
-              <div class="muted">Pick river card + actions.</div>
+              <div class="muted">Pick river card + actions. Only active players show.</div>
             </div>
             <span class="pill">Pot: <b id="riPot">0</b> bb</span>
           </div>
@@ -656,11 +651,36 @@
       </div>
     </div>
 
-    <!-- HANDS -->
+    <!-- HANDS + FRIENDS -->
     <div class="card">
       <h2>Hands</h2>
-      <div class="muted">Tap to view/copy. Newest first.</div>
+      <div class="muted">Tap a hand to view/copy/send. Newest first.</div>
       <div id="handsList" class="list"></div>
+
+      <div class="subcard" style="margin-top:12px;">
+        <div class="miniHeader">
+          <div>
+            <h3>Friends</h3>
+            <div class="muted">Stored locally on your phone. Sending happens in Hand Detail.</div>
+          </div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div>
+            <label>Name</label>
+            <input id="friendName" placeholder="e.g., Tom" />
+          </div>
+          <div>
+            <label>Phone</label>
+            <input id="friendPhone" inputmode="tel" placeholder="e.g., 9175551234 or +1 917..." />
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button class="secondary" id="addFriendBtn" type="button" style="width:100%;">+ Add friend</button>
+          </div>
+        </div>
+
+        <div id="friendsList" class="list" style="margin-top:10px;"></div>
+      </div>
     </div>
 
     <!-- DETAIL -->
@@ -671,6 +691,26 @@
         <button class="danger" id="deleteOne" type="button">Delete</button>
         <button class="ghost" id="closeDetail" type="button">Close</button>
       </div>
+
+      <div class="subcard" style="margin-top:10px;">
+        <div class="miniHeader">
+          <div>
+            <h3>Send to Friend</h3>
+            <div class="muted">Opens Messages with the hand history prefilled.</div>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:10px;">
+          <div>
+            <label>Friend</label>
+            <select id="sendFriendSelect"></select>
+          </div>
+          <div style="display:flex; align-items:end;">
+            <button class="primary" id="sendToFriendBtn" type="button" style="width:100%;">Send</button>
+          </div>
+        </div>
+      </div>
+
       <pre id="detailText"></pre>
     </div>
 
@@ -682,18 +722,24 @@
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
   }
 
-  const KEY = "freeroll_pwa_data_v4";
+  const KEY = "freeroll_pwa_data_v6";
 
   function byId(id){ return document.getElementById(id); }
   function nowIso(){ return new Date().toISOString(); }
 
   function load(){
-    try { return JSON.parse(localStorage.getItem(KEY)) || { session:{}, hands:[] }; }
-    catch { return { session:{}, hands:[] }; }
+    try { return JSON.parse(localStorage.getItem(KEY)) || { session:{}, hands:[], friends:[] }; }
+    catch { return { session:{}, hands:[], friends:[] }; }
   }
   function save(data){ localStorage.setItem(KEY, JSON.stringify(data)); }
+  function ensure(data){
+    if (!data.session) data.session = {};
+    if (!data.hands) data.hands = [];
+    if (!data.friends) data.friends = [];
+    return data;
+  }
 
-  // --- Blind options (normal-ish MTT increments)
+  // ---------- Blind options ----------
   const BLIND_VALUES = [
     100,200,300,400,500,600,800,
     1000,1200,1500,2000,2500,3000,4000,5000,6000,8000,
@@ -701,24 +747,37 @@
     100000,120000,150000,200000,250000,300000,400000,500000,600000,800000,
     1000000,1200000,1500000,2000000
   ];
+
   function fmtBlind(n){
     if (!n && n !== 0) return "?";
     if (n >= 1000000) return (n/1000000) + "M";
     if (n >= 1000) return (n/1000) + "K";
     return String(n);
   }
+
   function fillBlindSelect(sel, def){
     sel.innerHTML = BLIND_VALUES.map(v => `<option value="${v}" ${v===def?"selected":""}>${fmtBlind(v)}</option>`).join("");
   }
 
-  // --- Levels 1–50
   function fillLevelSelect(sel, def){
     const opts = [];
     for (let i=1; i<=50; i++) opts.push(`<option ${i===def?"selected":""}>${i}</option>`);
     sel.innerHTML = opts.join("");
   }
 
-  // --- Cards
+  function fillAnteSelect(sel, bbValue, defAnte){
+    // Your ask: "ante from BB". We'll offer None + BB Ante + 0.5 BB (common option).
+    const options = [
+      { v: 0, label: "None (0)" },
+      { v: Math.round(bbValue * 0.5), label: "0.5 BB" },
+      { v: bbValue, label: "BB Ante (1 BB)" }
+    ];
+    const uniq = [];
+    for (const o of options) if (!uniq.some(u => u.v === o.v)) uniq.push(o);
+    sel.innerHTML = uniq.map(o => `<option value="${o.v}" ${o.v===defAnte ? "selected":""}>${o.label}</option>`).join("");
+  }
+
+  // ---------- Cards ----------
   const RANKS = ["A","K","Q","J","T","9","8","7","6","5","4","3","2"];
   const SUITS = [
     { code:"s", sym:"♠", cls:"suit-white" },
@@ -729,19 +788,45 @@
   function suitMeta(code){ return SUITS.find(s => s.code===code) || SUITS[0]; }
   function fillRankSelect(sel, def){ sel.innerHTML = RANKS.map(r => `<option ${r===def?"selected":""}>${r}</option>`).join(""); }
   function fillSuitSelect(sel, def){ sel.innerHTML = SUITS.map(s => `<option value="${s.code}" ${s.code===def?"selected":""}>${s.sym}</option>`).join(""); }
-  function cardText(rank, suitCode){
-    const m = suitMeta(suitCode);
-    return `${rank}${m.sym}`;
-  }
+  function cardPretty(rank, suitCode){ const m=suitMeta(suitCode); return `${rank}${m.sym}`; }
   function shorthand(rank, suitCode){ return `${rank}${suitCode}`; }
 
-  // --- Positions
+  function initHeroCards(prefix){
+    fillRankSelect(byId(prefix+"C1Rank"), "A");
+    fillSuitSelect(byId(prefix+"C1Suit"), "s");
+    fillRankSelect(byId(prefix+"C2Rank"), "K");
+    fillSuitSelect(byId(prefix+"C2Suit"), "c");
+
+    const update = () => {
+      const r1 = byId(prefix+"C1Rank").value, s1 = byId(prefix+"C1Suit").value;
+      const r2 = byId(prefix+"C2Rank").value, s2 = byId(prefix+"C2Suit").value;
+      const m1 = suitMeta(s1), m2 = suitMeta(s2);
+
+      const f1 = byId(prefix+"Card1Face");
+      const f2 = byId(prefix+"Card2Face");
+      f1.classList.remove("suit-red","suit-white");
+      f2.classList.remove("suit-red","suit-white");
+      f1.classList.add(m1.cls); f2.classList.add(m2.cls);
+
+      f1.textContent = cardPretty(r1, s1);
+      f2.textContent = cardPretty(r2, s2);
+      byId(prefix+"HeroCardsText").textContent = shorthand(r1,s1) + shorthand(r2,s2);
+    };
+
+    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"].forEach(id => byId(id).addEventListener("change", update));
+    update();
+  }
+
+  // ---------- Positions ----------
   function posOptionsHtml(selected){
     const positions = ["UTG","UTG+1","LJ","HJ","CO","BTN","SB","BB"];
     return positions.map(p => `<option ${p===selected?"selected":""}>${p}</option>`).join("");
   }
 
-  // --- Session Next Levels UI
+  // ---------- UI helpers ----------
+  function clearContainer(id){ byId(id).innerHTML = ""; }
+
+  // ---------- Next levels UI ----------
   function addLevelRow(level = { sb: 200, bb: 400, note:"" }) {
     const container = byId("levelsList");
     const id = crypto.randomUUID();
@@ -790,7 +875,7 @@
     });
   }
 
-  // --- Villains (Quick/Wizard)
+  // ---------- Villains UI ----------
   function addVillainRow(containerId, v = { pos:"BB", stackBb:"", note:"" }) {
     const container = byId(containerId);
     const id = crypto.randomUUID();
@@ -836,47 +921,101 @@
     return villains.filter(v => v.pos || v.stackBb || v.note);
   }
 
-  function clearContainer(containerId){ byId(containerId).innerHTML = ""; }
-
-  // --- Quick card picker helpers
-  function initHeroCards(prefix){
-    fillRankSelect(byId(prefix+"C1Rank"), "A");
-    fillSuitSelect(byId(prefix+"C1Suit"), "s");
-    fillRankSelect(byId(prefix+"C2Rank"), "K");
-    fillSuitSelect(byId(prefix+"C2Suit"), "c");
-
-    const update = () => {
-      const r1 = byId(prefix+"C1Rank").value, s1 = byId(prefix+"C1Suit").value;
-      const r2 = byId(prefix+"C2Rank").value, s2 = byId(prefix+"C2Suit").value;
-
-      const m1 = suitMeta(s1), m2 = suitMeta(s2);
-
-      const f1 = byId(prefix+"Card1Face");
-      const f2 = byId(prefix+"Card2Face");
-
-      f1.classList.remove("suit-red","suit-white");
-      f2.classList.remove("suit-red","suit-white");
-      f1.classList.add(m1.cls); f2.classList.add(m2.cls);
-
-      f1.textContent = cardText(r1, s1);
-      f2.textContent = cardText(r2, s2);
-
-      byId(prefix+"HeroCardsText").textContent = shorthand(r1,s1) + shorthand(r2,s2); // AsKc
-    };
-
-    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"].forEach(id => byId(id).addEventListener("change", update));
-    update();
+  // ---------- Friends ----------
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
-  // --- Wizard state
-  const wizard = {
-    step: "setup", // setup|preflop|flop|turn|river|reflection
-    hand: null, // built incrementally
-    pot: { pf: 0, fl: 0, tu: 0, ri: 0, total: 0 }
-  };
+  function normalizePhone(raw){
+    if(!raw) return "";
+    let p = raw.trim().replace(/[^\d+]/g, "");
+    if (/^\d{10}$/.test(p)) p = "+1" + p;
+    if (/^1\d{10}$/.test(p)) p = "+" + p;
+    return p;
+  }
 
-  const STREET_ORDER = ["setup","preflop","flop","turn","river","reflection"];
+  function renderFriends(){
+    const data = ensure(load());
+    const list = byId("friendsList");
+    if (!list) return;
 
+    list.innerHTML = "";
+
+    if (!data.friends.length){
+      list.innerHTML = `<div class="muted">No friends yet. Add one above.</div>`;
+    } else {
+      data.friends.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div>
+              <b>${escapeHtml(f.name || "Friend")}</b>
+              <div class="muted" style="margin-top:4px;">${escapeHtml(f.phone || "")}</div>
+            </div>
+            <button class="danger" type="button" data-del="${f.id}">Remove</button>
+          </div>
+        `;
+        div.querySelector(`[data-del="${f.id}"]`).onclick = () => {
+          const d = ensure(load());
+          d.friends = d.friends.filter(x => x.id !== f.id);
+          save(d);
+          renderFriends();
+          renderFriendDropdown();
+        };
+        list.appendChild(div);
+      });
+    }
+
+    renderFriendDropdown();
+  }
+
+  function renderFriendDropdown(){
+    const data = ensure(load());
+    const sel = byId("sendFriendSelect");
+    const btn = byId("sendToFriendBtn");
+    if (!sel || !btn) return;
+
+    if (!data.friends.length){
+      sel.innerHTML = `<option value="">Add a friend first</option>`;
+      sel.disabled = true;
+      btn.disabled = true;
+      return;
+    }
+
+    sel.disabled = false;
+    btn.disabled = false;
+    sel.innerHTML = data.friends.map(f =>
+      `<option value="${f.id}">${escapeHtml(f.name)} • ${escapeHtml(f.phone)}</option>`
+    ).join("");
+  }
+
+  function sendCurrentHandToFriend(){
+    const data = ensure(load());
+    const handId = byId("detailCard")?.dataset?.id;
+    if (!handId) return alert("Open a hand first.");
+
+    const hand = data.hands.find(h => h.id === handId);
+    if (!hand) return alert("Could not find that hand.");
+
+    const friendId = byId("sendFriendSelect")?.value;
+    const friend = data.friends.find(f => f.id === friendId);
+    if (!friend) return alert("Pick a friend.");
+
+    const phone = normalizePhone(friend.phone);
+    if (!phone) return alert("Friend phone number is missing.");
+
+    const msg = formatHand(data.session || {}, hand);
+    const url = `sms:${phone}?&body=${encodeURIComponent(msg)}`;
+    window.location.href = url;
+  }
+
+  // ---------- Mode ----------
   function setMode(mode){
     const quick = byId("quickCard");
     const wiz = byId("wizardCard");
@@ -896,6 +1035,14 @@
       renderStreetBar();
     }
   }
+
+  // ---------- Wizard state ----------
+  const wizard = {
+    step: "setup", // setup|preflop|flop|turn|river|reflection
+    hand: null,
+    activeKeys: [],
+    pot: { pf:0, fl:0, tu:0, ri:0, total:0 }
+  };
 
   function renderStreetBar(){
     const bar = byId("streetBar");
@@ -925,10 +1072,10 @@
       river: "wizRiver",
       reflection: "wizReflection"
     };
+
     Object.values(sections).forEach(id => byId(id).style.display = "none");
     byId(sections[step]).style.display = "";
 
-    // refresh pot labels
     byId("pfPot").textContent = String(wizard.pot.pf);
     byId("flPot").textContent = String(wizard.pot.fl);
     byId("tuPot").textContent = String(wizard.pot.tu);
@@ -936,9 +1083,7 @@
     byId("totalPot").textContent = String(wizard.pot.total);
   }
 
-  // --- Wizard Action builder
-  // We keep it simple: each street asks "How much did this player put in this street (bb)?"
-  // Action dropdown mainly for readability + exporting (doesn't drive math).
+  // ---------- Wizard actions ----------
   const ACTIONS_PF = ["Fold","Limp","Open","Call","3bet","4bet","Jam","Other"];
   const ACTIONS_POST = ["Fold","Check","Bet","Call","Raise","Jam","Other"];
 
@@ -948,16 +1093,17 @@
 
     players.forEach(p => {
       const rowId = crypto.randomUUID();
-      const prev = existing?.[p.key] || { action: actionsList[0], amt: "" };
+      const prev = existing?.[p.key] || { action: actionsList[0], amt: "", note: "" };
 
       const div = document.createElement("div");
       div.className = "miniRow";
       div.dataset.rid = rowId;
+      div.dataset.playerKey = p.key;
 
       div.innerHTML = `
         <div class="miniHeader">
-          <b>${p.label}</b>
-          <span class="pill">${p.pos || ""} ${p.stackBb ? (p.stackBb+"bb") : ""}</span>
+          <b>${escapeHtml(p.label)}</b>
+          <span class="pill">${escapeHtml((p.stackBb || "?") + "bb")}</span>
         </div>
         <div class="miniGrid3">
           <div>
@@ -968,17 +1114,14 @@
           </div>
           <div>
             <label>Amount Put In (bb)</label>
-            <input data-amt="${rowId}" inputmode="decimal" placeholder="0" value="${prev.amt || ""}" />
+            <input data-amt="${rowId}" inputmode="decimal" placeholder="0" value="${escapeHtml(prev.amt || "")}" />
           </div>
           <div>
             <label>Note (optional)</label>
-            <input data-note="${rowId}" placeholder="e.g., sizing / read" value="${prev.note || ""}" />
+            <input data-note="${rowId}" placeholder="e.g., sizing / read" value="${escapeHtml(prev.note || "")}" />
           </div>
         </div>
       `;
-
-      // attach mapping keys
-      div.dataset.playerKey = p.key;
       container.appendChild(div);
     });
   }
@@ -999,14 +1142,24 @@
 
   function sumStreetAmounts(streetActions){
     let s = 0;
-    Object.values(streetActions).forEach(x => {
+    for (const x of Object.values(streetActions || {})){
       const n = Number(x.amt || 0);
       if (!Number.isNaN(n)) s += n;
-    });
-    return Math.round(s * 100) / 100; // keep simple
+    }
+    return Math.round(s * 100) / 100;
   }
 
-  // --- Board pickers (wizard)
+  function eliminateFolds(activeKeys, streetActions){
+    const next = [];
+    for (const k of activeKeys){
+      const a = streetActions?.[k]?.action;
+      if (a === "Fold") continue;
+      next.push(k);
+    }
+    return next;
+  }
+
+  // ---------- Wizard board pickers ----------
   function initBoardPicker(rankId, suitId, defRank, defSuit, onChange){
     fillRankSelect(byId(rankId), defRank);
     fillSuitSelect(byId(suitId), defSuit);
@@ -1016,273 +1169,9 @@
   function getBoardCard(rankId, suitId){
     const r = byId(rankId).value;
     const s = byId(suitId).value;
-    return { r, s, text: shorthand(r,s), pretty: cardText(r,s) };
+    return { r, s, text: shorthand(r,s), pretty: cardPretty(r,s) };
   }
 
-  // --- Pot math (basic, but useful)
-  // Pot starts with SB+BB (no antes for now).
-  function computeWizardPot(){
-    const session = load().session || {};
-    const base = Number(session.sb || 0) + Number(session.bb || 0);
-    const pf = base + sumStreetAmounts(wizard.hand.streets.preflop.actions);
-    const fl = pf + sumStreetAmounts(wizard.hand.streets.flop.actions);
-    const tu = fl + sumStreetAmounts(wizard.hand.streets.turn.actions);
-    const ri = tu + sumStreetAmounts(wizard.hand.streets.river.actions);
-    wizard.pot = { pf, fl, tu, ri, total: ri };
-  }
-
-  function formatSessionBlinds(session){
-    if (!session.sb || !session.bb) return "?/?";
-    return `${fmtBlind(session.sb)}/${fmtBlind(session.bb)}`;
-  }
-
-  // --- Formatting (Quick + Wizard)
-  function formatHand(session, h){
-    const sName = session.sessionName || "Session";
-    const sDate = session.sessionDate || "";
-    const header = `${sName}${sDate ? " ("+sDate+")" : ""} | L${session.level || "?"} | Blinds ${formatSessionBlinds(session)}`;
-
-    const levels = (session.nextLevels && session.nextLevels.length)
-      ? "Next levels: " + session.nextLevels.map(l => `${fmtBlind(l.sb)}/${fmtBlind(l.bb)}${l.note?(" ("+l.note+")"):""}`).join(" → ")
-      : "";
-
-    const heroLine = `Hero (${h.heroPos}) ${h.heroStack || "?"}bb | Cards: ${h.heroCards || "?"}`;
-    const villainsLine = (h.villains && h.villains.length)
-      ? "Villains: " + h.villains.map(v => `${v.pos} ${v.stackBb || "?"}bb${v.note ? " ("+v.note+")" : ""}`).join(" | ")
-      : "Villains: ?";
-
-    if (h.mode === "quick"){
-      const lines = [
-        header,
-        session.sessionNotes ? `Session note: ${session.sessionNotes}` : "",
-        levels,
-        heroLine,
-        villainsLine,
-        h.quick.preflop ? `Preflop: ${h.quick.preflop.trim()}` : "",
-        h.quick.postflop ? `Postflop: ${h.quick.postflop.trim()}` : "",
-        h.quick.board ? `Board: ${h.quick.board}` : "",
-        h.quick.pot ? `Pot: ${h.quick.pot}bb` : "",
-        `Result: ${h.result} | ${h.game}`,
-        h.turningPoint ? `Turning point: ${h.turningPoint}` : "",
-        `Logged: ${new Date(h.createdAt).toLocaleString()}`
-      ].filter(Boolean);
-      return lines.join("\n");
-    }
-
-    // wizard
-    const st = h.wizard.streets;
-
-    const boardPretty = [];
-    if (st.flop.board?.length) boardPretty.push(st.flop.board.map(c => c.pretty).join(" "));
-    if (st.turn.board?.pretty) boardPretty.push(st.turn.board.pretty);
-    if (st.river.board?.pretty) boardPretty.push(st.river.board.pretty);
-
-    const boardLine = boardPretty.length ? `Board: ${boardPretty.join(" | ")}` : "";
-
-    function streetLines(name, actions){
-      const lines = [];
-      for (const [k, v] of Object.entries(actions)){
-        const who = h.wizard.playersByKey[k] || k;
-        const amt = v.amt ? `${v.amt}bb` : "0";
-        const note = v.note ? ` (${v.note})` : "";
-        lines.push(`${who}: ${v.action} ${amt}${note}`);
-      }
-      return [`${name}:`, ...lines];
-    }
-
-    const potLine = `Pot: PF ${h.wizard.pot.pf}bb | F ${h.wizard.pot.fl}bb | T ${h.wizard.pot.tu}bb | R ${h.wizard.pot.ri}bb | Total ${h.wizard.pot.total}bb`;
-
-    const lines = [
-      header,
-      session.sessionNotes ? `Session note: ${session.sessionNotes}` : "",
-      levels,
-      heroLine,
-      villainsLine,
-      ...streetLines("Preflop", st.preflop.actions),
-      boardLine,
-      ...streetLines("Flop", st.flop.actions),
-      ...streetLines("Turn", st.turn.actions),
-      ...streetLines("River", st.river.actions),
-      potLine,
-      `Result: ${h.result} | ${h.game} | Showdown: ${h.wizard.showdown}`,
-      h.turningPoint ? `Turning point: ${h.turningPoint}` : "",
-      `Logged: ${new Date(h.createdAt).toLocaleString()}`
-    ].filter(Boolean);
-
-    return lines.join("\n");
-  }
-
-  // --- Hands list + detail
-  function renderHands(){
-    const data = load();
-    const list = byId("handsList");
-    list.innerHTML = "";
-
-    const hands = [...data.hands].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
-    hands.forEach(h => {
-      const div = document.createElement("div");
-      div.className = "item";
-      const vCount = (h.villains && h.villains.length) ? h.villains.length : 0;
-      const title = `${h.result} • ${h.heroPos} • ${h.heroCards || "??"}`;
-      const sub = `${h.mode === "wizard" ? "Wizard" : "Quick"} • Hero ${h.heroStack || "?"}bb • ${vCount} villain${vCount===1?"":"s"} • ${h.game}`;
-      const small = new Date(h.createdAt).toLocaleString();
-      div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-          <b>${title}</b>
-          <span class="pill">L${data.session.level || "?"} • ${formatSessionBlinds(data.session)}</span>
-        </div>
-        <div class="muted" style="margin-top:6px;">${sub}</div>
-        <div class="muted" style="margin-top:2px;">${small}</div>
-      `;
-      div.onclick = () => openDetail(h.id);
-      list.appendChild(div);
-    });
-  }
-
-  function openDetail(id){
-    const data = load();
-    const h = data.hands.find(x => x.id === id);
-    if(!h) return;
-    byId("detailText").textContent = formatHand(data.session, h);
-    byId("detailCard").style.display = "";
-    byId("detailCard").dataset.id = id;
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  }
-
-  // --- Init session UI
-  function renderSession(){
-    const data = load();
-    byId("sessionName").value = data.session.sessionName || "";
-    byId("sessionDate").value = data.session.sessionDate || "";
-    byId("sessionNotes").value = data.session.sessionNotes || "";
-
-    fillLevelSelect(byId("levelSelect"), Number(data.session.level || 1));
-
-    fillBlindSelect(byId("sbSelect"), Number(data.session.sb || 200));
-    fillBlindSelect(byId("bbSelect"), Number(data.session.bb || 400));
-
-    clearContainer("levelsList");
-    (data.session.nextLevels || []).forEach(l => addLevelRow(l));
-  }
-
-  // --- Buttons: session
-  byId("addLevelBtn").onclick = () => addLevelRow({ sb: 200, bb: 400, note:"" });
-
-  byId("sbSelect").addEventListener("change", () => {
-    const sb = Number(byId("sbSelect").value);
-    const target = sb * 2;
-    if (BLIND_VALUES.includes(target)) byId("bbSelect").value = String(target);
-  });
-
-  byId("saveSession").onclick = () => {
-    const data = load();
-    data.session = {
-      sessionName: byId("sessionName").value.trim(),
-      sessionDate: byId("sessionDate").value,
-      level: Number(byId("levelSelect").value),
-      sb: Number(byId("sbSelect").value),
-      bb: Number(byId("bbSelect").value),
-      sessionNotes: byId("sessionNotes").value.trim(),
-      nextLevels: getLevelsFromUI()
-    };
-    save(data);
-    renderSession();
-    renderHands();
-    alert("Session saved.");
-  };
-
-  // --- Mode buttons
-  byId("modeQuickBtn").onclick = () => setMode("quick");
-  byId("modeWizardBtn").onclick = () => setMode("wizard");
-
-  // --- QUICK wiring
-  initHeroCards("q");
-
-  byId("qAddVillainBtn").onclick = () => addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
-  function resetQuick(){
-    byId("qHeroPos").value = "BTN";
-    byId("qHeroStack").value = "";
-    byId("qGame").value = "NLH";
-    byId("qPreflop").value = "";
-    byId("qPostflop").value = "";
-    byId("qBoard").value = "";
-    byId("qPot").value = "";
-    byId("qResult").value = "Won";
-    byId("qTurningPoint").value = "";
-    clearContainer("qVillainsList");
-    addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
-
-    byId("qC1Rank").value = "A"; byId("qC1Suit").value = "s";
-    byId("qC2Rank").value = "K"; byId("qC2Suit").value = "c";
-    // trigger updates
-    byId("qC1Rank").dispatchEvent(new Event("change"));
-  }
-
-  byId("qClear").onclick = resetQuick;
-
-  byId("qSaveHand").onclick = () => {
-    const data = load();
-
-    const h = {
-      id: crypto.randomUUID(),
-      createdAt: nowIso(),
-      mode: "quick",
-      game: byId("qGame").value,
-      heroPos: byId("qHeroPos").value,
-      heroStack: byId("qHeroStack").value.trim(),
-      heroCards: byId("qHeroCardsText").textContent,
-      villains: getVillains("qVillainsList"),
-      quick: {
-        preflop: byId("qPreflop").value,
-        postflop: byId("qPostflop").value,
-        board: byId("qBoard").value.trim(),
-        pot: byId("qPot").value.trim()
-      },
-      result: byId("qResult").value,
-      turningPoint: byId("qTurningPoint").value.trim()
-    };
-
-    data.hands.push(h);
-    save(data);
-    renderHands();
-    resetQuick();
-    openDetail(h.id);
-  };
-
-  // --- WIZARD wiring
-  initHeroCards("w");
-  byId("wAddVillainBtn").onclick = () => addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
-
-  function resetWizard(){
-    wizard.step = "setup";
-    wizard.hand = null;
-    wizard.pot = { pf:0, fl:0, tu:0, ri:0, total:0 };
-
-    byId("wHeroPos").value = "BTN";
-    byId("wHeroStack").value = "";
-    byId("wGame").value = "NLH";
-    clearContainer("wVillainsList");
-    addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
-
-    // reset board pickers
-    byId("wResult").value = "Won";
-    byId("wShowdown").value = "No";
-    byId("wPotOverride").value = "";
-    byId("wNotes").value = "";
-    byId("wSummary").textContent = "";
-
-    // reset hero cards to AK default
-    byId("wC1Rank").value = "A"; byId("wC1Suit").value = "s";
-    byId("wC2Rank").value = "K"; byId("wC2Suit").value = "c";
-    byId("wC1Rank").dispatchEvent(new Event("change"));
-
-    showWizardStep("setup");
-  }
-
-  byId("wReset").onclick = resetWizard;
-  byId("wReset2").onclick = resetWizard;
-
-  // Board pickers init
   initBoardPicker("f1Rank","f1Suit","J","s", updateFlopBoard);
   initBoardPicker("f2Rank","f2Suit","8","d", updateFlopBoard);
   initBoardPicker("f3Rank","f3Suit","2","c", updateFlopBoard);
@@ -1325,38 +1214,260 @@
     byId("riBoardText").value = [flop, turn, river].filter(Boolean).join(" | ") || "";
   }
 
+  // ---------- Pot math ----------
+  function computeWizardPot(){
+    const session = ensure(load()).session || {};
+    const base =
+      Number(session.sb || 0) +
+      Number(session.bb || 0) +
+      Number(session.bbAnte || 0);
+
+    const pf = base + sumStreetAmounts(wizard.hand.streets.preflop.actions);
+    const fl = pf + sumStreetAmounts(wizard.hand.streets.flop.actions);
+    const tu = fl + sumStreetAmounts(wizard.hand.streets.turn.actions);
+    const ri = tu + sumStreetAmounts(wizard.hand.streets.river.actions);
+
+    wizard.pot = { pf, fl, tu, ri, total: ri };
+    wizard.hand.pot = { ...wizard.pot };
+  }
+
+  function formatSessionBlinds(session){
+    if (!session.sb || !session.bb) return "?/?";
+    const ante = session.bbAnte ? ` + ante ${fmtBlind(session.bbAnte)}` : "";
+    return `${fmtBlind(session.sb)}/${fmtBlind(session.bb)}${ante}`;
+  }
+
+  // ---------- Formatting ----------
+  function formatHand(session, h){
+    const sName = session.sessionName || "Session";
+    const sDate = session.sessionDate || "";
+    const header = `${sName}${sDate ? " ("+sDate+")" : ""} | L${session.level || "?"} | Blinds ${formatSessionBlinds(session)}`;
+
+    const levels = (session.nextLevels && session.nextLevels.length)
+      ? "Next levels: " + session.nextLevels.map(l => `${fmtBlind(l.sb)}/${fmtBlind(l.bb)}${l.note?(" ("+l.note+")"):""}`).join(" → ")
+      : "";
+
+    const heroLine = `Hero (${h.heroPos}) ${h.heroStack || "?"}bb | Cards: ${h.heroCards || "?"}`;
+    const villainsLine = (h.villains && h.villains.length)
+      ? "Villains: " + h.villains.map((v, idx) => {
+          const tag = `V${idx+1} (${v.pos})`;
+          const st = v.stackBb || "?";
+          return `${tag} ${st}bb${v.note ? " ("+v.note+")" : ""}`;
+        }).join(" | ")
+      : "Villains: ?";
+
+    if (h.mode === "quick"){
+      const lines = [
+        header,
+        session.sessionNotes ? `Session note: ${session.sessionNotes}` : "",
+        levels,
+        heroLine,
+        villainsLine,
+        h.quick.preflop ? `Preflop: ${h.quick.preflop.trim()}` : "",
+        h.quick.postflop ? `Postflop: ${h.quick.postflop.trim()}` : "",
+        h.quick.board ? `Board: ${h.quick.board}` : "",
+        h.quick.pot ? `Pot: ${h.quick.pot}bb` : "",
+        `Result: ${h.result} | ${h.game}`,
+        h.turningPoint ? `Turning point: ${h.turningPoint}` : "",
+        `Logged: ${new Date(h.createdAt).toLocaleString()}`
+      ].filter(Boolean);
+      return lines.join("\n");
+    }
+
+    // wizard
+    const st = h.wizard.streets;
+    const boardPretty = [];
+    if (st.flop.board?.length) boardPretty.push(st.flop.board.map(c => c.pretty).join(" "));
+    if (st.turn.board?.pretty) boardPretty.push(st.turn.board.pretty);
+    if (st.river.board?.pretty) boardPretty.push(st.river.board.pretty);
+    const boardLine = boardPretty.length ? `Board: ${boardPretty.join(" | ")}` : "";
+
+    function streetLines(name, actions, playersByKey){
+      const lines = [];
+      for (const [k, v] of Object.entries(actions || {})){
+        const who = playersByKey?.[k] || k;
+        const amt = (v.amt && String(v.amt).length) ? `${v.amt}bb` : "0bb";
+        const note = v.note ? ` (${v.note})` : "";
+        lines.push(`${who}: ${v.action} ${amt}${note}`);
+      }
+      return [`${name}:`, ...lines];
+    }
+
+    const potLine = `Pot: PF ${h.wizard.pot.pf}bb | F ${h.wizard.pot.fl}bb | T ${h.wizard.pot.tu}bb | R ${h.wizard.pot.ri}bb | Total ${h.wizard.pot.total}bb`;
+
+    const lines = [
+      header,
+      session.sessionNotes ? `Session note: ${session.sessionNotes}` : "",
+      levels,
+      heroLine,
+      villainsLine,
+      ...streetLines("Preflop", st.preflop.actions, h.wizard.playersByKey),
+      boardLine,
+      ...streetLines("Flop", st.flop.actions, h.wizard.playersByKey),
+      ...streetLines("Turn", st.turn.actions, h.wizard.playersByKey),
+      ...streetLines("River", st.river.actions, h.wizard.playersByKey),
+      potLine,
+      `Result: ${h.result} | ${h.game} | Showdown: ${h.wizard.showdown}`,
+      h.turningPoint ? `Turning point: ${h.turningPoint}` : "",
+      `Logged: ${new Date(h.createdAt).toLocaleString()}`
+    ].filter(Boolean);
+
+    return lines.join("\n");
+  }
+
+  // ---------- Hands list + detail ----------
+  function renderHands(){
+    const data = ensure(load());
+    const list = byId("handsList");
+    list.innerHTML = "";
+
+    const hands = [...data.hands].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    hands.forEach(h => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      const vCount = (h.villains && h.villains.length) ? h.villains.length : 0;
+      const title = `${h.result} • ${h.heroPos} • ${h.heroCards || "??"}`;
+      const sub = `${h.mode === "wizard" ? "Wizard" : "Quick"} • Hero ${h.heroStack || "?"}bb • ${vCount} villain${vCount===1?"":"s"} • ${h.game}`;
+      const small = new Date(h.createdAt).toLocaleString();
+
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <b>${escapeHtml(title)}</b>
+          <span class="pill">L${data.session.level || "?"} • ${escapeHtml(formatSessionBlinds(data.session))}</span>
+        </div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(sub)}</div>
+        <div class="muted" style="margin-top:2px;">${escapeHtml(small)}</div>
+      `;
+      div.onclick = () => openDetail(h.id);
+      list.appendChild(div);
+    });
+  }
+
+  function openDetail(id){
+    const data = ensure(load());
+    const h = data.hands.find(x => x.id === id);
+    if(!h) return;
+    byId("detailText").textContent = formatHand(data.session, h);
+    byId("detailCard").style.display = "";
+    byId("detailCard").dataset.id = id;
+    renderFriendDropdown();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }
+
+  // ---------- Session render ----------
+  function renderSession(){
+    const data = ensure(load());
+    byId("sessionName").value = data.session.sessionName || "";
+    byId("sessionDate").value = data.session.sessionDate || "";
+    byId("sessionNotes").value = data.session.sessionNotes || "";
+
+    fillLevelSelect(byId("levelSelect"), Number(data.session.level || 1));
+
+    const sb = Number(data.session.sb || 200);
+    const bb = Number(data.session.bb || 400);
+    fillBlindSelect(byId("sbSelect"), sb);
+    fillBlindSelect(byId("bbSelect"), bb);
+
+    const defAnte = Number(data.session.bbAnte || 0);
+    fillAnteSelect(byId("bbAnteSelect"), bb, defAnte);
+
+    clearContainer("levelsList");
+    (data.session.nextLevels || []).forEach(l => addLevelRow(l));
+  }
+
+  // ---------- Quick log ----------
+  initHeroCards("q");
+
+  function resetQuick(){
+    byId("qHeroPos").value = "BTN";
+    byId("qHeroStack").value = "";
+    byId("qGame").value = "NLH";
+    byId("qPreflop").value = "";
+    byId("qPostflop").value = "";
+    byId("qBoard").value = "";
+    byId("qPot").value = "";
+    byId("qResult").value = "Won";
+    byId("qTurningPoint").value = "";
+
+    clearContainer("qVillainsList");
+    addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+
+    byId("qC1Rank").value = "A"; byId("qC1Suit").value = "s";
+    byId("qC2Rank").value = "K"; byId("qC2Suit").value = "c";
+    byId("qC1Rank").dispatchEvent(new Event("change"));
+  }
+
+  // ---------- Wizard ----------
+  initHeroCards("w");
+
+  function resetWizard(){
+    wizard.step = "setup";
+    wizard.hand = null;
+    wizard.activeKeys = [];
+    wizard.pot = { pf:0, fl:0, tu:0, ri:0, total:0 };
+
+    byId("wHeroPos").value = "BTN";
+    byId("wHeroStack").value = "";
+    byId("wGame").value = "NLH";
+
+    clearContainer("wVillainsList");
+    addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
+
+    byId("wResult").value = "Won";
+    byId("wShowdown").value = "No";
+    byId("wPotOverride").value = "";
+    byId("wNotes").value = "";
+    byId("wSummary").textContent = "";
+
+    byId("wC1Rank").value = "A"; byId("wC1Suit").value = "s";
+    byId("wC2Rank").value = "K"; byId("wC2Suit").value = "c";
+    byId("wC1Rank").dispatchEvent(new Event("change"));
+
+    // reset action containers (so they rebuild correctly)
+    ["pfActions","flActions","tuActions","riActions"].forEach(id => { byId(id).innerHTML = ""; });
+
+    // default boards
+    updateFlopBoard();
+    updateTurnBoard();
+    updateRiverBoard();
+
+    showWizardStep("setup");
+  }
+
   function wizardPlayers(){
     const hero = {
       key: "hero",
-      label: "Hero",
+      label: `Hero (${byId("wHeroPos").value})`,
       pos: byId("wHeroPos").value,
-      stackBb: byId("wHeroStack").value.trim()
+      stackBb: byId("wHeroStack").value.trim() || "?"
     };
-    const villains = getVillains("wVillainsList").map((v, idx) => ({
+
+    const rawVillains = getVillains("wVillainsList");
+    const villainsPlayers = rawVillains.map((v, idx) => ({
       key: `v${idx+1}`,
-      label: `Villain ${idx+1}`,
+      label: `Villain ${idx+1} (${v.pos})`,
       pos: v.pos,
-      stackBb: v.stackBb
+      stackBb: (v.stackBb || "?")
     }));
-    return { hero, villains };
+
+    return { hero, villainsPlayers, rawVillains };
   }
 
   function startWizardHand(){
-    const { hero, villains } = wizardPlayers();
-    const players = [hero, ...villains];
+    const { hero, villainsPlayers, rawVillains } = wizardPlayers();
+    const players = [hero, ...villainsPlayers];
 
     const playersByKey = {};
-    players.forEach(p => {
-      playersByKey[p.key] = `${p.label}${p.pos ? " ("+p.pos+")" : ""}`;
-    });
+    for (const p of players) playersByKey[p.key] = `${p.label}`;
 
     wizard.hand = {
       game: byId("wGame").value,
-      heroPos: hero.pos,
-      heroStack: hero.stackBb,
+      heroPos: byId("wHeroPos").value,
+      heroStack: byId("wHeroStack").value.trim(),
       heroCards: byId("wHeroCardsText").textContent,
-      villains: getVillains("wVillainsList"),
-      players, // includes hero + villains
+      villains: rawVillains,
+      players,
       playersByKey,
       streets: {
         preflop: { actions: {} },
@@ -1368,157 +1479,86 @@
       showdown: "No"
     };
 
-    // build preflop actions UI
+    wizard.activeKeys = players.map(p => p.key);
+
     buildStreetActions("pfActions", players, ACTIONS_PF, null);
 
-    // default flop board display
     updateFlopBoard();
     updateTurnBoard();
     updateRiverBoard();
 
-    // compute pot baseline now
-    wizard.hand.streets.preflop.actions = readStreetActions("pfActions"); // initial values
-    wizard.hand.streets.flop.actions = {}; wizard.hand.streets.turn.actions = {}; wizard.hand.streets.river.actions = {};
-    computeWizardPot();
-    wizard.hand.pot = { ...wizard.pot };
+    // initialize empty action maps
+    wizard.hand.streets.preflop.actions = readStreetActions("pfActions");
+    wizard.hand.streets.flop.actions = {};
+    wizard.hand.streets.turn.actions = {};
+    wizard.hand.streets.river.actions = {};
 
+    computeWizardPot();
     showWizardStep("preflop");
     refreshWizardSummary();
   }
 
-  byId("wStartHand").onclick = startWizardHand;
+  function activePlayersList(){
+    const all = wizard.hand.players;
+    const keep = new Set(wizard.activeKeys);
+    return all.filter(p => keep.has(p.key));
+  }
 
-  // Wizard navigation handlers
-  byId("wToSetup").onclick = () => showWizardStep("setup");
-
-  function savePFAndCompute(){
+  function savePF(){
     wizard.hand.streets.preflop.actions = readStreetActions("pfActions");
+    wizard.activeKeys = eliminateFolds(wizard.activeKeys, wizard.hand.streets.preflop.actions);
     computeWizardPot();
-    wizard.hand.pot = { ...wizard.pot };
     byId("pfPot").textContent = String(wizard.pot.pf);
   }
 
-  function saveFlopAndCompute(){
-    wizard.hand.streets.flop.actions = readStreetActions("flActions");
+  function saveFlop(){
+    const fl = readStreetActions("flActions");
+    // merge into full map (so folded players earlier keep old entries absent)
+    wizard.hand.streets.flop.actions = { ...wizard.hand.streets.flop.actions, ...fl };
+    wizard.activeKeys = eliminateFolds(wizard.activeKeys, fl);
     computeWizardPot();
-    wizard.hand.pot = { ...wizard.pot };
     byId("flPot").textContent = String(wizard.pot.fl);
   }
 
-  function saveTurnAndCompute(){
-    wizard.hand.streets.turn.actions = readStreetActions("tuActions");
+  function saveTurn(){
+    const tu = readStreetActions("tuActions");
+    wizard.hand.streets.turn.actions = { ...wizard.hand.streets.turn.actions, ...tu };
+    wizard.activeKeys = eliminateFolds(wizard.activeKeys, tu);
     computeWizardPot();
-    wizard.hand.pot = { ...wizard.pot };
     byId("tuPot").textContent = String(wizard.pot.tu);
   }
 
-  function saveRiverAndCompute(){
-    wizard.hand.streets.river.actions = readStreetActions("riActions");
+  function saveRiver(){
+    const ri = readStreetActions("riActions");
+    wizard.hand.streets.river.actions = { ...wizard.hand.streets.river.actions, ...ri };
+    wizard.activeKeys = eliminateFolds(wizard.activeKeys, ri);
     computeWizardPot();
-    wizard.hand.pot = { ...wizard.pot };
     byId("riPot").textContent = String(wizard.pot.ri);
   }
 
-  function ensurePostflopActionsBuilt(){
-    const players = wizard.hand.players;
-
-    // flop actions
-    if (!byId("flActions").dataset.built){
-      buildStreetActions("flActions", players, ACTIONS_POST, wizard.hand.streets.flop.actions);
-      byId("flActions").dataset.built = "1";
-    }
-    // turn actions
-    if (!byId("tuActions").dataset.built){
-      buildStreetActions("tuActions", players, ACTIONS_POST, wizard.hand.streets.turn.actions);
-      byId("tuActions").dataset.built = "1";
-    }
-    // river actions
-    if (!byId("riActions").dataset.built){
-      buildStreetActions("riActions", players, ACTIONS_POST, wizard.hand.streets.river.actions);
-      byId("riActions").dataset.built = "1";
-    }
+  function buildPostflopStreet(containerId, actionsList, existingMap){
+    const players = activePlayersList();
+    buildStreetActions(containerId, players, actionsList, existingMap);
   }
 
-  byId("wToFlop").onclick = () => {
-    if (!wizard.hand) return;
-    savePFAndCompute();
-    ensurePostflopActionsBuilt();
-    showWizardStep("flop");
-    refreshWizardSummary();
-  };
-
-  byId("wBackToPF").onclick = () => {
-    if (!wizard.hand) return;
-    showWizardStep("preflop");
-  };
-
-  byId("wToTurn").onclick = () => {
-    if (!wizard.hand) return;
-    // persist board + actions
-    updateFlopBoard();
-    saveFlopAndCompute();
-    showWizardStep("turn");
-    refreshWizardSummary();
-  };
-
-  byId("wBackToFL").onclick = () => {
-    if (!wizard.hand) return;
-    showWizardStep("flop");
-  };
-
-  byId("wToRiver").onclick = () => {
-    if (!wizard.hand) return;
-    updateTurnBoard();
-    saveTurnAndCompute();
-    showWizardStep("river");
-    refreshWizardSummary();
-  };
-
-  byId("wBackToTU").onclick = () => {
-    if (!wizard.hand) return;
-    showWizardStep("turn");
-  };
-
-  byId("wToReflection").onclick = () => {
-    if (!wizard.hand) return;
-    updateRiverBoard();
-    saveRiverAndCompute();
-    showWizardStep("reflection");
-    refreshWizardSummary();
-  };
-
-  byId("wBackToRI").onclick = () => {
-    if (!wizard.hand) return;
-    showWizardStep("river");
-  };
-
-  // End now buttons (skip to reflection)
-  function endNowToReflection(saveFn){
-    if (!wizard.hand) return;
-    saveFn();
-    showWizardStep("reflection");
-    refreshWizardSummary();
+  function maybeAutoEndBecauseEveryoneFolded(){
+    // If only hero remains active, we can jump to Reflection.
+    // (Hero key is always 'hero'.)
+    const active = wizard.activeKeys.filter(Boolean);
+    return active.length === 1 && active[0] === "hero";
   }
-  byId("wEndNowPF").onclick = () => endNowToReflection(savePFAndCompute);
-  byId("wEndNowFL").onclick = () => endNowToReflection(saveFlopAndCompute);
-  byId("wEndNowTU").onclick = () => endNowToReflection(saveTurnAndCompute);
-  byId("wEndNowRI").onclick = () => endNowToReflection(saveRiverAndCompute);
 
-  // Reflection summary
+  // ---------- Wizard reflection summary ----------
   function refreshWizardSummary(){
     if (!wizard.hand) return;
 
-    // sync showdown
     wizard.hand.showdown = byId("wShowdown").value;
-
-    // pot override
     const override = byId("wPotOverride").value.trim();
     const computedTotal = wizard.hand.pot.total;
     const total = override ? Number(override) : computedTotal;
-
     byId("totalPot").textContent = String(total);
 
-    const data = load();
+    const data = ensure(load());
     const session = data.session || {};
     const lines = [];
 
@@ -1532,8 +1572,13 @@
 
     lines.push("");
     lines.push(`Hero (${wizard.hand.heroPos}) ${wizard.hand.heroStack || "?"}bb | ${wizard.hand.heroCards}`);
+
     if (wizard.hand.villains?.length){
-      lines.push("Villains: " + wizard.hand.villains.map(v => `${v.pos} ${v.stackBb||"?"}bb${v.note?(" ("+v.note+")"):""}`).join(" | "));
+      lines.push("Villains: " + wizard.hand.villains.map((v, idx) => {
+        const tag = `V${idx+1} (${v.pos})`;
+        const st = v.stackBb || "?";
+        return `${tag} ${st}bb${v.note?(" ("+v.note+")"):""}`;
+      }).join(" | "));
     }
 
     const st = wizard.hand.streets;
@@ -1546,7 +1591,6 @@
     lines.push("");
     lines.push(`Pot (computed): PF ${wizard.hand.pot.pf}bb | F ${wizard.hand.pot.fl}bb | T ${wizard.hand.pot.tu}bb | R ${wizard.hand.pot.ri}bb | Total ${computedTotal}bb`);
     if (override) lines.push(`Pot override: ${override}bb`);
-
     lines.push("");
     lines.push(`Result: ${byId("wResult").value} | Game: ${wizard.hand.game} | Showdown: ${wizard.hand.showdown}`);
 
@@ -1558,15 +1602,168 @@
     byId(id).addEventListener("input", refreshWizardSummary);
   });
 
+  // ---------- Global buttons ----------
+  byId("modeQuickBtn").onclick = () => setMode("quick");
+  byId("modeWizardBtn").onclick = () => setMode("wizard");
+
+  byId("addLevelBtn").onclick = () => addLevelRow({ sb: 200, bb: 400, note:"" });
+
+  byId("sbSelect").addEventListener("change", () => {
+    const sb = Number(byId("sbSelect").value);
+    const target = sb * 2;
+    if (BLIND_VALUES.includes(target)) {
+      byId("bbSelect").value = String(target);
+      // refresh ante options after BB auto-update
+      const bb = Number(byId("bbSelect").value);
+      const currentAnte = Number(byId("bbAnteSelect").value || 0);
+      fillAnteSelect(byId("bbAnteSelect"), bb, currentAnte);
+    }
+  });
+
+  byId("bbSelect").addEventListener("change", () => {
+    const bb = Number(byId("bbSelect").value);
+    const currentAnte = Number(byId("bbAnteSelect").value || 0);
+    fillAnteSelect(byId("bbAnteSelect"), bb, currentAnte);
+  });
+
+  byId("saveSession").onclick = () => {
+    const data = ensure(load());
+    data.session = {
+      sessionName: byId("sessionName").value.trim(),
+      sessionDate: byId("sessionDate").value,
+      level: Number(byId("levelSelect").value),
+      sb: Number(byId("sbSelect").value),
+      bb: Number(byId("bbSelect").value),
+      bbAnte: Number(byId("bbAnteSelect").value || 0),
+      sessionNotes: byId("sessionNotes").value.trim(),
+      nextLevels: getLevelsFromUI()
+    };
+    save(data);
+    renderSession();
+    renderHands();
+    alert("Session saved.");
+  };
+
+  // Quick
+  byId("qAddVillainBtn").onclick = () => addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+  byId("qClear").onclick = resetQuick;
+
+  byId("qSaveHand").onclick = () => {
+    const data = ensure(load());
+    const h = {
+      id: crypto.randomUUID(),
+      createdAt: nowIso(),
+      mode: "quick",
+      game: byId("qGame").value,
+      heroPos: byId("qHeroPos").value,
+      heroStack: byId("qHeroStack").value.trim(),
+      heroCards: byId("qHeroCardsText").textContent,
+      villains: getVillains("qVillainsList"),
+      quick: {
+        preflop: byId("qPreflop").value,
+        postflop: byId("qPostflop").value,
+        board: byId("qBoard").value.trim(),
+        pot: byId("qPot").value.trim()
+      },
+      result: byId("qResult").value,
+      turningPoint: byId("qTurningPoint").value.trim()
+    };
+
+    data.hands.push(h);
+    save(data);
+    renderHands();
+    resetQuick();
+    openDetail(h.id);
+  };
+
+  // Wizard
+  byId("wAddVillainBtn").onclick = () => addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
+  byId("wReset").onclick = resetWizard;
+  byId("wReset2").onclick = resetWizard;
+  byId("wStartHand").onclick = startWizardHand;
+
+  byId("wToSetup").onclick = () => showWizardStep("setup");
+  byId("wBackToPF").onclick = () => showWizardStep("preflop");
+  byId("wBackToFL").onclick = () => showWizardStep("flop");
+  byId("wBackToTU").onclick = () => showWizardStep("turn");
+  byId("wBackToRI").onclick = () => showWizardStep("river");
+
+  // Navigation forward with fold-elimination
+  byId("wToFlop").onclick = () => {
+    if (!wizard.hand) return;
+    savePF();
+
+    if (maybeAutoEndBecauseEveryoneFolded()){
+      showWizardStep("reflection");
+      refreshWizardSummary();
+      return;
+    }
+
+    // build flop actions for active players only
+    buildPostflopStreet("flActions", ACTIONS_POST, wizard.hand.streets.flop.actions);
+    showWizardStep("flop");
+    refreshWizardSummary();
+  };
+
+  byId("wToTurn").onclick = () => {
+    if (!wizard.hand) return;
+    updateFlopBoard();
+    saveFlop();
+
+    if (maybeAutoEndBecauseEveryoneFolded()){
+      showWizardStep("reflection");
+      refreshWizardSummary();
+      return;
+    }
+
+    buildPostflopStreet("tuActions", ACTIONS_POST, wizard.hand.streets.turn.actions);
+    showWizardStep("turn");
+    refreshWizardSummary();
+  };
+
+  byId("wToRiver").onclick = () => {
+    if (!wizard.hand) return;
+    updateTurnBoard();
+    saveTurn();
+
+    if (maybeAutoEndBecauseEveryoneFolded()){
+      showWizardStep("reflection");
+      refreshWizardSummary();
+      return;
+    }
+
+    buildPostflopStreet("riActions", ACTIONS_POST, wizard.hand.streets.river.actions);
+    showWizardStep("river");
+    refreshWizardSummary();
+  };
+
+  byId("wToReflection").onclick = () => {
+    if (!wizard.hand) return;
+    updateRiverBoard();
+    saveRiver();
+    showWizardStep("reflection");
+    refreshWizardSummary();
+  };
+
+  // End-now buttons
+  function endNowToReflection(saveFn){
+    if (!wizard.hand) return;
+    saveFn();
+    showWizardStep("reflection");
+    refreshWizardSummary();
+  }
+  byId("wEndNowPF").onclick = () => endNowToReflection(savePF);
+  byId("wEndNowFL").onclick = () => endNowToReflection(saveFlop);
+  byId("wEndNowTU").onclick = () => endNowToReflection(saveTurn);
+  byId("wEndNowRI").onclick = () => endNowToReflection(saveRiver);
+
   // Save wizard hand
   byId("wSaveHand").onclick = () => {
     if (!wizard.hand) return;
 
     refreshWizardSummary();
 
-    const data = load();
-    const session = data.session || {};
-
+    const data = ensure(load());
     const override = byId("wPotOverride").value.trim();
     const total = override ? Number(override) : wizard.hand.pot.total;
 
@@ -1596,7 +1793,7 @@
     resetWizard();
   };
 
-  // --- Global actions
+  // Detail actions
   byId("closeDetail").onclick = () => {
     byId("detailCard").style.display = "none";
     byId("detailCard").dataset.id = "";
@@ -1609,7 +1806,7 @@
 
   byId("deleteOne").onclick = () => {
     const id = byId("detailCard").dataset.id;
-    const data = load();
+    const data = ensure(load());
     data.hands = data.hands.filter(h => h.id !== id);
     save(data);
     byId("detailCard").style.display = "none";
@@ -1617,20 +1814,20 @@
   };
 
   byId("exportText").onclick = async () => {
-    const data = load();
+    const data = ensure(load());
     if (!data.hands.length) return alert("No hands yet.");
     const latest = [...data.hands].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""))[0];
-    await navigator.clipboard.writeText(formatHand(data.session, latest));
+    await navigator.clipboard.writeText(formatHand(data.session || {}, latest));
     alert("Latest hand copied.");
   };
 
   byId("exportJson").onclick = () => {
-    const data = load();
+    const data = ensure(load());
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "freeroll_hands.json";
+    a.download = "freeroll_data.json";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1638,42 +1835,63 @@
   };
 
   byId("wipeAll").onclick = () => {
-    if (confirm("Delete ALL hands and session data?")) {
+    if (confirm("Delete ALL hands, session data, and friends?")) {
       localStorage.removeItem(KEY);
       byId("detailCard").style.display = "none";
       boot();
     }
   };
 
-  // --- Boot
-  function boot(){
-    const data = load();
+  // Friends buttons
+  byId("addFriendBtn").onclick = () => {
+    const name = byId("friendName").value.trim();
+    const phone = normalizePhone(byId("friendPhone").value);
+    if (!name) return alert("Add a name.");
+    if (!phone) return alert("Add a phone number.");
 
-    // default date
+    const data = ensure(load());
+    data.friends.push({ id: crypto.randomUUID(), name, phone });
+    save(data);
+
+    byId("friendName").value = "";
+    byId("friendPhone").value = "";
+    renderFriends();
+  };
+
+  byId("sendToFriendBtn").onclick = sendCurrentHandToFriend;
+
+  // ---------- Boot ----------
+  function boot(){
+    const data = ensure(load());
+
+    // default date + defaults
     const d = new Date();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const dd = String(d.getDate()).padStart(2,'0');
     const today = `${yyyy}-${mm}-${dd}`;
-    if (!data.session.sessionDate) {
-      data.session.sessionDate = today;
-      data.session.level = data.session.level || 1;
-      data.session.sb = data.session.sb || 200;
-      data.session.bb = data.session.bb || 400;
-      save(data);
-    }
+
+    if (!data.session.sessionDate) data.session.sessionDate = today;
+    if (!data.session.level) data.session.level = 1;
+    if (!data.session.sb) data.session.sb = 200;
+    if (!data.session.bb) data.session.bb = 400;
+    if (data.session.bbAnte === undefined || data.session.bbAnte === null) data.session.bbAnte = 0;
+    save(data);
 
     renderSession();
 
-    // initial villains
+    // init villains
     clearContainer("qVillainsList");
     addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+
     clearContainer("wVillainsList");
     addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
 
     resetQuick();
     resetWizard();
+
     renderHands();
+    renderFriends();
 
     setMode("quick");
   }
