@@ -125,7 +125,7 @@
     /* Hero cards — 4 dropdown boxes in ONE horizontal row on iPhone */
     .heroSelectRow{
       display:flex;
-      gap: 8px;
+      gap: 6px;
       align-items:center;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -134,9 +134,9 @@
     .subcard .heroSelectRow{ max-width:100%; }
     .heroSelectRow select{
       flex: 0 0 auto;
-      width: 92px;
-      padding: 10px;
-      border-radius: 14px;
+      width: 64px;
+      padding: 8px;
+      border-radius: 12px;
       font-size: 16px; /* prevent iOS zoom */
     }
     .heroFacesRow{
@@ -183,6 +183,13 @@ h1{
       grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
       margin-top: 10px;
+    }
+
+    .modeRow button{
+      font-size: 15px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      letter-spacing: 0.2px;
     }
 
     .utilRow{
@@ -423,10 +430,10 @@ h1{
     }
 
     .btnActive{
-      background: linear-gradient(90deg, rgba(110,168,255,0.92), rgba(168,85,247,0.80));
-      border-color: rgba(255,255,255,0.18);
+      background: linear-gradient(90deg, rgba(120,210,255,0.98), rgba(190,120,255,0.92));
+      border-color: rgba(255,255,255,0.22);
       color:#05070d;
-      box-shadow: 0 0 0 4px rgba(110,168,255,0.14);
+      box-shadow: 0 0 0 4px rgba(120,210,255,0.22), 0 10px 30px rgba(0,0,0,0.35);
     }
 
     .badgeWarn{
