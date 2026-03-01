@@ -145,7 +145,7 @@
       margin-top: 8px;
       margin-bottom: 10px;
     }
-    .heroFacesRow .bigCard{ width: 64px; height: 78px; }
+    .heroFacesRow .bigCard{ width: 64px; height: 78px; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
 
 h1{
       margin:0;
@@ -431,11 +431,25 @@ h1{
       white-space: nowrap;
     }
 
+    .secondary{
+      color: rgba(255,255,255,0.92);
+    }
+
     .btnActive{
-      background: linear-gradient(90deg, rgba(120,210,255,1), rgba(190,120,255,1)) !important;
-      border-color: rgba(255,255,255,0.28) !important;
+      background: linear-gradient(90deg, rgba(140,235,255,1), rgba(210,140,255,1)) !important;
+      border-color: rgba(255,255,255,0.34) !important;
       color:#05070d !important;
-      box-shadow: 0 0 0 4px rgba(120,210,255,0.28), 0 12px 36px rgba(0,0,0,0.4);
+      box-shadow: 0 0 0 5px rgba(140,235,255,0.30), 0 14px 40px rgba(0,0,0,0.45);
+    }
+
+    #street_result{
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    #street_result textarea{
+      min-height: 120px;
     }
 
     .badgeWarn{
@@ -481,8 +495,8 @@ h1{
 
       <!-- Mode select -->
       <div class="modeRow" style="margin-top:10px;">
-        <button class="primary" id="topQuick" type="button">Quick Log</button>
-        <button class="primaryAlt" id="topWizard" type="button">Wizard Log</button>
+        <button class="secondary" id="topQuick" type="button">Quick Log</button>
+        <button class="secondary" id="topWizard" type="button">Wizard Log</button>
         <button class="secondary" id="topHistory" type="button">History</button>
       </div>
 
@@ -1000,6 +1014,7 @@ h1{
           </div>
         </div>
 
+        <div style="height:10px;"></div>
         <label>Reflection</label>
         <textarea id="wReflection" placeholder="What mattered? What would you do differently?"></textarea>
 
@@ -1826,8 +1841,73 @@ h1{
     });
   }
 
-  function addWizardAction(street, actorSelId, typeSelId, toInputId){
+  
+  function wizardTotalInvestedBb(hand, actorId){
+    const w = hand.wizard || {};
+    const streets = w.streets || {};
+    let total = 0;
+    ["preflop","flop","turn","river"].forEach(st=>{
+      const acts = streets[st]?.actions || [];
+      acts.forEach(a=>{
+        if (a.actorId === actorId) total += Number(a.investBb || 0);
+      });
+    });
+    return total;
+  }
+
+  function wizardHeroFolded(hand){
+    const w = hand.wizard || {};
+    const streets = w.streets || {};
+    return ["preflop","flop","turn","river"].some(st =>
+      (streets[st]?.actions || []).some(a => a.actorId === "hero" && a.type === "FOLD")
+    );
+  }
+
+  function wizardAllVillainsFolded(hand){
+    const players = hand.wizard?.players || [];
+    const villainIds = players.map(p=>p.id).filter(id => id && id !== "hero");
+    if (!villainIds.length) return false;
+
+    const w = hand.wizard || {};
+    const streets = w.streets || {};
+    const folded = {};
+    villainIds.forEach(id => folded[id] = false);
+
+    ["preflop","flop","turn","river"].forEach(st=>{
+      (streets[st]?.actions || []).forEach(a=>{
+        if (folded.hasOwnProperty(a.actorId) && a.type === "FOLD") folded[a.actorId] = true;
+      });
+    });
+
+    return villainIds.every(id => folded[id]);
+  }
+
+  function autoEndWizard(outcome, netBb, street){
+    // set model
+    wizActive.hand.wizard.result = wizActive.hand.wizard.result || {};
+    wizActive.hand.wizard.result.result = outcome;
+    wizActive.hand.wizard.result.showdown = false;
+    wizActive.hand.wizard.result.netBb = String(netBb);
+    wizActive.hand.wizard.autoEnded = true;
+
+    // set UI
+    byId("wResult").value = outcome;
+    byId("wShowdown").value = "no";
+    byId("wNetBb").value = String(netBb);
+
+    byId("wizStatus").textContent = "Auto-ended";
+    byId("wizStatus").className = "badgeWarn";
+
+    renderPotPills();
+    switchWizardTab("result");
+  }
+function addWizardAction(street, actorSelId, typeSelId, toInputId){
     if (!wizActive) return;
+
+    if (wizActive.hand.wizard.autoEnded){
+      alert("This hand has already ended. Go to Result or Start Hand to log a new one.");
+      return;
+    }
 
     const actorId = byId(actorSelId).value;
     const type = byId(typeSelId).value;
@@ -1867,6 +1947,21 @@ h1{
     renderPotPills();
     byId("wizStatus").textContent = "In progress";
     byId("wizStatus").className = "badgeOk";
+
+    // ---- Auto-end logic ----
+    // 1) If Hero folds → auto loss, no showdown, loss = total invested
+    if (act.actorId === "hero" && act.type === "FOLD"){
+      const invested = wizardTotalInvestedBb(wizActive.hand, "hero");
+      autoEndWizard("Lost", (-1 * invested).toFixed(1), street);
+      return;
+    }
+
+    // 2) If all villains folded → auto win, no showdown, win = total pot
+    if (wizardAllVillainsFolded(wizActive.hand)){
+      const potBb = calcStateForStreet(wizActive.hand, street).potBb;
+      autoEndWizard("Won", (potBb).toFixed(1), street);
+      return;
+    }
   }
 
   function undoWizardAction(street){
@@ -1924,39 +2019,55 @@ h1{
     if (h.mode === "quick"){
       const q = h.quick || {};
       if (q.preflop) lines.push("Preflop: " + q.preflop.trim());
-      if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
       if (q.board) lines.push("Board: " + q.board.trim());
+      if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
       if (q.potBb) lines.push("Pot: " + q.potBb + "bb");
       lines.push("Result: " + (h.result || "—"));
       if (h.turningPoint) lines.push("Turning point: " + h.turningPoint.trim());
     } else {
       const w = h.wizard || {};
       const board = w.board || {};
-      if (board.flop) lines.push("Flop: " + board.flop);
-      if (board.turn) lines.push("Turn: " + board.turn);
-      if (board.river) lines.push("River: " + board.river);
-
       const streets = (w.streets || {});
-      ["preflop","flop","turn","river"].forEach(st => {
-        const acts = streets[st]?.actions || [];
-        if (acts.length){
-          lines.push(st.toUpperCase() + ":");
-          acts.forEach((a, i) => {
-            lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`);
-          });
-        }
-      });
+
+      // MUST follow: Pre actions → Flop cards → Flop actions → Turn card → Turn actions → River card → River actions → Result
+      const preActs = streets.preflop?.actions || [];
+      if (preActs.length){
+        lines.push("PREFLOP:");
+        preActs.forEach((a,i)=> lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`));
+      }
+
+      if (board.flop) lines.push("FLOP CARDS: " + board.flop);
+      const flopActs = streets.flop?.actions || [];
+      if (flopActs.length){
+        lines.push("FLOP ACTIONS:");
+        flopActs.forEach((a,i)=> lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`));
+      }
+
+      if (board.turn) lines.push("TURN CARD: " + board.turn);
+      const turnActs = streets.turn?.actions || [];
+      if (turnActs.length){
+        lines.push("TURN ACTIONS:");
+        turnActs.forEach((a,i)=> lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`));
+      }
+
+      if (board.river) lines.push("RIVER CARD: " + board.river);
+      const riverActs = streets.river?.actions || [];
+      if (riverActs.length){
+        lines.push("RIVER ACTIONS:");
+        riverActs.forEach((a,i)=> lines.push(`  ${i+1}) ${a.actorLabel} (${a.actorPos}) ${a.type} +${a.investBb.toFixed(1)}bb`));
+      }
 
       const res = w.result || {};
-      lines.push("Result: " + (res.result || h.result || "—"));
-      if (res.showdown) lines.push("Showdown: Yes");
-      if (res.netBb) lines.push("Net: " + res.netBb + "bb");
-      if (res.reflection) lines.push("Reflection: " + res.reflection.trim());
+      lines.push("RESULT: " + (res.result || h.result || "—"));
+      lines.push("SHOWDOWN: " + (res.showdown ? "Yes" : "No"));
+      if (res.netBb) lines.push("NET: " + res.netBb + "bb");
+      if (res.reflection) lines.push("REFLECTION: " + res.reflection.trim());
     }
 
     lines.push("Logged: " + new Date(h.createdAt).toLocaleString());
     if (h.updatedAt) lines.push("Edited: " + new Date(h.updatedAt).toLocaleString());
-    return lines.join("\n");
+    return lines.join("
+");
   }
 
   // ---- History render ----
