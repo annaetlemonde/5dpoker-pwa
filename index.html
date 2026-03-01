@@ -1099,7 +1099,7 @@ h1{
 <script>
   // ---- Service Worker ----
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
+    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js", { scope: "./" }));
   }
 
   // ---- Storage keys ----
@@ -2066,8 +2066,7 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
 
     lines.push("Logged: " + new Date(h.createdAt).toLocaleString());
     if (h.updatedAt) lines.push("Edited: " + new Date(h.updatedAt).toLocaleString());
-    return lines.join("
-");
+    return lines.join("\n");
   }
 
   // ---- History render ----
