@@ -394,8 +394,8 @@ h1{
       font-size: 18px;
       letter-spacing: 0.4px;
     }
-.suit-red{ color: #ff6b6b; }
-    .suit-white{ color: #f3f4ff; }
+.suit-red{ color:#d63a3a !important; }
+    .suit-white{ color:#0b0f1a !important; }
 
     
     .cardPick select{ padding: 10px; border-radius: 14px; font-size: 15px; }
@@ -424,6 +424,8 @@ h1{
     }
 
     .streetGrid{
+      align-items:end;
+
       display:grid;
       grid-template-columns: 1.2fr 1fr 1fr;
       gap: 10px;
@@ -539,10 +541,15 @@ h1{
       </div>
 
       <div id="sessionBody">
-        <div class="grid3" style="margin-top:10px;">
+        <div class="grid2" style="margin-top:10px;">
           <div>
-            <label>Tournament / Casino</label>
-            <input id="sessionName" placeholder="e.g., Borgata $600 Deepstack" />
+            <label>Select Saved Session</label>
+            <select id="sessionSelect"></select>
+            <div class="muted" style="margin-top:6px;">Choose a saved session or select “New session…” to type a new one.</div>
+            <div id="sessionManualWrap" style="margin-top:10px; display:none;">
+              <label>Tournament / Casino</label>
+              <input id="sessionName" placeholder="e.g., Borgata $600 Deepstack" />
+            </div>
           </div>
           <div>
             <label>Date</label>
@@ -563,8 +570,7 @@ h1{
 
         <div class="btns">
           <button class="secondary" id="saveSession" type="button">Save Session</button>
-          <button class="secondary" id="selectSavedSession" type="button">Select from Saved Sessions</button>
-        </div>
+</div>
       </div>
     </div>
 
@@ -588,18 +594,24 @@ h1{
           </div>
           <div>
             <label>Blinds</label>
-            <div class="grid2 blindsInline">
-              <select id="qSb"></select>
-              <select id="qBb"></select>
+            <div class="blinds3">
+              <div>
+                <label class="miniLbl">SB</label>
+                <select id="qSb"></select>
+              </div>
+              <div>
+                <label class="miniLbl">BB</label>
+                <select id="qBb"></select>
+              </div>
+              <div>
+                <label class="miniLbl">BB Ante</label>
+                <select id="qAnte"></select>
+              </div>
             </div>
-          </div>
-          <div>
-            <label>BB Ante (chips)</label>
-            <select id="qAnte"></select>
           </div>
         </div>
 
-        <div class="grid3" style="margin-top:10px;">
+        <div class="grid2" style="margin-top:10px;">
           <div>
             <label>Hero Position</label>
             <select id="qHeroPos"></select>
@@ -608,6 +620,9 @@ h1{
             <label>Hero Stack (bb)</label>
             <input id="qHeroStack" inputmode="decimal" placeholder="e.g., 32" />
           </div>
+        </div>
+
+        <div style="margin-top:10px;">
           <div>
             <label>Result</label>
             <select id="qResult">
@@ -729,14 +744,20 @@ h1{
             </div>
             <div>
               <label>Blinds</label>
-              <div class="grid2 blindsInline">
-                <select id="wSb"></select>
-                <select id="wBb"></select>
+              <div class="blinds3">
+                <div>
+                  <label class="miniLbl">SB</label>
+                  <select id="wSb"></select>
+                </div>
+                <div>
+                  <label class="miniLbl">BB</label>
+                  <select id="wBb"></select>
+                </div>
+                <div>
+                  <label class="miniLbl">BB Ante</label>
+                  <select id="wAnte"></select>
+                </div>
               </div>
-            </div>
-            <div>
-              <label>BB Ante (chips)</label>
-              <select id="wAnte"></select>
             </div>
           </div>
 
@@ -829,7 +850,7 @@ h1{
         </div>
 
         <div class="btns">
-          <button class="secondary" id="addActionPre" type="button">+ Add Action</button>
+          <button class="secondary" id="addActionPre" type="button">+ Add New Action.</button>
           <button class="ghost" id="undoActionPre" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsPre" type="button">Clear Street</button>
         </div>
@@ -886,7 +907,7 @@ h1{
         </div>
 
         <div class="btns">
-          <button class="secondary" id="addActionFlop" type="button">+ Add Action</button>
+          <button class="secondary" id="addActionFlop" type="button">+ Add New Action.</button>
           <button class="ghost" id="undoActionFlop" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsFlop" type="button">Clear Street</button>
         </div>
@@ -931,7 +952,7 @@ h1{
         </div>
 
         <div class="btns">
-          <button class="secondary" id="addActionTurn" type="button">+ Add Action</button>
+          <button class="secondary" id="addActionTurn" type="button">+ Add New Action.</button>
           <button class="ghost" id="undoActionTurn" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsTurn" type="button">Clear Street</button>
         </div>
@@ -984,7 +1005,7 @@ h1{
         </div>
 
         <div class="btns">
-          <button class="secondary" id="addActionRiver" type="button">+ Add Action</button>
+          <button class="secondary" id="addActionRiver" type="button">+ Add New Action.</button>
           <button class="ghost" id="undoActionRiver" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsRiver" type="button">Clear Street</button>
         </div>
@@ -1224,6 +1245,10 @@ h1{
       .replaceAll(">","&gt;")
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
+  }
+
+  function cssEscape(str){
+    return String(str).replace(/["\\]/g, "\\$&").replace(/\n/g, "\\n");
   }
 
   function toNum(x){
@@ -1495,10 +1520,10 @@ h1{
           <label>Stack (bb)</label>
           <input data-stack="${id}" inputmode="decimal" placeholder="e.g., 41" value="${escapeHtml(v.stackBb || "")}" />
         </div>
-        <div>
-          <label>Note (optional)</label>
-          <input data-note="${id}" placeholder="e.g., chip leader / reg" value="${escapeHtml(v.note || "")}" />
-        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label>Note (optional)</label>
+        <input data-note="${id}" placeholder="e.g., chip leader / reg" value="${escapeHtml(v.note || "")}" />
       </div>
     `;
     container.appendChild(div);
@@ -1586,7 +1611,59 @@ h1{
   byId("topHistory").onclick = () => showView("history");
 
   
-  byId("topFriends").onclick = () => showView("friends");
+  byId("topFriends").onclick = () => showView("fri
+  function refreshSessionSelect(){
+    const data = load();
+    const list = Array.isArray(data.savedSessions) ? data.savedSessions : [];
+    const sel = byId("sessionSelect");
+    if (!sel) return;
+    const opts = [];
+    opts.push(`<option value="__new__">New session…</option>`);
+    for (const s of list){
+      const key = s._key || (s.sessionName+"|"+s.sessionDate+"|"+s.gameType);
+      const label = `${s.sessionName || "Session"} • ${s.sessionDate || ""} • ${s.gameType || "NLH"}`;
+      opts.push(`<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`);
+    }
+    sel.innerHTML = opts.join("");
+
+    // select current session if matching
+    const cur = data.session || {};
+    const curKey = (cur._key || (cur.sessionName+"|"+cur.sessionDate+"|"+cur.gameType)).trim();
+    if (curKey && sel.querySelector(`option[value="${cssEscape(curKey)}"]`)){
+      sel.value = curKey;
+      byId("sessionManualWrap").style.display = "none";
+    }else{
+      sel.value = "__new__";
+      byId("sessionManualWrap").style.display = "";
+    }
+  }
+
+  byId("sessionSelect").addEventListener("change", () => {
+    const data = load();
+    const list = Array.isArray(data.savedSessions) ? data.savedSessions : [];
+    const v = byId("sessionSelect").value;
+    if (v === "__new__"){
+      byId("sessionManualWrap").style.display = "";
+      byId("sessionName").value = "";
+      byId("sessionDate").value = "";
+      byId("sessionGame").value = "NLH";
+      byId("sessionNotes").value = "";
+      data.session = {};
+      save(data);
+      return;
+    }
+    const sel = list.find(s => (s._key || (s.sessionName+"|"+s.sessionDate+"|"+s.gameType)).trim() === v);
+    if (!sel) return;
+    byId("sessionManualWrap").style.display = "none";
+    byId("sessionName").value = sel.sessionName || "";
+    byId("sessionDate").value = sel.sessionDate || "";
+    byId("sessionGame").value = sel.gameType || "NLH";
+    byId("sessionNotes").value = sel.sessionNotes || "";
+    data.session = { sessionName: byId("sessionName").value.trim(), sessionDate: byId("sessionDate").value, gameType: byId("sessionGame").value, sessionNotes: byId("sessionNotes").value.trim(), _key: v };
+    save(data);
+  });
+
+ends");
 // ---- Session ----
   function setSessionPill(){ /* header pill removed for cleaner UI */ }
 
@@ -1597,6 +1674,7 @@ h1{
     byId("sessionDate").value = s.sessionDate || "";
     byId("sessionGame").value = s.gameType || "NLH";
     byId("sessionNotes").value = s.sessionNotes || "";
+    if (byId("sessionSelect")) refreshSessionSelect();
   }
 
   byId("saveSession").onclick = () => {
@@ -1607,6 +1685,7 @@ h1{
       gameType: byId("sessionGame").value,
       sessionNotes: byId("sessionNotes").value.trim()
     };
+    data.session._key = (data.session.sessionName + "|" + data.session.sessionDate + "|" + data.session.gameType).trim();
     // upsert into savedSessions for quick reuse
     data.savedSessions = Array.isArray(data.savedSessions) ? data.savedSessions : [];
     const key = (data.session.sessionName + "|" + data.session.sessionDate + "|" + data.session.gameType).trim();
@@ -1621,33 +1700,12 @@ h1{
 
     save(data);
     renderSession();
+    refreshSessionSelect();
     alert("Session saved.");
   };
 
 
-  byId("selectSavedSession").onclick = () => {
-    const data = load();
-    const list = Array.isArray(data.savedSessions) ? data.savedSessions : [];
-    if (!list.length){
-      alert("No saved sessions yet. Save a session first.");
-      return;
-    }
-    const menu = list.map((s,i)=> `${i+1}) ${s.sessionName || "Session"} • ${s.sessionDate || ""} • ${s.gameType || "NLH"}`).join("\n");
-    const pick = prompt("Select a saved session by number:\n\n" + menu);
-    const n = Number(String(pick||"").trim());
-    if (!Number.isFinite(n) || n < 1 || n > list.length) return;
-    const sel = list[n-1];
-    byId("sessionName").value = sel.sessionName || "";
-    byId("sessionDate").value = sel.sessionDate || "";
-    byId("sessionGame").value = sel.gameType || "NLH";
-    byId("sessionNotes").value = sel.sessionNotes || "";
-    // also persist as active session (without creating another saved entry)
-    const d2 = load();
-    d2.session = { sessionName: byId("sessionName").value.trim(), sessionDate: byId("sessionDate").value, gameType: byId("sessionGame").value, sessionNotes: byId("sessionNotes").value.trim() };
-    save(d2);
-    alert("Session loaded.");
-  };
-
+  
   // collapse session
   byId("toggleSession").onclick = () => {
     const body = byId("sessionBody");
@@ -1911,7 +1969,7 @@ h1{
     const remainingBb = state.bb ? Math.max(0, ((actor?.stackChips ?? 0) - total) / state.bb) : 0;
 
     // we populate "to total this street" amounts for BET/RAISE; for others keep empty
-    if (type !== "BET" && type !== "RAISE"){
+    if (type !== "BET" && type !== "RAISE" && type !== "JAM"){
       sel.innerHTML = `<option value="">—</option>`;
       return;
     }
