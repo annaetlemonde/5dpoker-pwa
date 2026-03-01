@@ -23,6 +23,18 @@
   <link rel="icon" href="icons/icon-192.png" />
 
   <style>
+    .blindsInline{ grid-template-columns: 1fr 1fr !important; gap:10px !important; }
+
+    .stackTable{ width:100%; border-collapse:collapse; }
+    .stackTable th,.stackTable td{ padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px; }
+    .stackTable th{ text-align:left; color:rgba(255,255,255,0.72); font-weight:600; }
+    .stackTable td{ color:rgba(255,255,255,0.92); }
+    .stackMono{ font-variant-numeric: tabular-nums; }
+    .amountSelect{ width:100%; }
+
+    .blindsRow{ display:flex; gap:10px; align-items:flex-end; }
+    .blindsRow > .field{ flex:1; min-width: 0; }
+
     *, *::before, *::after { box-sizing: border-box; }
 
     :root{
@@ -145,7 +157,7 @@
       margin-top: 8px;
       margin-bottom: 10px;
     }
-    .heroFacesRow .bigCard{ width: 64px; height: 78px; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+    .heroFacesRow .bigCard{ width: 64px; height: 78px; background: rgba(255,255,255,0.96); border-color: rgba(0,0,0,0.18); color: #0b0f1a; }
 
 h1{
       margin:0;
@@ -551,6 +563,7 @@ h1{
 
         <div class="btns">
           <button class="secondary" id="saveSession" type="button">Save Session</button>
+          <button class="secondary" id="selectSavedSession" type="button">Select from Saved Sessions</button>
         </div>
       </div>
     </div>
@@ -575,7 +588,7 @@ h1{
           </div>
           <div>
             <label>Blinds</label>
-            <div class="grid2">
+            <div class="grid2 blindsInline">
               <select id="qSb"></select>
               <select id="qBb"></select>
             </div>
@@ -716,7 +729,7 @@ h1{
             </div>
             <div>
               <label>Blinds</label>
-              <div class="grid2">
+              <div class="grid2 blindsInline">
                 <select id="wSb"></select>
                 <select id="wBb"></select>
               </div>
@@ -790,6 +803,7 @@ h1{
             <div class="muted">Add actions in order. Raise sequences supported.</div>
           </div>
           <div class="pill" id="potPillPre">Pot: —</div>
+          <div class="subcard" id="stackSummaryPre" style="margin-top:10px;"></div>
         </div>
 
         <div class="streetGrid">
@@ -810,7 +824,7 @@ h1{
           </div>
           <div>
             <label>Bet/Raise To (bb)</label>
-            <input id="actToBbPre" inputmode="decimal" placeholder="e.g., 8" />
+            <select class="amountSelect" id="actToBbPre"></select>
           </div>
         </div>
 
@@ -834,6 +848,7 @@ h1{
             <div class="muted">Board + actions.</div>
           </div>
           <div class="pill" id="potPillFlop">Pot: —</div>
+          <div class="subcard" id="stackSummaryFlop" style="margin-top:10px;"></div>
         </div>
 
         
@@ -866,7 +881,7 @@ h1{
           </div>
           <div>
             <label>Bet/Raise To (bb)</label>
-            <input id="actToBbFlop" inputmode="decimal" placeholder="e.g., 6" />
+            <select class="amountSelect" id="actToBbFlop"></select>
           </div>
         </div>
 
@@ -890,6 +905,7 @@ h1{
             <div class="muted">Actions on turn.</div>
           </div>
           <div class="pill" id="potPillTurn">Pot: —</div>
+          <div class="subcard" id="stackSummaryTurn" style="margin-top:10px;"></div>
         </div>
 
         <div class="streetGrid">
@@ -910,7 +926,7 @@ h1{
           </div>
           <div>
             <label>Bet/Raise To (bb)</label>
-            <input id="actToBbTurn" inputmode="decimal" placeholder="e.g., 12" />
+            <select class="amountSelect" id="actToBbTurn"></select>
           </div>
         </div>
 
@@ -942,6 +958,7 @@ h1{
             <div class="muted">Actions on river.</div>
           </div>
           <div class="pill" id="potPillRiver">Pot: —</div>
+          <div class="subcard" id="stackSummaryRiver" style="margin-top:10px;"></div>
         </div>
 
         <div class="streetGrid">
@@ -962,7 +979,7 @@ h1{
           </div>
           <div>
             <label>Bet/Raise To (bb)</label>
-            <input id="actToBbRiver" inputmode="decimal" placeholder="e.g., 18" />
+            <select class="amountSelect" id="actToBbRiver"></select>
           </div>
         </div>
 
@@ -989,6 +1006,7 @@ h1{
             <div class="muted">End the hand and capture the key thought.</div>
           </div>
           <div class="pill" id="potPillResult">Pot: —</div>
+          <div class="subcard" id="stackSummaryResult" style="margin-top:10px;"></div>
         </div>
 
         <div class="grid3">
@@ -1145,6 +1163,7 @@ h1{
       app: { name: "5D", version: "1.0.0" },
       session: { sessionName:"", sessionDate:"", gameType:"NLH", sessionNotes:"" },
       friends: [],
+      savedSessions: [],
       hands: []
     };
   }
@@ -1588,9 +1607,45 @@ h1{
       gameType: byId("sessionGame").value,
       sessionNotes: byId("sessionNotes").value.trim()
     };
+    // upsert into savedSessions for quick reuse
+    data.savedSessions = Array.isArray(data.savedSessions) ? data.savedSessions : [];
+    const key = (data.session.sessionName + "|" + data.session.sessionDate + "|" + data.session.gameType).trim();
+    if (key !== "||"){
+      const idx = data.savedSessions.findIndex(s => (s._key || (s.sessionName+"|"+s.sessionDate+"|"+s.gameType)).trim() === key);
+      const entry = { ...data.session, _key: key, updatedAt: nowIso() };
+      if (idx >= 0) data.savedSessions[idx] = entry;
+      else data.savedSessions.unshift(entry);
+      // cap list
+      data.savedSessions = data.savedSessions.slice(0, 25);
+    }
+
     save(data);
     renderSession();
     alert("Session saved.");
+  };
+
+
+  byId("selectSavedSession").onclick = () => {
+    const data = load();
+    const list = Array.isArray(data.savedSessions) ? data.savedSessions : [];
+    if (!list.length){
+      alert("No saved sessions yet. Save a session first.");
+      return;
+    }
+    const menu = list.map((s,i)=> `${i+1}) ${s.sessionName || "Session"} • ${s.sessionDate || ""} • ${s.gameType || "NLH"}`).join("\n");
+    const pick = prompt("Select a saved session by number:\n\n" + menu);
+    const n = Number(String(pick||"").trim());
+    if (!Number.isFinite(n) || n < 1 || n > list.length) return;
+    const sel = list[n-1];
+    byId("sessionName").value = sel.sessionName || "";
+    byId("sessionDate").value = sel.sessionDate || "";
+    byId("sessionGame").value = sel.gameType || "NLH";
+    byId("sessionNotes").value = sel.sessionNotes || "";
+    // also persist as active session (without creating another saved entry)
+    const d2 = load();
+    d2.session = { sessionName: byId("sessionName").value.trim(), sessionDate: byId("sessionDate").value, gameType: byId("sessionGame").value, sessionNotes: byId("sessionNotes").value.trim() };
+    save(d2);
+    alert("Session loaded.");
   };
 
   // collapse session
@@ -1729,6 +1784,8 @@ h1{
       potBb: bb > 0 ? (pot / bb) : 0,
       bb, sb, ante,
       players,
+      contribTotal,
+      contribThisStreet,
       invested,
       maxInvested
     };
@@ -1754,7 +1811,8 @@ h1{
     const toCall = state.maxInvested - invested;
 
     const actor = state.players.find(p => p.id === actorId);
-    const stackBehind = Math.max(0, (actor?.stackChips ?? 0) - invested);
+    const totalInvested = state.contribTotal?.[actorId] ?? invested;
+    const stackBehind = Math.max(0, (actor?.stackChips ?? 0) - totalInvested);
 
     if (type === "CHECK") return { ok: (toCall===0), investChips: 0, note:"" };
     if (type === "FOLD") return { ok: (toCall>0), investChips: 0, note:"" };
@@ -1795,7 +1853,83 @@ h1{
     byId("potPillTurn").textContent = txt;
     byId("potPillRiver").textContent = txt;
     byId("potPillResult").textContent = txt;
+  
+  function renderStackSummary(){
+    if (!wizActive) return;
+    const st = wizActive.ui.activeStreet;
+    const state = calcStateForStreet(wizActive.hand, st);
+
+    function rowFor(p){
+      const total = state.contribTotal?.[p.id] ?? 0;
+      const streetInvest = state.contribThisStreet?.[p.id] ?? 0;
+      const remaining = Math.max(0, (p.stackChips ?? 0) - total);
+      return {
+        label: `${p.label} (${p.pos})`,
+        streetBb: state.bb ? (streetInvest/state.bb) : 0,
+        totalBb: state.bb ? (total/state.bb) : 0,
+        remBb: state.bb ? (remaining/state.bb) : 0
+      };
+    }
+
+    const rows = state.players.map(rowFor);
+
+    const htmlTable = `
+      <table class="stackTable">
+        <thead><tr><th>Player</th><th class="stackMono">This St</th><th class="stackMono">Total</th><th class="stackMono">Remain</th></tr></thead>
+        <tbody>
+          ${rows.map(r=>`<tr><td>${escapeHtml(r.label)}</td><td class="stackMono">${r.streetBb.toFixed(1)}bb</td><td class="stackMono">${r.totalBb.toFixed(1)}bb</td><td class="stackMono">${r.remBb.toFixed(1)}bb</td></tr>`).join("")}
+        </tbody>
+      </table>
+    `;
+
+    const map = {
+      preflop: "stackSummaryPre",
+      flop: "stackSummaryFlop",
+      turn: "stackSummaryTurn",
+      river: "stackSummaryRiver",
+      result: "stackSummaryResult"
+    };
+    const targetId = map[st] || "stackSummaryPre";
+    const el = byId(targetId);
+    if (el) el.innerHTML = htmlTable;
   }
+
+  function fillAmountSelectForStreet(street){
+    if (!wizActive) return;
+    const actorSelId = {preflop:"actActorPre",flop:"actActorFlop",turn:"actActorTurn",river:"actActorRiver"}[street];
+    const typeSelId  = {preflop:"actTypePre",flop:"actTypeFlop",turn:"actTypeTurn",river:"actTypeRiver"}[street];
+    const amtId      = {preflop:"actToBbPre",flop:"actToBbFlop",turn:"actToBbTurn",river:"actToBbRiver"}[street];
+
+    const actorId = byId(actorSelId)?.value;
+    const type = byId(typeSelId)?.value;
+    const sel = byId(amtId);
+    if (!sel) return;
+
+    const state = calcStateForStreet(wizActive.hand, street);
+    const actor = state.players.find(p=>p.id===actorId);
+    const total = state.contribTotal?.[actorId] ?? 0;
+    const remainingBb = state.bb ? Math.max(0, ((actor?.stackChips ?? 0) - total) / state.bb) : 0;
+
+    // we populate "to total this street" amounts for BET/RAISE; for others keep empty
+    if (type !== "BET" && type !== "RAISE"){
+      sel.innerHTML = `<option value="">—</option>`;
+      return;
+    }
+
+    const currentStreetInvestBb = state.bb ? ((state.contribThisStreet?.[actorId] ?? 0) / state.bb) : 0;
+    // Allow selecting up to current + remaining
+    const maxTo = currentStreetInvestBb + remainingBb;
+    const step = 0.5;
+
+    const opts = [];
+    opts.push(`<option value="">Select (to bb)</option>`);
+    for (let v = step; v <= maxTo + 1e-9; v += step){
+      const vv = Math.round(v*10)/10;
+      opts.push(`<option value="${vv}">${vv.toFixed(1)} bb</option>`);
+    }
+    sel.innerHTML = opts.join("");
+  }
+}
 
   function renderActionList(street){
     if (!wizActive) return;
@@ -1945,6 +2079,7 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
 
     renderActionList(street);
     renderPotPills();
+    if (["preflop","flop","turn","river"].includes(street)) fillAmountSelectForStreet(street);
     byId("wizStatus").textContent = "In progress";
     byId("wizStatus").className = "badgeOk";
 
@@ -2324,7 +2459,7 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
 
   byId("qSaveHand").onclick = () => {
     const data = load();
-    const meta = readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"));
+    const meta = JSON.parse(JSON.stringify(readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"))));
 
     const hand = {
       id: editingHandId || uuid(),
@@ -2408,7 +2543,7 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
   }
 
   byId("wStartHand").onclick = () => {
-    const meta = readHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"));
+    const meta = JSON.parse(JSON.stringify(readHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"))));
     const heroPos = byId("wHeroPos").value;
     const heroStackBb = byId("wHeroStack").value.trim();
     const heroCards = byId("wHeroCardsText").textContent;
@@ -2428,6 +2563,8 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
     };
 
     fillWizardActorSelects();
+    ["preflop","flop","turn","river"].forEach(st=>fillAmountSelectForStreet(st));
+    renderStackSummary();
 
     // collapse meta
     setWizardMetaSummary(meta, heroPos, heroStackBb);
@@ -2520,6 +2657,14 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
   });
 
   // ---- Street buttons ----
+
+  // Refresh amount pickers when actor/type changes
+  ["preflop","flop","turn","river"].forEach(st=>{
+    const actorSel = byId({preflop:"actActorPre",flop:"actActorFlop",turn:"actActorTurn",river:"actActorRiver"}[st]);
+    const typeSel  = byId({preflop:"actTypePre",flop:"actTypeFlop",turn:"actTypeTurn",river:"actTypeRiver"}[st]);
+    if (actorSel) actorSel.addEventListener("change", ()=>fillAmountSelectForStreet(st));
+    if (typeSel) typeSel.addEventListener("change", ()=>fillAmountSelectForStreet(st));
+  });
   byId("addActionPre").onclick = () => addWizardAction("preflop","actActorPre","actTypePre","actToBbPre");
   byId("undoActionPre").onclick = () => undoWizardAction("preflop");
   byId("clearActionsPre").onclick = () => clearWizardStreet("preflop");
