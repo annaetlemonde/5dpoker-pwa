@@ -23,6 +23,9 @@
   <link rel="icon" href="icons/icon-192.png" />
 
   <style>
+    .stackSummary{ margin-top:10px; }
+    .stackSummary *{ pointer-events: auto; }
+
     .blindsInline{ grid-template-columns: 1fr 1fr !important; gap:10px !important; }
 
     .stackTable{ width:100%; border-collapse:collapse; }
@@ -824,8 +827,9 @@ h1{
             <div class="muted">Add actions in order. Raise sequences supported.</div>
           </div>
           <div class="pill" id="potPillPre">Pot: —</div>
-          <div class="subcard" id="stackSummaryPre" style="margin-top:10px;"></div>
         </div>
+
+        <div class="subcard stackSummary" id="stackSummaryPre"></div>
 
         <div class="streetGrid">
           <div>
@@ -868,8 +872,9 @@ h1{
             <div class="muted">Board + actions.</div>
           </div>
           <div class="pill" id="potPillFlop">Pot: —</div>
-          <div class="subcard" id="stackSummaryFlop" style="margin-top:10px;"></div>
         </div>
+
+        <div class="subcard stackSummary" id="stackSummaryFlop"></div>
 
         
         <div class="subcard" style="margin-top:10px;">
@@ -924,8 +929,9 @@ h1{
             <div class="muted">Actions on turn.</div>
           </div>
           <div class="pill" id="potPillTurn">Pot: —</div>
-          <div class="subcard" id="stackSummaryTurn" style="margin-top:10px;"></div>
         </div>
+
+        <div class="subcard stackSummary" id="stackSummaryTurn"></div>
 
         <div class="streetGrid">
           <div>
@@ -976,8 +982,9 @@ h1{
             <div class="muted">Actions on river.</div>
           </div>
           <div class="pill" id="potPillRiver">Pot: —</div>
-          <div class="subcard" id="stackSummaryRiver" style="margin-top:10px;"></div>
         </div>
+
+        <div class="subcard stackSummary" id="stackSummaryRiver"></div>
 
         <div class="streetGrid">
           <div>
@@ -1023,8 +1030,9 @@ h1{
             <div class="muted">End the hand and capture the key thought.</div>
           </div>
           <div class="pill" id="potPillResult">Pot: —</div>
-          <div class="subcard" id="stackSummaryResult" style="margin-top:10px;"></div>
         </div>
+
+        <div class="subcard stackSummary" id="stackSummaryResult"></div>
 
         <div class="grid3">
           <div>
