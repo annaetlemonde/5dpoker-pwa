@@ -186,10 +186,12 @@ h1{
     }
 
     .modeRow button{
+      min-width: 120px;
       font-size: 15px;
-      padding: 14px 14px;
+      padding: 14px 18px;
       border-radius: 16px;
       letter-spacing: 0.2px;
+      white-space: nowrap;
     }
 
     .utilRow{
@@ -430,10 +432,10 @@ h1{
     }
 
     .btnActive{
-      background: linear-gradient(90deg, rgba(120,210,255,0.98), rgba(190,120,255,0.92));
-      border-color: rgba(255,255,255,0.22);
-      color:#05070d;
-      box-shadow: 0 0 0 4px rgba(120,210,255,0.22), 0 10px 30px rgba(0,0,0,0.35);
+      background: linear-gradient(90deg, rgba(120,210,255,1), rgba(190,120,255,1)) !important;
+      border-color: rgba(255,255,255,0.28) !important;
+      color:#05070d !important;
+      box-shadow: 0 0 0 4px rgba(120,210,255,0.28), 0 12px 36px rgba(0,0,0,0.4);
     }
 
     .badgeWarn{
@@ -1522,18 +1524,23 @@ h1{
     byId("historyCard").style.display = (view === "history") ? "" : "none";
     byId("friendsTabCard").style.display = (view === "friends") ? "" : "none";
 
-    // Hide Session card on History + Friends (per spec)
+    // Hide Session card on History + Friends
     byId("sessionCard").style.display = (view === "history" || view === "friends") ? "none" : "";
 
-    // Active states (make obvious)
-    byId("topQuick").className = (view === "quick") ? "primary btnActive" : "secondary";
-    byId("topWizard").className = (view === "wizard") ? "primaryAlt btnActive" : "secondary";
-    byId("topHistory").className = (view === "history") ? "secondary btnActive" : "secondary";
-    byId("topFriends").className = (view === "friends") ? "secondary btnActive" : "secondary";
+    const tabs = ["topQuick","topWizard","topHistory","topFriends"];
+    tabs.forEach(id=>{
+      byId(id).classList.remove("btnActive");
+      byId(id).classList.add("secondary");
+    });
+
+    if (view === "quick") byId("topQuick").classList.add("btnActive");
+    if (view === "wizard") byId("topWizard").classList.add("btnActive");
+    if (view === "history") byId("topHistory").classList.add("btnActive");
+    if (view === "friends") byId("topFriends").classList.add("btnActive");
 
     if (view === "history"){
       renderHands();
-      renderFriends(); // populate Send-to dropdown
+      renderFriends();
     }
     if (view === "friends"){
       renderFriends();
