@@ -448,7 +448,12 @@ h1{
       margin-top: 10px;
     }
 
-    .badgeOk{
+    
+    .extraEntries{ margin-top:10px; display:flex; flex-direction:column; gap:10px; }
+    .miniActionEntry{ padding:10px; border-radius:14px; border:1px dashed rgba(255,255,255,0.16); background: rgba(255,255,255,0.035); }
+    .miniBtns{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+    button.mini{ padding:9px 12px; font-size:13px; }
+.badgeOk{
       display:inline-flex;
       align-items:center;
       gap:6px;
@@ -496,7 +501,7 @@ h1{
     }
 
     @media (max-width: 860px){
-      .grid2, .grid3, .streetGrid{ grid-template-columns: 1fr; }
+      .grid2, .grid3{ grid-template-columns: 1fr; }
       /* keep hero card section compact: do NOT force single column */
       .cardsWrap{ grid-template-columns: 1fr; }
       .card{ padding: 12px; }
@@ -865,8 +870,11 @@ h1{
           </div>
         </div>
 
+        <div id="extraEntriesPre" class="extraEntries"></div>
+
         <div class="btns">
-          <button class="secondary" id="addActionPre" type="button">+ Add New Action.</button>
+          <button class="secondary" id="addActionPre" type="button">Add Action</button>
+          <button class="secondary" id="addNewActionRowPre" type="button">+ Add New Action</button>
           <button class="ghost" id="undoActionPre" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsPre" type="button">Clear Street</button>
         </div>
@@ -875,6 +883,8 @@ h1{
 
         <div class="btns" style="margin-top:12px;">
           <button class="primary" id="nextToFlop" type="button">Next Flop</button>
+        
+          <button class="danger" id="endHandPre" type="button">End Hand / Reflection</button>
         </div>
       </div>
 
@@ -922,8 +932,11 @@ h1{
           </div>
         </div>
 
+        <div id="extraEntriesFlop" class="extraEntries"></div>
+
         <div class="btns">
-          <button class="secondary" id="addActionFlop" type="button">+ Add New Action.</button>
+          <button class="secondary" id="addActionFlop" type="button">Add Action</button>
+          <button class="secondary" id="addNewActionRowFlop" type="button">+ Add New Action</button>
           <button class="ghost" id="undoActionFlop" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsFlop" type="button">Clear Street</button>
         </div>
@@ -932,6 +945,8 @@ h1{
 
         <div class="btns" style="margin-top:12px;">
           <button class="primary" id="nextToTurn" type="button">Next Turn</button>
+        
+          <button class="danger" id="endHandFlop" type="button">End Hand / Reflection</button>
         </div>
       </div>
 
@@ -967,8 +982,11 @@ h1{
           </div>
         </div>
 
+        <div id="extraEntriesTurn" class="extraEntries"></div>
+
         <div class="btns">
-          <button class="secondary" id="addActionTurn" type="button">+ Add New Action.</button>
+          <button class="secondary" id="addActionTurn" type="button">Add Action</button>
+          <button class="secondary" id="addNewActionRowTurn" type="button">+ Add New Action</button>
           <button class="ghost" id="undoActionTurn" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsTurn" type="button">Clear Street</button>
         </div>
@@ -985,6 +1003,8 @@ h1{
 
         <div class="btns" style="margin-top:12px;">
           <button class="primary" id="nextToRiver" type="button">Next River</button>
+        
+          <button class="danger" id="endHandTurn" type="button">End Hand / Reflection</button>
         </div>
       </div>
 
@@ -1020,8 +1040,11 @@ h1{
           </div>
         </div>
 
+        <div id="extraEntriesRiver" class="extraEntries"></div>
+
         <div class="btns">
-          <button class="secondary" id="addActionRiver" type="button">+ Add New Action.</button>
+          <button class="secondary" id="addActionRiver" type="button">Add Action</button>
+          <button class="secondary" id="addNewActionRowRiver" type="button">+ Add New Action</button>
           <button class="ghost" id="undoActionRiver" type="button">Undo Last</button>
           <button class="ghost" id="clearActionsRiver" type="button">Clear Street</button>
         </div>
@@ -1033,6 +1056,13 @@ h1{
             <select id="rRank"></select><select id="rSuit"></select>
           </div>
           <div class="pill" style="margin-top:10px;">River: <b id="riverText">—</b></div>
+        </div>
+      
+
+        <div class="btns" style="margin-top:12px;">
+          <button class="primary" id="nextToResult" type="button">Next Result</button>
+        
+          <button class="danger" id="endHandRiver" type="button">End Hand / Reflection</button>
         </div>
       </div>
 
@@ -1076,7 +1106,6 @@ h1{
 
         <div class="btns">
           <button class="primaryAlt" id="saveWizardHand" type="button">Save Wizard Hand</button>
-          <button class="danger" id="endHandReflection" type="button">End Hand / Reflection</button>
         </div>
 
         <div class="muted" id="wizardEditHint" style="margin-top:10px; display:none;">
@@ -2050,6 +2079,89 @@ h1{
     });
   }
 
+  function wizardActorOptionsHtml(){
+    if (!wizActive) return "";
+    return wizActive.hand.wizard.players.map(p =>
+      `<option value="${p.id}">${escapeHtml(p.label)} • ${escapeHtml(p.pos)}</option>`
+    ).join("");
+  }
+
+  function updateEntryRowAmountUI(rowEl){
+    const typeSel = rowEl.querySelector('select[data-role="type"]');
+    const amtInp  = rowEl.querySelector('input[data-role="toBb"]');
+    if (!typeSel || !amtInp) return;
+
+    const type = typeSel.value || "";
+    if (type !== "BET" && type !== "RAISE"){
+      amtInp.value = "";
+      amtInp.placeholder = "—";
+      amtInp.disabled = true;
+      amtInp.classList.add("disabledInput");
+    } else {
+      amtInp.disabled = false;
+      amtInp.placeholder = "e.g., 6.5";
+      amtInp.classList.remove("disabledInput");
+    }
+  }
+
+  function addWizardEntryRow(street, suffix){
+    const host = byId("extraEntries"+suffix);
+    if (!host) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "miniActionEntry";
+    wrap.innerHTML = `
+      <div class="streetGrid" style="margin-top:0;">
+        <div>
+          <label>Actor</label>
+          <select data-role="actor">${wizardActorOptionsHtml()}</select>
+        </div>
+        <div>
+          <label>Action</label>
+          <select data-role="type">
+            <option value="FOLD">Fold</option>
+            <option value="CHECK">Check</option>
+            <option value="CALL">Call</option>
+            <option value="BET">Bet</option>
+            <option value="RAISE">Raise</option>
+          </select>
+        </div>
+        <div>
+          <label>Bet/Raise To (bb)</label>
+          <input data-role="toBb" inputmode="decimal" placeholder="—" disabled class="disabledInput"/>
+        </div>
+      </div>
+      <div class="miniBtns">
+        <button class="secondary mini" type="button" data-role="log">Add Action</button>
+        <button class="ghost mini" type="button" data-role="remove">Remove</button>
+      </div>
+    `;
+
+    const typeSel = wrap.querySelector('select[data-role="type"]');
+    const actorSel = wrap.querySelector('select[data-role="actor"]');
+    const amtInp = wrap.querySelector('input[data-role="toBb"]');
+
+    // default actor = match main selector if present
+    const mainActor = byId("actActor"+suffix);
+    if (mainActor && actorSel) actorSel.value = mainActor.value;
+
+    // wire amount enable/disable
+    if (typeSel) typeSel.addEventListener("change", ()=>updateEntryRowAmountUI(wrap));
+    updateEntryRowAmountUI(wrap);
+
+    wrap.querySelector('[data-role="remove"]').onclick = ()=> wrap.remove();
+    wrap.querySelector('[data-role="log"]').onclick = ()=>{
+      const actorId = actorSel?.value || "";
+      const type = typeSel?.value || "";
+      const toBb = amtInp?.value || "";
+      const ok = addWizardActionValues(street, actorId, type, toBb, ()=>{});
+      if (ok) wrap.remove();
+    };
+
+    host.appendChild(wrap);
+  }
+
+
   
   function wizardTotalInvestedBb(hand, actorId){
     const w = hand.wizard || {};
@@ -2110,29 +2222,25 @@ h1{
     renderPotPills();
     switchWizardTab("result");
   }
-function addWizardAction(street, actorSelId, typeSelId, toInputId){
-    if (!wizActive) return;
+function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
+    if (!wizActive) return false;
 
     if (wizActive.hand.wizard.autoEnded){
       alert("This hand has already ended. Go to Result or Start Hand to log a new one.");
-      return;
+      return false;
     }
-
-    const actorId = byId(actorSelId).value;
-    const type = byId(typeSelId).value;
-    const toBb = byId(toInputId).value;
 
     const state = calcStateForStreet(wizActive.hand, street);
 
     if (!canActionType(state, actorId, type)){
       alert("Illegal action for current to-call state.");
-      return;
+      return false;
     }
 
     const computed = computeInvestForAction(state, actorId, type, toBb);
     if (!computed.ok){
       alert(computed.note || "Invalid action.");
-      return;
+      return false;
     }
 
     const p = wizActive.hand.wizard.players.find(x => x.id === actorId);
@@ -2149,29 +2257,25 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
 
     wizActive.hand.wizard.streets[street].actions.push(act);
 
-    // clear amount input after bet/raise
-    byId(toInputId).value = "";
+    if (typeof afterSuccess === "function") afterSuccess();
 
     renderActionList(street);
     renderPotPills();
     if (["preflop","flop","turn","river"].includes(street)) fillAmountSelectForStreet(street);
     byId("wizStatus").textContent = "In progress";
     byId("wizStatus").className = "badgeOk";
+    return true;
+  }
 
-    // ---- Auto-end logic ----
-    // 1) If Hero folds → auto loss, no showdown, loss = total invested
-    if (act.actorId === "hero" && act.type === "FOLD"){
-      const invested = wizardTotalInvestedBb(wizActive.hand, "hero");
-      autoEndWizard("Lost", (-1 * invested).toFixed(1), street);
-      return;
-    }
+  function addWizardAction(street, actorSelId, typeSelId, toInputId){
+    const actorId = byId(actorSelId).value;
+    const type = byId(typeSelId).value;
+    const toBb = byId(toInputId).value;
 
-    // 2) If all villains folded → auto win, no showdown, win = total pot
-    if (wizardAllVillainsFolded(wizActive.hand)){
-      const potBb = calcStateForStreet(wizActive.hand, street).potBb;
-      autoEndWizard("Won", (potBb).toFixed(1), street);
-      return;
-    }
+    return addWizardActionValues(street, actorId, type, toBb, () => {
+      // clear amount input after bet/raise
+      byId(toInputId).value = "";
+    });
   }
 
   function undoWizardAction(street){
@@ -2206,25 +2310,45 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
   }
 
   // ---- Formatting for History ----
+  
   function handHeader(data, h){
-    const s = data.session || {};
+    // Prefer per-hand session snapshot, fallback to current session
+    const sess = h.session || data.session || {};
     const meta = h.meta || {};
-    const game = s.gameType || "NLH";
-    return `${game} | L${meta.level || "?"} | ${formatBlinds(meta)}`;
+    const sessionName = (sess.sessionName || "").trim();
+    const sessionDate = (sess.sessionDate || "").trim();
+    const game = (sess.gameType || "NLH").trim();
+
+    const headLeft = (sessionName ? sessionName : "Session") + (sessionDate ? ` (${sessionDate})` : "");
+    const sb = meta.sb ?? "";
+    const bb = meta.bb ?? "";
+    const bbAnte = meta.bbAnte ?? 0;
+
+    let blindsStr = (sb !== "" && bb !== "") ? `Blinds ${sb} /${bb}` : formatBlinds(meta);
+    if (bbAnte && Number(bbAnte) > 0) blindsStr += ` | BB Ante ${bbAnte}`;
+
+    return `${headLeft} | ${game} | ${blindsStr}`;
   }
+
 
   function formatHandText(data, h){
     const header = handHeader(data, h);
-    const heroLine = `Hero: ${h.heroPos || "?"} • ${h.heroStackBb || "?"}bb • ${h.heroCards || "??"}`;
-    const villainsLine = (h.villains && h.villains.length)
-      ? "Villains: " + h.villains.map((v, idx) => {
-          const tag = `V${idx+1} (${v.pos||"?"})`;
-          const st = v.stackBb || "?";
-          return `${tag} ${st}bb${v.note ? " ("+v.note+")" : ""}`;
-        }).join(" | ")
-      : "Villains: —";
 
-    const lines = [header, heroLine, villainsLine];
+    const heroPos = h.heroPos || "?";
+    const heroStack = (h.heroStackBb || "?");
+    const heroCards = h.heroCards || "??";
+    const heroLine = `Hero (${heroPos}) | ${heroStack} bb | Cards: ${heroCards}`;
+
+    const villainLines = (h.villains && h.villains.length)
+      ? h.villains.map((v, idx) => {
+          const pos = v.pos || "?";
+          const st = v.stackBb || "?";
+          const note = v.note ? ` | ${v.note}` : "";
+          return `Villain ${idx+1} (${pos}) | ${st} bb${note}`;
+        })
+      : ["Villains: —"];
+
+    const lines = [header, heroLine, ...villainLines];
 
     if (h.mode === "quick"){
       const q = h.quick || {};
@@ -2326,7 +2450,20 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
     byId("detailCard").style.display = "";
     byId("detailCard").dataset.id = id;
 
-    byId("detailMetaPill").textContent = `${(h.session?.sessionName || data.session?.sessionName || "").trim() ? (h.session?.sessionName || data.session?.sessionName) + " • " : ""}${(h.session?.sessionDate || data.session?.sessionDate) ? (h.session?.sessionDate || data.session?.sessionDate) + " • " : ""}${h.session?.gameType || data.session?.gameType || ""} • L${h.meta?.level || "?"} • ${formatBlinds(h.meta||{sb:0,bb:0,bbAnte:0})}`.replace(/^ • /,"").replace(/ • $/,"");
+    byId("detailMetaPill").textContent = (() => {
+      const sess = h.session || data.session || {};
+      const meta = h.meta || {};
+      const name = (sess.sessionName || "").trim();
+      const date = (sess.sessionDate || "").trim();
+      const game = (sess.gameType || "NLH").trim();
+      const left = (name ? name : "Session") + (date ? ` (${date})` : "");
+      const sb = meta.sb ?? "";
+      const bb = meta.bb ?? "";
+      const bbAnte = meta.bbAnte ?? 0;
+      let blinds = (sb !== "" && bb !== "") ? `Blinds ${sb} /${bb}` : formatBlinds(meta);
+      if (bbAnte && Number(bbAnte) > 0) blinds += ` | BB Ante ${bbAnte}`;
+      return `${left} | ${game} | ${blinds}`;
+    })();
 
     byId("detailCard").scrollIntoView({ behavior:"smooth", block:"start" });
   }
@@ -2770,18 +2907,22 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
     if (typeSel) typeSel.addEventListener("change", ()=>fillAmountSelectForStreet(st));
   });
   byId("addActionPre").onclick = () => addWizardAction("preflop","actActorPre","actTypePre","actToBbPre");
+  byId("addNewActionRowPre").onclick = () => addWizardEntryRow("preflop","Pre");
   byId("undoActionPre").onclick = () => undoWizardAction("preflop");
   byId("clearActionsPre").onclick = () => clearWizardStreet("preflop");
 
   byId("addActionFlop").onclick = () => addWizardAction("flop","actActorFlop","actTypeFlop","actToBbFlop");
+  byId("addNewActionRowFlop").onclick = () => addWizardEntryRow("flop","Flop");
   byId("undoActionFlop").onclick = () => undoWizardAction("flop");
   byId("clearActionsFlop").onclick = () => clearWizardStreet("flop");
 
   byId("addActionTurn").onclick = () => addWizardAction("turn","actActorTurn","actTypeTurn","actToBbTurn");
+  byId("addNewActionRowTurn").onclick = () => addWizardEntryRow("turn","Turn");
   byId("undoActionTurn").onclick = () => undoWizardAction("turn");
   byId("clearActionsTurn").onclick = () => clearWizardStreet("turn");
 
   byId("addActionRiver").onclick = () => addWizardAction("river","actActorRiver","actTypeRiver","actToBbRiver");
+  byId("addNewActionRowRiver").onclick = () => addWizardEntryRow("river","River");
   byId("undoActionRiver").onclick = () => undoWizardAction("river");
   byId("clearActionsRiver").onclick = () => clearWizardStreet("river");
 
@@ -2794,6 +2935,18 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
   byId("nextToRiver").onclick = () => {
     switchWizardTab("river");
   };
+
+  byId("nextToResult").onclick = () => {
+    switchWizardTab("result");
+  };
+
+
+
+  // End hand early (jump to Result) from any street
+  ["endHandPre","endHandFlop","endHandTurn","endHandRiver"].forEach(id=>{
+    const el = byId(id);
+    if (el) el.onclick = () => switchWizardTab("result");
+  });
 
   // Save wizard hand
   byId("saveWizardHand").onclick = () => {
@@ -2834,12 +2987,6 @@ function addWizardAction(street, actorSelId, typeSelId, toInputId){
 
     alert("Wizard hand saved.");
   };
-
-  byId("endHandReflection").onclick = () => {
-    // per your spec: reflection below street progress. This button just switches to result tab.
-    switchWizardTab("result");
-  };
-
   // ---- Init selects and forms ----
   function init(){
     // session
