@@ -11,7 +11,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0a0a0c" />
+  <meta name="theme-color" content="#14141c" />
 
   <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -69,24 +69,25 @@
       --tertiary-soft:rgba(141,108,146,0.22);
 
       /* Stitch-style dot grid (subtle; uses brand tints) */
-      --dot-primary: rgba(115, 116, 155, 0.32);
-      --dot-secondary: rgba(117, 117, 139, 0.22);
-      --dot-tertiary: rgba(141, 108, 146, 0.18);
-      --dot-size: 20px;
+      --dot-primary: rgba(115, 116, 155, 0.2);
+      --dot-secondary: rgba(117, 117, 139, 0.14);
+      --dot-tertiary: rgba(141, 108, 146, 0.12);
+      --dot-size: 22px;
 
-      --bg0:#08080a;
-      --bg1:#0e0e12;
+      /* Lighter Stitch-like base */
+      --bg0:#14141c;
+      --bg1:#1a1a26;
 
-      --text:#f4f3f8;
-      --body:#c9c6d4;
-      --muted:#9a97a8;
+      --text:#faf9fc;
+      --body:#dcd8ea;
+      --muted:#a8a4ba;
 
-      --border: rgba(115,116,155,0.32);
-      --border2: rgba(117,117,139,0.45);
+      --border: rgba(115,116,155,0.42);
+      --border2: rgba(141,108,146,0.38);
 
-      --chip: rgba(115,116,155,0.18);
-      --input: rgba(14,14,18,0.78);
-      --input2: rgba(115,116,155,0.2);
+      --chip: rgba(115,116,155,0.22);
+      --input: rgba(255,255,255,0.07);
+      --input2: rgba(115,116,155,0.18);
 
       --danger:#e85d6f;
       --ok:#5eb88a;
@@ -109,9 +110,9 @@
       background-color: var(--bg0);
       /* Dot grid (Stitch-like) + soft brand glows */
       background-image:
-        radial-gradient(ellipse 900px 520px at 50% -15%, var(--primary-soft), transparent 55%),
-        radial-gradient(ellipse 720px 480px at 100% 25%, var(--tertiary-soft), transparent 50%),
-        radial-gradient(ellipse 640px 420px at 0% 70%, var(--secondary-soft), transparent 48%),
+        radial-gradient(ellipse 1000px 580px at 45% -12%, rgba(115,116,155,0.18), transparent 58%),
+        radial-gradient(ellipse 780px 520px at 98% 18%, rgba(141,108,146,0.14), transparent 52%),
+        radial-gradient(ellipse 680px 460px at 5% 65%, rgba(117,117,139,0.12), transparent 50%),
         radial-gradient(circle at center, var(--dot-primary) 1px, transparent 1.2px),
         radial-gradient(circle at center, var(--dot-tertiary) 1px, transparent 1.2px),
         linear-gradient(180deg, var(--bg0), var(--bg1));
@@ -144,11 +145,13 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      padding: 14px 0 10px;
-      background: transparent;
-      backdrop-filter: none;
-      border-bottom: 1px solid rgba(115,116,155,0.28);
-      margin-bottom: 8px;
+      padding: 14px 0 12px;
+      background: linear-gradient(180deg, rgba(20,20,28,0.85), rgba(20,20,28,0.35));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(115,116,155,0.38);
+      box-shadow: 0 1px 0 rgba(141,108,146,0.12);
+      margin-bottom: 10px;
     }
 
     .topHead{
@@ -281,6 +284,7 @@ h1{
       border-radius: 999px;
       letter-spacing: 0.02em;
       white-space: nowrap;
+      border-width: 1.5px;
     }
 
     .utilRow{
@@ -308,15 +312,17 @@ h1{
       color: #ffe5e8;
     }
 
-    /* Sections sit on Stitch dot background — structure via territory accent, not panel fills */
+    /* Sections: territory accent + subtle glow line for depth */
     .card{
       background: transparent;
       border: none;
-      border-left: 3px solid var(--territory, var(--primary));
-      border-radius: 0;
+      border-left: 4px solid var(--territory, var(--primary));
+      border-radius: 0 12px 12px 0;
       padding: 16px 14px 16px 18px;
-      margin: 16px 0;
-      box-shadow: none;
+      margin: 18px 0;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        4px 0 24px rgba(115,116,155,0.08);
       backdrop-filter: none;
       overflow: visible;
     }
@@ -349,11 +355,26 @@ h1{
       display:inline-block;
       font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--territory, var(--primary));
       margin-bottom: 6px;
-      opacity: 0.95;
+      text-shadow: 0 0 20px rgba(115,116,155,0.35);
+    }
+
+    .quickHeroCombo{
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(141,108,146,0.45) !important;
+      background: rgba(255,255,255,0.09) !important;
+    }
+    .quickBoardGrid{
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 560px){
+      .quickBoardGrid{ grid-template-columns: 1fr 1fr; }
     }
 
     .metaRowActions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
@@ -473,11 +494,11 @@ h1{
     }
 
     button.primary{
-      background: linear-gradient(165deg, #eceaf4 0%, var(--btn-primary-bot) 55%, #c4b4d4 100%);
-      border-color: rgba(115,116,155,0.55);
-      color: #14141a;
+      background: linear-gradient(165deg, #f2f0fa 0%, #d4d0e8 45%, #c8b8dc 100%);
+      border-color: rgba(115,116,155,0.65);
+      color: #121018;
       font-weight: 800;
-      box-shadow: 0 4px 14px rgba(141,108,146,0.18);
+      box-shadow: 0 4px 20px rgba(141,108,146,0.28), 0 0 0 1px rgba(255,255,255,0.2) inset;
     }
     button.primaryAlt{
       background: linear-gradient(135deg, #e0dce8 0%, #b8b4d4 40%, #a898bc 100%);
@@ -828,22 +849,28 @@ h1{
         </div>
 
         
-        <label>Hero Cards</label>
-        <div class="heroShorthandRow">
-          <label>Quick type (e.g. AsKd or Ah Kd)</label>
-          <input id="qHeroShorthand" type="text" inputmode="text" autocomplete="off" placeholder="AsKd" />
-        </div>
-        <div class="heroFacesRow">
-          <div class="bigCard suit-white" id="qCard1Face">A♠</div>
-          <div class="bigCard suit-white" id="qCard2Face">K♣</div>
-        </div>
-        <div class="heroSelectRow" aria-label="Hero card selection">
-          <select id="qC1Rank"></select>
-          <select id="qC1Suit"></select>
-          <select id="qC2Rank"></select>
-          <select id="qC2Suit"></select>
-        </div>
-        <div class="pill" style="margin-top:10px;">Shorthand: <b id="qHeroCardsText">AsKc</b></div>
+        <label>Your hand</label>
+        <input id="qHeroCombo" class="quickHeroCombo" type="text" inputmode="text" autocomplete="off" placeholder="QQ · AKs · AJo · T9s" />
+        <div class="muted" style="margin-top:6px;">How you remember it: pairs, suited (s), offsuit (o). Exact suits optional.</div>
+
+        <details class="boardDetails" id="qExactHeroDetails" style="margin-top:12px;">
+          <summary>Exact suits (optional)</summary>
+          <div class="heroShorthandRow">
+            <label>Two cards (e.g. AsKd or Ah Kd)</label>
+            <input id="qHeroShorthand" type="text" inputmode="text" autocomplete="off" placeholder="AsKd" />
+          </div>
+          <div class="heroFacesRow">
+            <div class="bigCard suit-white" id="qCard1Face">A♠</div>
+            <div class="bigCard suit-white" id="qCard2Face">K♣</div>
+          </div>
+          <div class="heroSelectRow" aria-label="Hero card selection">
+            <select id="qC1Rank"></select>
+            <select id="qC1Suit"></select>
+            <select id="qC2Rank"></select>
+            <select id="qC2Suit"></select>
+          </div>
+          <div class="pill" style="margin-top:10px;">Exact: <b id="qHeroCardsText">AsKc</b></div>
+        </details>
 
       </div>
 
@@ -873,23 +900,51 @@ h1{
         
         <div>
           <details class="boardDetails" id="qBoardDetails">
-            <summary>Board (optional) — tap to add cards</summary>
-            <div class="muted" style="margin-bottom:8px;">Up to 5 cards (flop / turn / river)</div>
-            <div class="heroSelectRow" aria-label="Board ranks">
-              <select id="qB1Rank"></select>
-              <select id="qB2Rank"></select>
-              <select id="qB3Rank"></select>
-              <select id="qB4Rank"></select>
-              <select id="qB5Rank"></select>
+            <summary>Board &amp; runout (optional)</summary>
+            <div class="muted" style="margin-bottom:10px;">Ranks + texture first — how live players remember. Turn/river = what changed.</div>
+            <div class="quickBoardGrid">
+              <div>
+                <label>Flop ranks</label>
+                <input id="qFlopRanks" type="text" inputmode="text" maxlength="12" placeholder="e.g. K72 or K 7 2" autocomplete="off" />
+              </div>
+              <div>
+                <label>Flop texture</label>
+                <select id="qFlopTexture">
+                  <option value="" selected>— Skip —</option>
+                  <option value="rainbow">Rainbow (3 suits)</option>
+                  <option value="two-tone">Two-tone (flush possible)</option>
+                  <option value="monotone">Monotone (3 same suit)</option>
+                  <option value="paired">Paired flop</option>
+                  <option value="unknown">Not sure</option>
+                </select>
+              </div>
+              <div>
+                <label>Turn (what changed)</label>
+                <select id="qTurnRunout">
+                  <option value="" selected>— No turn / skip —</option>
+                  <option value="blank">Blank (bricks)</option>
+                  <option value="fd">Brings flush draw</option>
+                  <option value="flush">Flush completes</option>
+                  <option value="pair">Pairs the board</option>
+                  <option value="straight">Straight / straight draw completes</option>
+                  <option value="overcard">Scary overcard</option>
+                  <option value="bd">Backdoor gets there</option>
+                </select>
+              </div>
+              <div>
+                <label>River (what changed)</label>
+                <select id="qRiverRunout">
+                  <option value="" selected>— No river / skip —</option>
+                  <option value="blank">Blank</option>
+                  <option value="flush">Flush completes</option>
+                  <option value="bd">Backdoor completes</option>
+                  <option value="pair">Pairs / full house scare</option>
+                  <option value="straight">Straight completes</option>
+                  <option value="overcard">Overcard / scare</option>
+                </select>
+              </div>
             </div>
-            <div class="heroSelectRow" aria-label="Board suits" style="margin-top:8px;">
-              <select id="qB1Suit"></select>
-              <select id="qB2Suit"></select>
-              <select id="qB3Suit"></select>
-              <select id="qB4Suit"></select>
-              <select id="qB5Suit"></select>
-            </div>
-            <div class="pill" style="margin-top:10px;">Board: <b id="qBoardText">—</b></div>
+            <div class="pill" style="margin-top:12px;">Summary: <b id="qBoardSummary">—</b></div>
           </details>
         </div>
 
@@ -1574,9 +1629,16 @@ h1{
 
   function resetQuickPreserveMeta(){
     byId("qHeroStack").value = "";
+    byId("qHeroCombo").value = "";
     byId("qPreflop").value = "";
     byId("qPostflop").value = "";
-    setQuickBoardSelectsFromString("");
+    byId("qFlopRanks").value = "";
+    byId("qFlopTexture").value = "";
+    byId("qTurnRunout").value = "";
+    byId("qRiverRunout").value = "";
+    renderQuickBoardSummary();
+    const ex = byId("qExactHeroDetails");
+    if (ex) ex.open = false;
     byId("qPotBb").value = "";
     byId("qTurningPoint").value = "";
     byId("quickEditHint").style.display = "none";
@@ -1813,48 +1875,100 @@ h1{
     renderBoardText();
   }
 
-  // ---- Quick Log board dropdowns (5 cards) ----
-  function initQuickBoardSelects(){
-    for (let i=1;i<=5;i++){
-      fillRankSelectOpt(byId("qB"+i+"Rank"), "");
-      fillSuitSelectOpt(byId("qB"+i+"Suit"), "");
-      const rerender = () => renderQuickBoardText();
-      byId("qB"+i+"Rank").addEventListener("change", rerender);
-      byId("qB"+i+"Suit").addEventListener("change", rerender);
-    }
-    renderQuickBoardText();
+  // ---- Quick Log board: ranks + texture + runout (live-poker memory model) ----
+  function normalizeFlopRanksInput(raw){
+    let s = String(raw || "").toUpperCase().replace(/\s+/g, "");
+    s = s.replace(/10/g, "T");
+    s = s.replace(/[^AKQJT98765432]/g, "");
+    return s.slice(0, 3);
   }
 
-  function renderQuickBoardText(){
-    const toks = [];
-    for (let i=1;i<=5;i++){
-      const r = byId("qB"+i+"Rank").value;
-      const s = byId("qB"+i+"Suit").value;
-      const pretty = prettyToken(r, s);
-      if (pretty !== "—") toks.push(pretty);
-    }
-    byId("qBoardText").textContent = toks.length ? toks.join(" ") : "—";
+  function readQuickBoardMetaFromForm(){
+    return {
+      flopRanks: normalizeFlopRanksInput(byId("qFlopRanks").value),
+      flopTexture: byId("qFlopTexture").value,
+      turnRunout: byId("qTurnRunout").value,
+      riverRunout: byId("qRiverRunout").value
+    };
   }
 
-  function quickBoardStringFromSelects(){
-    const toks = [];
-    for (let i=1;i<=5;i++){
-      const r = byId("qB"+i+"Rank").value;
-      const s = byId("qB"+i+"Suit").value;
-      const tok = cardToken(r, s);
-      if (tok) toks.push(tok);
+  function buildQuickBoardSummaryLine(meta){
+    if (!meta || typeof meta !== "object") return "";
+    const parts = [];
+    const fr = (meta.flopRanks || "").trim();
+    const texShort = {
+      rainbow: "rainbow",
+      "two-tone": "two-tone",
+      monotone: "mono",
+      paired: "paired",
+      unknown: "?"
+    };
+    if (fr){
+      const disp = fr.toUpperCase().split("").join("");
+      const tx = meta.flopTexture ? (texShort[meta.flopTexture] || meta.flopTexture) : "";
+      parts.push("Flop " + disp + (tx ? " " + tx : ""));
+    } else if (meta.flopTexture){
+      parts.push("Flop: " + (texShort[meta.flopTexture] || meta.flopTexture));
     }
-    return toks.join(" ");
+    const run = {
+      blank: "blank",
+      fd: "+FD",
+      flush: "flush",
+      pair: "pairs",
+      straight: "straight",
+      overcard: "overcard",
+      bd: "backdoor"
+    };
+    if (meta.turnRunout) parts.push("Turn " + (run[meta.turnRunout] || meta.turnRunout));
+    if (meta.riverRunout) parts.push("River " + (run[meta.riverRunout] || meta.riverRunout));
+    return parts.join(" · ");
   }
 
-  function setQuickBoardSelectsFromString(boardStr){
-    const toks = String(boardStr || "").trim() ? String(boardStr).trim().split(/\s+/) : [];
-    for (let i=1;i<=5;i++){
-      const tok = toks[i-1] || "";
-      byId("qB"+i+"Rank").value = tok ? tok[0].toUpperCase() : "";
-      byId("qB"+i+"Suit").value = tok ? tok[1].toLowerCase() : "";
+  function tryBoardMetaFromLegacyBoardString(str){
+    const s = String(str || "").trim();
+    if (!s) return null;
+    const toks = s.split(/\s+/).filter(Boolean);
+    const ranks = [];
+    for (const t of toks){
+      if (t.length >= 1) ranks.push(t[0].toUpperCase());
+      if (ranks.length >= 3) break;
     }
-    renderQuickBoardText();
+    if (ranks.length >= 3){
+      return { flopRanks: ranks.slice(0, 3).join(""), flopTexture: "", turnRunout: "", riverRunout: "" };
+    }
+    return null;
+  }
+
+  function applyQuickBoardMetaToForm(meta){
+    if (!meta || typeof meta !== "object") return;
+    byId("qFlopRanks").value = meta.flopRanks || "";
+    byId("qFlopTexture").value = meta.flopTexture || "";
+    byId("qTurnRunout").value = meta.turnRunout || "";
+    byId("qRiverRunout").value = meta.riverRunout || "";
+    renderQuickBoardSummary();
+  }
+
+  function renderQuickBoardSummary(){
+    const line = buildQuickBoardSummaryLine(readQuickBoardMetaFromForm());
+    const el = byId("qBoardSummary");
+    if (el) el.textContent = line.trim() ? line : "—";
+  }
+
+  function initQuickBoardForm(){
+    ["qFlopTexture", "qTurnRunout", "qRiverRunout"].forEach(id => {
+      const el = byId(id);
+      if (el) el.addEventListener("change", renderQuickBoardSummary);
+    });
+    const rin = byId("qFlopRanks");
+    if (rin) rin.addEventListener("input", renderQuickBoardSummary);
+    renderQuickBoardSummary();
+  }
+
+  function resolveHeroCardsForSave(){
+    const combo = byId("qHeroCombo").value.trim().toUpperCase();
+    if (combo) return combo;
+    const exact = byId("qHeroCardsText").textContent.trim();
+    return exact || "??";
   }
 
   // ---- Villains UI ----
@@ -2656,11 +2770,18 @@ h1{
   function prettyFromHeroCards(raw){
     const s = (raw || "").trim();
     if (!s) return "??";
-    // Accept "AsKc" or "As Kc"
-    const toks = s.includes(" ")
-      ? s.split(/\s+/).filter(Boolean)
-      : (s.length === 4 ? [s.slice(0,2), s.slice(2,4)] : [s]);
-    return toks.map(prettyFromToken).join(" ");
+    const compact = s.replace(/\s+/g, "");
+    const isExactTwo =
+      compact.length === 4 &&
+      /[shdc]/i.test(compact[1] || "") &&
+      /[shdc]/i.test(compact[3] || "");
+    if (isExactTwo){
+      return prettyFromToken(compact.slice(0, 2)) + " " + prettyFromToken(compact.slice(2, 4));
+    }
+    if (s.includes(" ")){
+      return s.split(/\s+/).filter(Boolean).map(prettyFromToken).join(" ");
+    }
+    return s;
   }
 
   function prettyFromBoardStreet(raw){
@@ -2691,7 +2812,12 @@ h1{
     if (h.mode === "quick"){
       const q = h.quick || {};
       if (q.preflop) lines.push("Preflop: " + q.preflop.trim());
-      if (q.board) lines.push("Board: " + q.board.trim());
+      let boardLine = "";
+      if (q.boardMeta && typeof q.boardMeta === "object"){
+        boardLine = buildQuickBoardSummaryLine(q.boardMeta).trim();
+      }
+      if (!boardLine) boardLine = (q.board || "").trim();
+      if (boardLine) lines.push("Board: " + boardLine);
       if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
       if (q.potBb) lines.push("Pot: " + q.potBb + "bb");
       lines.push("Result: " + (h.result || "—"));
@@ -2997,14 +3123,36 @@ h1{
     const q = h.quick || {};
     byId("qPreflop").value = q.preflop || "";
     byId("qPostflop").value = q.postflop || "";
-    setQuickBoardSelectsFromString(q.board || "");
+    if (q.boardMeta && typeof q.boardMeta === "object"){
+      applyQuickBoardMetaToForm(q.boardMeta);
+    } else {
+      const legacy = tryBoardMetaFromLegacyBoardString(q.board || "");
+      applyQuickBoardMetaToForm(legacy || { flopRanks: "", flopTexture: "", turnRunout: "", riverRunout: "" });
+    }
     byId("qPotBb").value = q.potBb || "";
     byId("qTurningPoint").value = h.turningPoint || "";
 
-    // cards (best-effort)
-    // expects like "AsKc"
+    byId("qHeroCombo").value = (q.heroCombo || "").trim();
     const cards = (h.heroCards || "").trim();
-    if (cards.length >= 4){
+    const looksCombo = cards && !/[shdc]/i.test(cards) && cards.length <= 6;
+    if (!byId("qHeroCombo").value && looksCombo) byId("qHeroCombo").value = cards.toUpperCase();
+
+    const compact = cards.replace(/\s+/g, "");
+    const isExactTwo =
+      compact.length === 4 &&
+      /[shdc]/i.test(compact[1] || "") &&
+      /[shdc]/i.test(compact[3] || "");
+    if (isExactTwo){
+      const det = byId("qExactHeroDetails");
+      if (det) det.open = true;
+      byId("qC1Rank").value = compact[0].toUpperCase();
+      byId("qC1Suit").value = compact[1].toLowerCase();
+      byId("qC2Rank").value = compact[2].toUpperCase();
+      byId("qC2Suit").value = compact[3].toLowerCase();
+      byId("qC1Rank").dispatchEvent(new Event("change"));
+    } else if (cards.length >= 4 && /[shdc]/i.test(cards)){
+      const det = byId("qExactHeroDetails");
+      if (det) det.open = true;
       byId("qC1Rank").value = cards[0].toUpperCase();
       byId("qC1Suit").value = cards[1].toLowerCase();
       byId("qC2Rank").value = cards[2].toUpperCase();
@@ -3019,12 +3167,16 @@ h1{
 
     const sh = byId("qHeroShorthand");
     if (sh) sh.value = byId("qHeroCardsText").textContent;
-    if ((q.board || "").trim()){ const bd = byId("qBoardDetails"); if (bd) bd.open = true; }
+    const bm = readQuickBoardMetaFromForm();
+    const hasBoard = bm.flopRanks || bm.flopTexture || bm.turnRunout || bm.riverRunout;
+    if (hasBoard || (q.board || "").trim()){ const bd = byId("qBoardDetails"); if (bd) bd.open = true; }
   }
 
   byId("qSaveHand").onclick = () => {
     const data = load();
     const meta = JSON.parse(JSON.stringify(readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"))));
+    const boardMeta = readQuickBoardMetaFromForm();
+    const boardSummary = buildQuickBoardSummaryLine(boardMeta);
 
     const hand = {
       id: editingHandId || uuid(),
@@ -3034,12 +3186,14 @@ h1{
       meta,
       heroPos: byId("qHeroPos").value,
       heroStackBb: byId("qHeroStack").value.trim(),
-      heroCards: byId("qHeroCardsText").textContent,
+      heroCards: resolveHeroCardsForSave(),
       villains: getVillains("qVillainsList"),
       quick: {
         preflop: byId("qPreflop").value,
         postflop: byId("qPostflop").value,
-        board: quickBoardStringFromSelects(),
+        heroCombo: byId("qHeroCombo").value.trim().toUpperCase(),
+        boardMeta,
+        board: boardSummary,
         potBb: byId("qPotBb").value.trim()
       },
       result: byId("qResult").value,
@@ -3365,8 +3519,7 @@ h1{
     initBoardSelects();
 
     
-    // quick board selects
-    initQuickBoardSelects();
+    initQuickBoardForm();
 // villains defaults
     resetQuickPreserveMeta();
     clearContainer("wVillainsList");
