@@ -771,6 +771,141 @@ h1{
       color: var(--muted);
     }
 
+    /* Tap card pickers (Quick hero, Wizard hero, board) */
+    .tapCardPairRow{
+      display:flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .tapCardSlot{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tapCardRank{
+      min-width: 56px;
+      height: 68px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      font-size: 26px;
+      font-weight: 900;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1;
+      padding: 0;
+    }
+    .tapCardSuit{
+      min-width: 48px;
+      height: 56px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1;
+      padding: 0;
+    }
+    .tapCardRank--sm{
+      min-width: 42px;
+      height: 50px;
+      font-size: 19px;
+      border-radius: 12px;
+    }
+    .tapCardSuit--sm{
+      min-width: 36px;
+      height: 44px;
+      font-size: 17px;
+      border-radius: 11px;
+    }
+    .tapBoardRow{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .cardPickOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.42);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 0 max(12px, env(safe-area-inset-bottom)) 0;
+    }
+    .cardPickOverlay[hidden]{
+      display: none !important;
+    }
+    .cardPickPanel{
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 14px 16px 22px;
+      max-height: 52vh;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+    .cardPickTitle{
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+    .cardPickGrid{
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .cardPickGrid--ranks{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+    .cardPickCell{
+      min-height: 46px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 17px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .cardPickCell--wide{
+      grid-column: span 5;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .cardPickCell--suit{
+      min-width: 58px;
+      font-size: 24px;
+    }
+    html[data-theme="light"] .tapCardRank,
+    html[data-theme="light"] .tapCardSuit,
+    html[data-theme="light"] .cardPickCell{
+      background: rgba(255,254,255,0.94);
+    }
+    .tapCardSuit--neutral:not(.suit-red):not(.suit-white){
+      color: var(--muted);
+    }
+
     /* Light mode — Stitch 2.0–style canvas: warm gray-violet, soft dots, airy glows */
     html[data-theme="light"]{
       color-scheme: light;
@@ -982,7 +1117,22 @@ h1{
 
         <div class="captureBlock">
           <span class="captureLbl">Your cards</span>
-          <input id="qHeroCombo" class="quickHeroCombo quickHeroCombo--lite" type="text" inputmode="text" autocomplete="off" placeholder="QQ · AKs · JTs" />
+          <div class="muted" style="font-size:12px; margin-top:4px;">Tap rank or suit — only fill what you remember.</div>
+          <div class="tapCardPairRow" aria-label="Hero cards">
+            <div class="tapCardSlot">
+              <button type="button" class="tapCardRank" id="qTapC1Rank" aria-label="First card rank">?</button>
+              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC1Suit" aria-label="First card suit">—</button>
+              <select id="qC1Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+              <select id="qC1Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+            </div>
+            <div class="tapCardSlot">
+              <button type="button" class="tapCardRank" id="qTapC2Rank" aria-label="Second card rank">?</button>
+              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC2Suit" aria-label="Second card suit">—</button>
+              <select id="qC2Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+              <select id="qC2Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+            </div>
+          </div>
+          <div class="pill" style="margin-top:10px;">Saved as: <b id="qHeroCardsText">—</b></div>
         </div>
 
         <div class="captureBlock">
@@ -999,25 +1149,6 @@ h1{
           <textarea id="qHandNotes" class="quickNotesArea" placeholder="Freeform: preflop through river, one stream of thought."></textarea>
         </div>
       </div>
-
-      <details class="boardDetails detailsQuiet" id="qExactHeroDetails" style="margin-top:12px;">
-        <summary>Exact suits (optional)</summary>
-        <div class="heroShorthandRow">
-          <label>Two cards (e.g. AsKd)</label>
-          <input id="qHeroShorthand" type="text" inputmode="text" autocomplete="off" placeholder="AsKd" />
-        </div>
-        <div class="heroFacesRow">
-          <div class="bigCard suit-white" id="qCard1Face">A♠</div>
-          <div class="bigCard suit-white" id="qCard2Face">K♣</div>
-        </div>
-        <div class="heroSelectRow" aria-label="Hero card selection">
-          <select id="qC1Rank"></select>
-          <select id="qC1Suit"></select>
-          <select id="qC2Rank"></select>
-          <select id="qC2Suit"></select>
-        </div>
-        <div class="pill" style="margin-top:10px;">Exact: <b id="qHeroCardsText">AsKc</b></div>
-      </details>
 
       <details class="boardDetails detailsQuiet" id="qSdDetails" style="margin-top:8px;">
         <summary>Showdown &amp; their cards (optional)</summary>
@@ -1205,19 +1336,23 @@ h1{
             </div>
           </div>
 
-          
-          <label>Hero Cards</label>
-          <div class="heroFacesRow">
-            <div class="bigCard suit-white" id="wCard1Face">A♠</div>
-            <div class="bigCard suit-white" id="wCard2Face">K♣</div>
+          <label>Hero cards</label>
+          <div class="muted" style="font-size:12px; margin-top:4px;">Same tap UI as Quick — optional rank and suit per card.</div>
+          <div class="tapCardPairRow" aria-label="Hero cards">
+            <div class="tapCardSlot">
+              <button type="button" class="tapCardRank" id="wTapC1Rank" aria-label="First card rank">?</button>
+              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="wTapC1Suit" aria-label="First card suit">—</button>
+              <select id="wC1Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+              <select id="wC1Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+            </div>
+            <div class="tapCardSlot">
+              <button type="button" class="tapCardRank" id="wTapC2Rank" aria-label="Second card rank">?</button>
+              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="wTapC2Suit" aria-label="Second card suit">—</button>
+              <select id="wC2Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+              <select id="wC2Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+            </div>
           </div>
-          <div class="heroSelectRow" aria-label="Hero card selection">
-            <select id="wC1Rank"></select>
-            <select id="wC1Suit"></select>
-            <select id="wC2Rank"></select>
-            <select id="wC2Suit"></select>
-          </div>
-          <div class="pill" style="margin-top:10px;">Shorthand: <b id="wHeroCardsText">AsKc</b></div>
+          <div class="pill" style="margin-top:10px;">Hand will save as: <b id="wHeroCardsText">—</b></div>
 
 
           <div class="subcard">
@@ -1251,6 +1386,10 @@ h1{
 
       <!-- Streets -->
       <div class="subcard" id="street_preflop">
+        <div id="wizPreflopGate" class="subcard" style="margin:0; border-style:dashed;">
+          <p class="muted" style="margin:0;">Finish <b>Hand Meta</b> above, then tap <b>Start Hand</b> to open preflop actions.</p>
+        </div>
+        <div id="wizPreflopBody" style="display:none;">
         <div class="rowBetween">
           <div>
             <h3>Preflop Actions</h3>
@@ -1296,6 +1435,7 @@ h1{
         
           <button class="danger" id="endHandPre" type="button">End Hand / Reflection</button>
         </div>
+        </div>
       </div>
 
       <div class="subcard" id="street_flop" style="display:none;">
@@ -1311,11 +1451,11 @@ h1{
 
         
         <div class="subcard" style="margin-top:10px;">
-          <h3 style="margin:0 0 8px;">Flop Cards</h3>
-          <div class="heroSelectRow" aria-label="Flop cards">
-            <select id="f1Rank"></select><select id="f1Suit"></select>
-            <select id="f2Rank"></select><select id="f2Suit"></select>
-            <select id="f3Rank"></select><select id="f3Suit"></select>
+          <h3 style="margin:0 0 8px;">Flop cards</h3>
+          <div class="tapBoardRow" aria-label="Flop cards">
+            <div class="tapCardSlot"><button type="button" class="tapCardRank tapCardRank--sm" id="fTap1Rank">?</button><button type="button" class="tapCardSuit tapCardSuit--sm tapCardSuit--neutral" id="fTap1Suit">—</button><select id="f1Rank" class="srOnly" tabindex="-1"></select><select id="f1Suit" class="srOnly" tabindex="-1"></select></div>
+            <div class="tapCardSlot"><button type="button" class="tapCardRank tapCardRank--sm" id="fTap2Rank">?</button><button type="button" class="tapCardSuit tapCardSuit--sm tapCardSuit--neutral" id="fTap2Suit">—</button><select id="f2Rank" class="srOnly" tabindex="-1"></select><select id="f2Suit" class="srOnly" tabindex="-1"></select></div>
+            <div class="tapCardSlot"><button type="button" class="tapCardRank tapCardRank--sm" id="fTap3Rank">?</button><button type="button" class="tapCardSuit tapCardSuit--sm tapCardSuit--neutral" id="fTap3Suit">—</button><select id="f3Rank" class="srOnly" tabindex="-1"></select><select id="f3Suit" class="srOnly" tabindex="-1"></select></div>
           </div>
           <div class="pill" style="margin-top:10px;">Flop: <b id="flopText">—</b></div>
         </div>
@@ -1400,9 +1540,9 @@ h1{
         <div id="actionsListTurn" class="list"></div>
 
         <div class="subcard" style="margin-top:12px;">
-          <h3 style="margin:0 0 8px;">Turn Card</h3>
-          <div class="heroSelectRow" aria-label="Turn card">
-            <select id="tRank"></select><select id="tSuit"></select>
+          <h3 style="margin:0 0 8px;">Turn card</h3>
+          <div class="tapBoardRow" aria-label="Turn card">
+            <div class="tapCardSlot"><button type="button" class="tapCardRank tapCardRank--sm" id="tTapRank">?</button><button type="button" class="tapCardSuit tapCardSuit--sm tapCardSuit--neutral" id="tTapSuit">—</button><select id="tRank" class="srOnly" tabindex="-1"></select><select id="tSuit" class="srOnly" tabindex="-1"></select></div>
           </div>
           <div class="pill" style="margin-top:10px;">Turn: <b id="turnText">—</b></div>
         </div>
@@ -1455,9 +1595,9 @@ h1{
 
         <div id="actionsListRiver" class="list"></div>
         <div class="subcard" style="margin-top:12px;">
-          <h3 style="margin:0 0 8px;">River Card</h3>
-          <div class="heroSelectRow" aria-label="River card">
-            <select id="rRank"></select><select id="rSuit"></select>
+          <h3 style="margin:0 0 8px;">River card</h3>
+          <div class="tapBoardRow" aria-label="River card">
+            <div class="tapCardSlot"><button type="button" class="tapCardRank tapCardRank--sm" id="rTapRank">?</button><button type="button" class="tapCardSuit tapCardSuit--sm tapCardSuit--neutral" id="rTapSuit">—</button><select id="rRank" class="srOnly" tabindex="-1"></select><select id="rSuit" class="srOnly" tabindex="-1"></select></div>
           </div>
           <div class="pill" style="margin-top:10px;">River: <b id="riverText">—</b></div>
         </div>
@@ -1836,7 +1976,6 @@ h1{
 
   function resetQuickPreserveMeta(){
     byId("qHeroStack").value = "";
-    byId("qHeroCombo").value = "";
     const qn = byId("qHandNotes");
     if (qn) qn.value = "";
     byId("qFlopRanks").value = "";
@@ -1848,8 +1987,6 @@ h1{
     if (qtc) qtc.value = "";
     if (qrc) qrc.value = "";
     renderQuickBoardSummary();
-    const ex = byId("qExactHeroDetails");
-    if (ex) ex.open = false;
     byId("qPotBb").value = "";
     byId("qTurningPoint").value = "";
     byId("quickEditHint").style.display = "none";
@@ -1862,13 +1999,11 @@ h1{
     setQuickShowdownUI("no");
     const qvs = byId("qVillainShowdown");
     if (qvs) qvs.value = "";
-    byId("qC1Rank").value = "A";
-    byId("qC1Suit").value = "s";
-    byId("qC2Rank").value = "K";
-    byId("qC2Suit").value = "c";
-    byId("qC1Rank").dispatchEvent(new Event("change"));
-    const sh = byId("qHeroShorthand");
-    if (sh) sh.value = "";
+    byId("qC1Rank").value = "";
+    byId("qC1Suit").value = "";
+    byId("qC2Rank").value = "";
+    byId("qC2Suit").value = "";
+    refreshTapHeroButtons("q");
     const bd = byId("qBoardDetails");
     if (bd) bd.open = false;
     const qmb = byId("qMetaBlinds");
@@ -2007,41 +2142,6 @@ h1{
   function cardPretty(rank, suitCode){ const m=suitMeta(suitCode); return `${rank}${m.sym}`; }
   function shorthand(rank, suitCode){ return `${rank}${suitCode}`; }
 
-  function initHeroCards(prefix){
-    fillRankSelect(byId(prefix+"C1Rank"), "A");
-    fillSuitSelect(byId(prefix+"C1Suit"), "s");
-    fillRankSelect(byId(prefix+"C2Rank"), "K");
-    fillSuitSelect(byId(prefix+"C2Suit"), "c");
-
-    const update = () => {
-      const r1 = byId(prefix+"C1Rank").value, s1 = byId(prefix+"C1Suit").value;
-      const r2 = byId(prefix+"C2Rank").value, s2 = byId(prefix+"C2Suit").value;
-
-      const m1 = suitMeta(s1), m2 = suitMeta(s2);
-      const f1 = byId(prefix+"Card1Face");
-      const f2 = byId(prefix+"Card2Face");
-
-      f1.classList.remove("suit-red","suit-white");
-      f2.classList.remove("suit-red","suit-white");
-      f1.classList.add(m1.cls);
-      f2.classList.add(m2.cls);
-
-      f1.textContent = cardPretty(r1, s1);
-      f2.textContent = cardPretty(r2, s2);
-
-      byId(prefix+"HeroCardsText").textContent = shorthand(r1,s1) + shorthand(r2,s2);
-      if (prefix === "q"){
-        const sh = byId("qHeroShorthand");
-        if (sh) sh.value = byId("qHeroCardsText").textContent;
-      }
-    };
-
-    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"]
-      .forEach(id => byId(id).addEventListener("change", update));
-    update();
-  }
-
-
   // ---- Board cards (Wizard) ----
   const RANKS_OPT = ["", ...RANKS]; // "" means not set
 
@@ -2060,6 +2160,228 @@ h1{
     }).join("");
   }
 
+  let cardPickBackdropFn = null;
+  function closeCardPickOverlay(){
+    const ov = byId("cardPickOverlay");
+    if (!ov) return;
+    ov.hidden = true;
+    if (cardPickBackdropFn){
+      ov.removeEventListener("click", cardPickBackdropFn);
+      cardPickBackdropFn = null;
+    }
+  }
+  function openCardPickOverlay(opts){
+    const { title, gridClass, buildGrid } = opts;
+    const ov = byId("cardPickOverlay");
+    const panel = byId("cardPickPanel");
+    const grid = byId("cardPickGrid");
+    const tit = byId("cardPickTitleText");
+    if (!ov || !grid || !tit) return;
+    tit.textContent = title;
+    grid.innerHTML = "";
+    grid.className = "cardPickGrid" + (gridClass ? " " + gridClass : "");
+    buildGrid(grid);
+    ov.hidden = false;
+    cardPickBackdropFn = (e) => { if (e.target === ov) closeCardPickOverlay(); };
+    ov.addEventListener("click", cardPickBackdropFn);
+    if (panel) panel.onclick = (e) => e.stopPropagation();
+  }
+  function pickRank(optional, onPick){
+    openCardPickOverlay({
+      title: optional ? "Rank (optional)" : "Rank",
+      gridClass: "cardPickGrid--ranks",
+      buildGrid(grid){
+        RANKS.forEach(r => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "cardPickCell";
+          b.textContent = r;
+          b.onclick = () => { onPick(r); closeCardPickOverlay(); };
+          grid.appendChild(b);
+        });
+        if (optional){
+          const clr = document.createElement("button");
+          clr.type = "button";
+          clr.className = "cardPickCell cardPickCell--wide";
+          clr.textContent = "Clear rank";
+          clr.onclick = () => { onPick(""); closeCardPickOverlay(); };
+          grid.appendChild(clr);
+        }
+      }
+    });
+  }
+  function pickSuit(optional, onPick){
+    openCardPickOverlay({
+      title: optional ? "Suit (optional)" : "Suit",
+      buildGrid(grid){
+        SUITS.forEach(s => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "cardPickCell cardPickCell--suit " + s.cls;
+          b.textContent = s.sym;
+          b.onclick = () => { onPick(s.code); closeCardPickOverlay(); };
+          grid.appendChild(b);
+        });
+        if (optional){
+          const clr = document.createElement("button");
+          clr.type = "button";
+          clr.className = "cardPickCell cardPickCell--wide";
+          clr.textContent = "Clear suit";
+          clr.onclick = () => { onPick(""); closeCardPickOverlay(); };
+          grid.appendChild(clr);
+        }
+      }
+    });
+  }
+
+  function buildHeroStorageStringFromSelects(prefix){
+    const r1 = byId(prefix+"C1Rank").value, s1 = byId(prefix+"C1Suit").value;
+    const r2 = byId(prefix+"C2Rank").value, s2 = byId(prefix+"C2Suit").value;
+    function oneToken(r, s){
+      if (!r && !s) return "";
+      if (r && s) return r + s;
+      if (r && !s) return r;
+      return "?" + s;
+    }
+    const parts = [oneToken(r1, s1), oneToken(r2, s2)].filter(Boolean);
+    if (!parts.length) return "??";
+    return parts.join(" ");
+  }
+
+  function updateTapHeroSummary(prefix){
+    const raw = buildHeroStorageStringFromSelects(prefix);
+    const el = byId(prefix + "HeroCardsText");
+    if (!el) return;
+    el.textContent = raw === "??" ? "—" : prettyFromHeroCards(raw);
+  }
+
+  function refreshTapHeroButtons(prefix){
+    function one(i){
+      const r = byId(prefix+"C"+i+"Rank")?.value || "";
+      const s = byId(prefix+"C"+i+"Suit")?.value || "";
+      const rb = byId(prefix+"TapC"+i+"Rank");
+      const sb = byId(prefix+"TapC"+i+"Suit");
+      if (rb) rb.textContent = r || "?";
+      if (sb){
+        sb.textContent = s ? suitMeta(s).sym : "—";
+        sb.classList.remove("suit-red","suit-white","tapCardSuit--neutral");
+        if (s) sb.classList.add(suitMeta(s).cls);
+        else sb.classList.add("tapCardSuit--neutral");
+      }
+    }
+    one(1);
+    one(2);
+    updateTapHeroSummary(prefix);
+  }
+
+  function applyHeroCardsStringToTaps(prefix, raw){
+    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"].forEach(id => {
+      const el = byId(id);
+      if (el) el.value = "";
+    });
+    const s = String(raw || "").trim();
+    if (!s || s === "??"){
+      refreshTapHeroButtons(prefix);
+      return;
+    }
+    const compactNoSpace = s.replace(/\s/g, "");
+    if (compactNoSpace.length === 4 && /[shdc]/i.test(compactNoSpace[1]) && /[shdc]/i.test(compactNoSpace[3])){
+      byId(prefix+"C1Rank").value = compactNoSpace[0].toUpperCase();
+      byId(prefix+"C1Suit").value = compactNoSpace[1].toLowerCase();
+      byId(prefix+"C2Rank").value = compactNoSpace[2].toUpperCase();
+      byId(prefix+"C2Suit").value = compactNoSpace[3].toLowerCase();
+      refreshTapHeroButtons(prefix);
+      return;
+    }
+    const tok = s.split(/\s+/).filter(Boolean);
+    function applyTok(t, rankId, suitId){
+      t = String(t).replace(/\s/g, "");
+      if (!t) return;
+      const ten = /^10([shdc])$/i.exec(t);
+      if (ten){
+        byId(rankId).value = "T";
+        byId(suitId).value = ten[1].toLowerCase();
+        return;
+      }
+      if (t.length === 2 && RANKS.includes(t[0].toUpperCase()) && /[shdc]/i.test(t[1])){
+        byId(rankId).value = t[0].toUpperCase();
+        byId(suitId).value = t[1].toLowerCase();
+        return;
+      }
+      if (t.length === 2 && t[0] === "?" && /[shdc]/i.test(t[1])){
+        byId(rankId).value = "";
+        byId(suitId).value = t[1].toLowerCase();
+        return;
+      }
+      if (t.length === 1 && RANKS.includes(t.toUpperCase())){
+        byId(rankId).value = t.toUpperCase();
+        byId(suitId).value = "";
+      }
+    }
+    if (tok[0]) applyTok(tok[0], prefix+"C1Rank", prefix+"C1Suit");
+    if (tok[1]) applyTok(tok[1], prefix+"C2Rank", prefix+"C2Suit");
+    refreshTapHeroButtons(prefix);
+  }
+
+  function initTapHeroCards(prefix){
+    fillRankSelectOpt(byId(prefix+"C1Rank"), "");
+    fillRankSelectOpt(byId(prefix+"C2Rank"), "");
+    fillSuitSelectOpt(byId(prefix+"C1Suit"), "");
+    fillSuitSelectOpt(byId(prefix+"C2Suit"), "");
+    [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"].forEach(id => {
+      byId(id).addEventListener("change", () => refreshTapHeroButtons(prefix));
+    });
+    [[1, prefix+"TapC1Rank", prefix+"TapC1Suit"], [2, prefix+"TapC2Rank", prefix+"TapC2Suit"]].forEach(([i, rb, sb]) => {
+      byId(rb).onclick = () => pickRank(true, v => {
+        byId(prefix+"C"+i+"Rank").value = v;
+        byId(prefix+"C"+i+"Rank").dispatchEvent(new Event("change"));
+      });
+      byId(sb).onclick = () => pickSuit(true, v => {
+        byId(prefix+"C"+i+"Suit").value = v;
+        byId(prefix+"C"+i+"Suit").dispatchEvent(new Event("change"));
+      });
+    });
+    refreshTapHeroButtons(prefix);
+  }
+
+  function syncBoardTapVisual(rankId, suitId, rankBtnId, suitBtnId){
+    const r = byId(rankId).value, s = byId(suitId).value;
+    const rb = byId(rankBtnId), sb = byId(suitBtnId);
+    if (rb) rb.textContent = r || "?";
+    if (sb){
+      sb.textContent = s ? suitMeta(s).sym : "—";
+      sb.classList.remove("suit-red","suit-white","tapCardSuit--neutral");
+      if (s) sb.classList.add(suitMeta(s).cls);
+      else sb.classList.add("tapCardSuit--neutral");
+    }
+  }
+
+  function wireBoardTapSlot(rankId, suitId, rankBtnId, suitBtnId){
+    const bump = () => {
+      syncBoardTapVisual(rankId, suitId, rankBtnId, suitBtnId);
+      renderBoardText();
+    };
+    byId(rankBtnId).onclick = () => pickRank(true, v => {
+      byId(rankId).value = v;
+      bump();
+    });
+    byId(suitBtnId).onclick = () => pickSuit(true, v => {
+      byId(suitId).value = v;
+      bump();
+    });
+    byId(rankId).addEventListener("change", bump);
+    byId(suitId).addEventListener("change", bump);
+    bump();
+  }
+
+  function refreshAllBoardTapButtons(){
+    syncBoardTapVisual("f1Rank", "f1Suit", "fTap1Rank", "fTap1Suit");
+    syncBoardTapVisual("f2Rank", "f2Suit", "fTap2Rank", "fTap2Suit");
+    syncBoardTapVisual("f3Rank", "f3Suit", "fTap3Rank", "fTap3Suit");
+    syncBoardTapVisual("tRank", "tSuit", "tTapRank", "tTapSuit");
+    syncBoardTapVisual("rRank", "rSuit", "rTapRank", "rTapSuit");
+  }
+
   function cardToken(rank, suit){
     if (!rank || !suit) return "";
     return `${rank}${suit}`;
@@ -2071,22 +2393,17 @@ h1{
   }
 
   function initBoardSelects(){
-    ["f1","f2","f3"].forEach(p => {
+    [["f1","fTap1Rank","fTap1Suit"],["f2","fTap2Rank","fTap2Suit"],["f3","fTap3Rank","fTap3Suit"]].forEach(([p, rb, sb]) => {
       fillRankSelectOpt(byId(p+"Rank"), "");
       fillSuitSelectOpt(byId(p+"Suit"), "");
-      const rerender = () => renderBoardText();
-      byId(p+"Rank").addEventListener("change", rerender);
-      byId(p+"Suit").addEventListener("change", rerender);
+      wireBoardTapSlot(p+"Rank", p+"Suit", rb, sb);
     });
-
-    ["t","r"].forEach(p => {
-      fillRankSelectOpt(byId(p+"Rank"), "");
-      fillSuitSelectOpt(byId(p+"Suit"), "");
-      const rerender = () => renderBoardText();
-      byId(p+"Rank").addEventListener("change", rerender);
-      byId(p+"Suit").addEventListener("change", rerender);
-    });
-
+    fillRankSelectOpt(byId("tRank"), "");
+    fillSuitSelectOpt(byId("tSuit"), "");
+    wireBoardTapSlot("tRank", "tSuit", "tTapRank", "tTapSuit");
+    fillRankSelectOpt(byId("rRank"), "");
+    fillSuitSelectOpt(byId("rSuit"), "");
+    wireBoardTapSlot("rRank", "rSuit", "rTapRank", "rTapSuit");
     renderBoardText();
   }
 
@@ -2147,6 +2464,7 @@ h1{
     }
 
     renderBoardText();
+    refreshAllBoardTapButtons();
   }
 
   // ---- Quick Log board: ranks + texture + runout (live-poker memory model) ----
@@ -2269,10 +2587,21 @@ h1{
   }
 
   function resolveHeroCardsForSave(){
-    const combo = byId("qHeroCombo").value.trim().toUpperCase();
-    if (combo) return combo;
-    const exact = byId("qHeroCardsText").textContent.trim();
-    return exact || "??";
+    return buildHeroStorageStringFromSelects("q");
+  }
+
+  function quickHeroComboForSave(){
+    const r1 = byId("qC1Rank").value, s1 = byId("qC1Suit").value;
+    const r2 = byId("qC2Rank").value, s2 = byId("qC2Suit").value;
+    if (s1 || s2) return "";
+    if (r1 && r2){
+      const hi = RANKS.indexOf(r1), lo = RANKS.indexOf(r2);
+      if (hi < 0 || lo < 0) return "";
+      const [a, b] = hi <= lo ? [r1, r2] : [r2, r1];
+      if (a === b) return a + b;
+      return a + b + "o";
+    }
+    return "";
   }
 
   // ---- Villains UI ----
@@ -2675,7 +3004,11 @@ h1{
 
     if (type === "CALL"){
       const call = Math.min(toCall, stackBehind);
-      return { ok: (toCall>0), investChips: call, note: call < toCall ? "call (all-in)" : "call" };
+      const callBb = bb > 0 ? (call / bb).toFixed(1) : String(call);
+      const note = call < toCall
+        ? `call ~${callBb}bb (stack cap)`
+        : `call ~${callBb}bb`;
+      return { ok: (toCall>0), investChips: call, note };
     }
 
     if (type === "JAM"){
@@ -2833,13 +3166,33 @@ h1{
     });
   }
 
+  function playerFoldedPreflop(hand, actorId){
+    const acts = hand?.wizard?.streets?.preflop?.actions || [];
+    return acts.some(a => a.actorId === actorId && a.type === "FOLD");
+  }
+
   function fillWizardActorSelects(){
-    const opts = wizActive.hand.wizard.players.map(p =>
+    const emptyOpt = '<option value="">—</option>';
+    if (!wizActive || !wizActive.hand?.wizard?.players){
+      ["Pre","Flop","Turn","River"].forEach(suffix => {
+        const el = byId("actActor"+suffix);
+        if (el) el.innerHTML = emptyOpt;
+      });
+      return;
+    }
+    const players = wizActive.hand.wizard.players;
+    const optsAll = players.map(p =>
+      `<option value="${p.id}">${escapeHtml(p.label)} • ${escapeHtml(p.pos)}</option>`
+    ).join("");
+    const optsPost = players.filter(p => !playerFoldedPreflop(wizActive.hand, p.id)).map(p =>
       `<option value="${p.id}">${escapeHtml(p.label)} • ${escapeHtml(p.pos)}</option>`
     ).join("");
 
-    ["Pre","Flop","Turn","River"].forEach(suffix => {
-      byId("actActor"+suffix).innerHTML = opts;
+    const pre = byId("actActorPre");
+    if (pre) pre.innerHTML = optsAll || emptyOpt;
+    ["Flop","Turn","River"].forEach(suffix => {
+      const el = byId("actActor"+suffix);
+      if (el) el.innerHTML = optsPost || emptyOpt;
     });
   }
 
@@ -2943,7 +3296,10 @@ h1{
 
     renderActionList(street);
     refreshWizardPotAndStacks();
-    if (["preflop","flop","turn","river"].includes(street)) fillAmountSelectForStreet(street);
+    if (street === "preflop") fillWizardActorSelects();
+    if (["preflop","flop","turn","river"].includes(street)){
+      ["preflop","flop","turn","river"].forEach(st => fillAmountSelectForStreet(st));
+    }
     byId("wizStatus").textContent = "In progress";
     byId("wizStatus").className = "badgeOk";
     return true;
@@ -2966,6 +3322,8 @@ h1{
     acts.pop();
     renderActionList(street);
     refreshWizardPotAndStacks();
+    if (street === "preflop") fillWizardActorSelects();
+    ["preflop","flop","turn","river"].forEach(st => fillAmountSelectForStreet(st));
   }
 
   function clearWizardStreet(street){
@@ -2973,6 +3331,8 @@ h1{
     wizActive.hand.wizard.streets[street].actions = [];
     renderActionList(street);
     refreshWizardPotAndStacks();
+    if (street === "preflop") fillWizardActorSelects();
+    ["preflop","flop","turn","river"].forEach(st => fillAmountSelectForStreet(st));
   }
 
   function switchWizardTab(tab){
@@ -3422,32 +3782,35 @@ h1{
     byId("qPotBb").value = q.potBb || "";
     byId("qTurningPoint").value = h.turningPoint || "";
 
-    byId("qHeroCombo").value = (q.heroCombo || "").trim();
     const cards = (h.heroCards || "").trim();
-    const looksCombo = cards && !/[shdc]/i.test(cards) && cards.length <= 6;
-    if (!byId("qHeroCombo").value && looksCombo) byId("qHeroCombo").value = cards.toUpperCase();
-
-    const compact = cards.replace(/\s+/g, "");
-    const isExactTwo =
-      compact.length === 4 &&
-      /[shdc]/i.test(compact[1] || "") &&
-      /[shdc]/i.test(compact[3] || "");
-    if (isExactTwo){
-      const det = byId("qExactHeroDetails");
-      if (det) det.open = true;
-      byId("qC1Rank").value = compact[0].toUpperCase();
-      byId("qC1Suit").value = compact[1].toLowerCase();
-      byId("qC2Rank").value = compact[2].toUpperCase();
-      byId("qC2Suit").value = compact[3].toLowerCase();
-      byId("qC1Rank").dispatchEvent(new Event("change"));
-    } else if (cards.length >= 4 && /[shdc]/i.test(cards)){
-      const det = byId("qExactHeroDetails");
-      if (det) det.open = true;
-      byId("qC1Rank").value = cards[0].toUpperCase();
-      byId("qC1Suit").value = cards[1].toLowerCase();
-      byId("qC2Rank").value = cards[2].toUpperCase();
-      byId("qC2Suit").value = cards[3].toLowerCase();
-      byId("qC1Rank").dispatchEvent(new Event("change"));
+    if (cards){
+      applyHeroCardsStringToTaps("q", cards);
+    } else {
+      const hc = (q.heroCombo || "").trim().toUpperCase();
+      if (hc){
+        const pair = parseTwoCardShorthand(hc.replace(/\s+/g, ""));
+        if (pair){
+          byId("qC1Rank").value = pair[0].rank;
+          byId("qC1Suit").value = pair[0].suit;
+          byId("qC2Rank").value = pair[1].rank;
+          byId("qC2Suit").value = pair[1].suit;
+          refreshTapHeroButtons("q");
+        } else {
+          const compact = hc.replace(/\s+/g, "");
+          const m = /^([AKQJT2-9])([AKQJT2-9])(S|O)?$/.exec(compact);
+          if (m){
+            byId("qC1Rank").value = m[1];
+            byId("qC2Rank").value = m[2];
+            byId("qC1Suit").value = "";
+            byId("qC2Suit").value = "";
+            refreshTapHeroButtons("q");
+          } else {
+            applyHeroCardsStringToTaps("q", "");
+          }
+        }
+      } else {
+        applyHeroCardsStringToTaps("q", "");
+      }
     }
 
     // villains
@@ -3457,8 +3820,6 @@ h1{
     const qvb = byId("qVillainsBlock");
     if (qvb) qvb.open = !!(h.villains && h.villains.length);
 
-    const sh = byId("qHeroShorthand");
-    if (sh) sh.value = byId("qHeroCardsText").textContent;
     const bm = readQuickBoardMetaFromForm();
     const hasBoard = bm.flopRanks || bm.flopTexture || bm.turnRunout || bm.riverRunout || bm.turnCard || bm.riverCard;
     if (hasBoard || (q.board || "").trim()){ const bd = byId("qBoardDetails"); if (bd) bd.open = true; }
@@ -3486,7 +3847,7 @@ h1{
         handNotes: hn,
         preflop: hn,
         postflop: "",
-        heroCombo: byId("qHeroCombo").value.trim().toUpperCase(),
+        heroCombo: quickHeroComboForSave(),
         boardMeta,
         board: boardSummary,
         potBb: byId("qPotBb").value.trim(),
@@ -3512,6 +3873,13 @@ h1{
   // ---- Wizard start/reset/save/edit ----
   byId("wAddVillainBtn").onclick = () => addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
 
+  function setWizPreflopStarted(on){
+    const gate = byId("wizPreflopGate");
+    const body = byId("wizPreflopBody");
+    if (gate) gate.style.display = on ? "none" : "";
+    if (body) body.style.display = on ? "" : "none";
+  }
+
   function resetWizardUI(){
     byId("wizStatus").textContent = "Meta not started";
     byId("wizStatus").className = "badgeWarn";
@@ -3524,6 +3892,8 @@ h1{
 
     // clear draft
     wizActive = null;
+    setWizPreflopStarted(false);
+    fillWizardActorSelects();
 
     // clear street lists
     ["Pre","Flop","Turn","River"].forEach(suffix => {
@@ -3549,11 +3919,11 @@ h1{
 
     byId("wHeroPos").value = "BTN";
     byId("wHeroStack").value = "";
-    byId("wC1Rank").value = "A";
-    byId("wC1Suit").value = "s";
-    byId("wC2Rank").value = "K";
-    byId("wC2Suit").value = "c";
-    byId("wC1Rank").dispatchEvent(new Event("change"));
+    byId("wC1Rank").value = "";
+    byId("wC1Suit").value = "";
+    byId("wC2Rank").value = "";
+    byId("wC2Suit").value = "";
+    refreshTapHeroButtons("w");
 
     // clear villains list
     clearContainer("wVillainsList");
@@ -3597,7 +3967,7 @@ h1{
     const meta = JSON.parse(JSON.stringify(readHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"))));
     const heroPos = byId("wHeroPos").value;
     const heroStackBb = byId("wHeroStack").value.trim();
-    const heroCards = byId("wHeroCardsText").textContent;
+    const heroCards = buildHeroStorageStringFromSelects("w");
 
     if (!heroStackBb){
       alert("Enter Hero stack (bb) to start wizard.");
@@ -3615,6 +3985,7 @@ h1{
 
     fillWizardActorSelects();
     ["preflop","flop","turn","river"].forEach(st=>fillAmountSelectForStreet(st));
+    setWizPreflopStarted(true);
 
     // collapse meta
     setWizardMetaSummary(meta, heroPos, heroStackBb);
@@ -3647,15 +4018,7 @@ h1{
     byId("wHeroPos").value = h.heroPos || "BTN";
     byId("wHeroStack").value = h.heroStackBb || "";
 
-    // cards
-    const cards = (h.heroCards || "").trim();
-    if (cards.length >= 4){
-      byId("wC1Rank").value = cards[0].toUpperCase();
-      byId("wC1Suit").value = cards[1].toLowerCase();
-      byId("wC2Rank").value = cards[2].toUpperCase();
-      byId("wC2Suit").value = cards[3].toLowerCase();
-      byId("wC1Rank").dispatchEvent(new Event("change"));
-    }
+    applyHeroCardsStringToTaps("w", (h.heroCards || "").trim());
 
     // villains
     clearContainer("wVillainsList");
@@ -3669,6 +4032,7 @@ h1{
         ui: { activeStreet: "preflop" }
       };
       fillWizardActorSelects();
+      setWizPreflopStarted(true);
 
       // collapse meta summary
       setWizardMetaSummary(h.meta, h.heroPos, h.heroStackBb);
@@ -3766,6 +4130,8 @@ h1{
     wizActive.hand.wizard.board.turn = b.turn;
     wizActive.hand.wizard.board.river = b.river;
 
+    wizActive.hand.heroCards = buildHeroStorageStringFromSelects("w");
+
     // result
     wizActive.hand.wizard.result.result = byId("wResult").value;
     wizActive.hand.wizard.result.showdown = (byId("wShowdown").value === "yes");
@@ -3834,9 +4200,8 @@ h1{
     applyLastQuickMetaToWizard();
     initQuickHeroPosChips();
 
-    // hero cards compact UI
-    initHeroCards("q");
-    initHeroCards("w");
+    initTapHeroCards("q");
+    initTapHeroCards("w");
 
     // wizard board selects
     initBoardSelects();
@@ -3881,23 +4246,6 @@ h1{
         setQuickShowdownUI(btn.dataset.sd);
       });
     }
-    const shIn = byId("qHeroShorthand");
-    if (shIn){
-      shIn.addEventListener("blur", () => {
-        const raw = shIn.value.trim();
-        if (!raw) return;
-        const pair = parseTwoCardShorthand(raw);
-        if (!pair){
-          alert("Could not parse cards. Try AsKd, Ah Kd, Th 9c, or 10h 9c.");
-          return;
-        }
-        byId("qC1Rank").value = pair[0].rank;
-        byId("qC1Suit").value = pair[0].suit;
-        byId("qC2Rank").value = pair[1].rank;
-        byId("qC2Suit").value = pair[1].suit;
-        byId("qC1Rank").dispatchEvent(new Event("change"));
-      });
-    }
   })();
 
   byId("qSameAsLast").onclick = () => {
@@ -3932,6 +4280,13 @@ h1{
   init();
 
 </script>
+
+<div id="cardPickOverlay" class="cardPickOverlay" hidden>
+  <div class="cardPickPanel" id="cardPickPanel" role="dialog" aria-modal="true" aria-labelledby="cardPickTitleText">
+    <div class="cardPickTitle" id="cardPickTitleText">Pick</div>
+    <div id="cardPickGrid" class="cardPickGrid"></div>
+  </div>
+</div>
 
 </body>
 </html>
