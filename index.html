@@ -11,7 +11,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#03060c" />
+  <meta name="theme-color" content="#0a0a0c" />
 
   <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -22,11 +22,15 @@
   <!-- Optional favicon -->
   <link rel="icon" href="icons/icon-192.png" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
   <style>
 
     .grid2tight{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
     .blinds3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; align-items:end; }
-    .miniLbl{ font-size:12px; color: rgba(255,255,255,0.65); margin-bottom:6px; display:block; }
+    .miniLbl{ font-size:12px; color: var(--muted); margin-bottom:6px; display:block; font-weight:500; }
     @media (max-width: 430px){
       .streetGrid{ grid-template-columns: 1.1fr 1fr 1fr; gap:8px; }
       .streetGrid select, .streetGrid input{ padding:10px 10px; }
@@ -36,15 +40,15 @@
       .grid2tight select, .grid2tight input, .blinds3 select, .blinds3 input{ padding:10px 10px; }
     }
 
-    .stackSummary{ margin-top:10px; display:none; }
+    .stackSummary{ margin-top:10px; }
     .stackSummary *{ pointer-events: auto; }
 
     .blindsInline{ grid-template-columns: 1fr 1fr !important; gap:10px !important; }
 
     .stackTable{ width:100%; border-collapse:collapse; }
-    .stackTable th,.stackTable td{ padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px; }
-    .stackTable th{ text-align:left; color:rgba(255,255,255,0.72); font-weight:600; }
-    .stackTable td{ color:rgba(255,255,255,0.92); }
+    .stackTable th,.stackTable td{ padding:6px 8px; border-bottom:1px solid var(--border); font-size:12px; }
+    .stackTable th{ text-align:left; color:var(--muted); font-weight:600; }
+    .stackTable td{ color:var(--text); }
     .stackMono{ font-variant-numeric: tabular-nums; }
     .amountSelect{ width:100%; }
 
@@ -53,39 +57,52 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
+    /* Design system: primary #73749B, secondary #75758B, tertiary #8D6C92, neutral #78767C */
     :root{
-      --bg0:#03060c;
-      --bg1:#02040a;
+      --primary:#73749B;
+      --secondary:#75758B;
+      --tertiary:#8D6C92;
+      --neutral:#78767C;
 
-      --text:#f5f7ff;
-      --muted:#8b93b1;
+      --primary-soft:rgba(115,116,155,0.22);
+      --tertiary-soft:rgba(141,108,146,0.18);
 
-      --border: rgba(255,255,255,0.11);
-      --border2: rgba(255,255,255,0.16);
+      --bg0:#0a0a0c;
+      --bg1:#121214;
 
-      --chip: rgba(255,255,255,0.07);
-      --input: rgba(255,255,255,0.06);
-      --input2: rgba(255,255,255,0.10);
+      --text:#f4f3f8;
+      --body:#c9c6d4;
+      --muted:#9a97a8;
 
-      --danger:#ff5c6c;
-      --ok:#22c55e;
+      --border: rgba(120,118,124,0.28);
+      --border2: rgba(120,118,124,0.42);
 
-      --accentA: rgba(110,168,255,0.92);
-      --accentB: rgba(34,197,94,0.78);
-      --accentC: rgba(168,85,247,0.70);
+      --chip: rgba(115,116,155,0.12);
+      --input: rgba(18,18,22,0.72);
+      --input2: rgba(115,116,155,0.14);
 
-      --shadow: 0 12px 34px rgba(0,0,0,0.55);
+      --danger:#e85d6f;
+      --ok:#5eb88a;
+
+      --accentA: #73749B;
+      --accentB: #8D6C92;
+      --accentC: #75758B;
+
+      --btn-primary-top:#e4e3ef;
+      --btn-primary-bot:#c8c6dc;
+      --shadow: 0 12px 34px rgba(0,0,0,0.5);
     }
 
     html, body { height:100%; }
     body{
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-feature-settings: "cv02","cv03","cv04","cv11";
+      color: var(--body);
       background:
-        radial-gradient(1100px 560px at 15% -10%, rgba(110,168,255,0.16), transparent 60%),
-        radial-gradient(900px 560px at 90% 0%, rgba(168,85,247,0.10), transparent 55%),
-        radial-gradient(900px 560px at 70% 10%, rgba(34,197,94,0.10), transparent 60%),
+        radial-gradient(1000px 520px at 12% -8%, var(--primary-soft), transparent 58%),
+        radial-gradient(880px 480px at 92% 0%, var(--tertiary-soft), transparent 52%),
+        radial-gradient(700px 400px at 55% 12%, rgba(117,117,139,0.08), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       -webkit-font-smoothing: antialiased;
       touch-action: manipulation;
@@ -103,9 +120,9 @@
       top: 0;
       z-index: 30;
       padding: 14px 0 10px;
-      background: transparent; /* seamless with page background */
+      background: transparent;
       backdrop-filter: none;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid var(--border);
       margin-bottom: 8px;
     }
 
@@ -178,20 +195,26 @@
 h1{
       margin:0;
       font-size: 26px;
-      letter-spacing:-0.8px;
+      font-weight: 700;
+      letter-spacing:-0.6px;
       line-height: 1.05;
+      color: var(--text);
     }
     h2{
       margin:0 0 10px;
       font-size: 18px;
+      font-weight: 700;
       letter-spacing:-0.2px;
+      color: var(--text);
     }
     h3{
       margin:0 0 8px;
       font-size: 14px;
-      letter-spacing:-0.1px;
+      font-weight: 600;
+      letter-spacing:-0.05px;
+      color: var(--text);
     }
-    .muted{ color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .muted{ color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.4; }
 
     .pill{
       display:inline-flex;
@@ -209,9 +232,10 @@ h1{
     .pill.potPill{
       padding: 8px 12px;
       font-size: 13px;
-      color: rgba(255,255,255,0.86);
-      background: rgba(110,168,255,0.12);
-      border: 1px solid rgba(110,168,255,0.32);
+      font-weight: 600;
+      color: var(--text);
+      background: var(--primary-soft);
+      border: 1px solid rgba(115,116,155,0.4);
       box-shadow: 0 8px 18px rgba(0,0,0,0.35);
     }
 
@@ -225,9 +249,10 @@ h1{
     .modeRow button{
       min-width: 120px;
       font-size: 15px;
+      font-weight: 700;
       padding: 14px 18px;
-      border-radius: 16px;
-      letter-spacing: 0.2px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
       white-space: nowrap;
     }
 
@@ -256,9 +281,9 @@ h1{
     }
 
 .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      background: linear-gradient(180deg, rgba(115,116,155,0.08), rgba(255,255,255,0.02));
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 20px;
       box-shadow: var(--shadow);
       padding: 14px;
       margin: 12px 0;
@@ -291,6 +316,11 @@ h1{
     }
 
     /* iOS: prevent zoom on input focus by using >=16px */
+    input.disabledInput, select.disabledInput, textarea.disabledInput{
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     input, textarea, select{
       width: 100%;
       padding: 12px;
@@ -305,39 +335,43 @@ h1{
       appearance: none;
     }
     textarea{ min-height: 88px; resize: vertical; }
-    input::placeholder, textarea::placeholder{ color: rgba(139,147,177,0.55); }
+    input::placeholder, textarea::placeholder{ color: rgba(154,151,168,0.5); }
     input:focus, textarea:focus, select:focus{
-      border-color: rgba(110,168,255,0.65);
-      box-shadow: 0 0 0 4px rgba(110,168,255,0.16);
+      border-color: rgba(115,116,155,0.65);
+      box-shadow: 0 0 0 4px rgba(115,116,155,0.2);
       background: var(--input2);
     }
 
     .btns{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 
     button{
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 12px 18px;
+      border-radius: 999px;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      font-weight: 900;
+      background: rgba(30,30,34,0.85);
+      color: var(--body);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.02em;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
 
     button.primary{
-      background: linear-gradient(90deg, var(--accentA), var(--accentB));
-      border-color: rgba(255,255,255,0.14);
-      color: #05070d;
+      background: linear-gradient(180deg, var(--btn-primary-top), var(--btn-primary-bot));
+      border-color: rgba(115,116,155,0.45);
+      color: #14141a;
+      font-weight: 800;
     }
     button.primaryAlt{
-      background: linear-gradient(90deg, rgba(110,168,255,0.92), rgba(168,85,247,0.80));
-      border-color: rgba(255,255,255,0.14);
-      color: #05070d;
+      background: linear-gradient(135deg, #d4d2e8 0%, #b8b4d4 45%, #a39fc4 100%);
+      border-color: rgba(115,116,155,0.5);
+      color: #14141a;
+      font-weight: 800;
     }
-    button.secondary{ background: rgba(255,255,255,0.05); }
+    button.secondary{ background: rgba(30,30,34,0.9); color: rgba(244,243,248,0.92); }
     button.ghost{ background: transparent; }
     button.danger{
       background: rgba(255,92,108,0.18);
@@ -364,9 +398,9 @@ h1{
 
     pre{
       margin: 10px 0 0;
-      background: #050816;
-      border: 1px solid rgba(255,255,255,0.08);
-      color:#e9ecf8;
+      background: #0e0e12;
+      border: 1px solid var(--border);
+      color: var(--body);
       padding: 12px;
       border-radius: 16px;
       overflow:auto;
@@ -392,12 +426,12 @@ h1{
       margin-top: 10px;
     }
 .cardPick{
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 12px;
       background:
-        radial-gradient(420px 120px at 30% 0%, rgba(110,168,255,0.10), transparent 55%),
-        rgba(255,255,255,0.03);
+        radial-gradient(420px 120px at 30% 0%, var(--primary-soft), transparent 55%),
+        rgba(255,255,255,0.02);
       box-shadow: 0 10px 26px rgba(0,0,0,0.28);
       overflow: hidden;
     }
@@ -442,10 +476,10 @@ h1{
       user-select: none;
     }
     .tab.active{
-      color: #05070d;
-      border-color: rgba(255,255,255,0.16);
-      background: linear-gradient(90deg, var(--accentA), var(--accentB));
-      box-shadow: 0 0 0 4px rgba(110,168,255,0.16);
+      color: #14141a;
+      border-color: rgba(115,116,155,0.4);
+      background: linear-gradient(135deg, var(--btn-primary-top), #b4b0cc);
+      box-shadow: 0 0 0 4px rgba(115,116,155,0.2);
     }
 
     .streetGrid{
@@ -468,10 +502,11 @@ h1{
       gap:6px;
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(34,197,94,0.35);
-      background: rgba(34,197,94,0.10);
-      color: rgba(220,255,235,0.95);
+      border: 1px solid rgba(94,184,138,0.45);
+      background: rgba(94,184,138,0.12);
+      color: #d4f0e3;
       font-size: 12px;
+      font-weight: 600;
       white-space: nowrap;
     }
 
@@ -480,10 +515,10 @@ h1{
     }
 
     .btnActive{
-      background: linear-gradient(90deg, rgba(140,235,255,1), rgba(210,140,255,1)) !important;
-      border-color: rgba(255,255,255,0.34) !important;
-      color:#05070d !important;
-      box-shadow: 0 0 0 5px rgba(140,235,255,0.30), 0 14px 40px rgba(0,0,0,0.45);
+      background: linear-gradient(135deg, #ddd9f0 0%, #c4bfd8 50%, #a8a3c4 100%) !important;
+      border-color: rgba(115,116,155,0.45) !important;
+      color:#14141a !important;
+      box-shadow: 0 0 0 4px rgba(115,116,155,0.25), 0 14px 36px rgba(0,0,0,0.4);
     }
 
     #street_result{
@@ -1966,7 +2001,8 @@ h1{
     byId("potPillTurn").textContent = txt;
     byId("potPillRiver").textContent = txt;
     byId("potPillResult").textContent = txt;
-  
+  }
+
   function renderStackSummary(){
     if (!wizActive) return;
     const st = wizActive.ui.activeStreet;
@@ -2042,7 +2078,11 @@ h1{
 
     inp.placeholder = `≤ ${maxTo.toFixed(1)} bb`;
   }
-}
+
+  function refreshWizardPotAndStacks(){
+    renderPotPills();
+    renderStackSummary();
+  }
 
   function renderActionList(street){
     if (!wizActive) return;
@@ -2220,10 +2260,11 @@ h1{
     byId("wizStatus").textContent = "Auto-ended";
     byId("wizStatus").className = "badgeWarn";
 
-    renderPotPills();
+    refreshWizardPotAndStacks();
     switchWizardTab("result");
   }
-function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
+
+  function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
     if (!wizActive) return false;
 
     if (wizActive.hand.wizard.autoEnded){
@@ -2261,7 +2302,7 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
     if (typeof afterSuccess === "function") afterSuccess();
 
     renderActionList(street);
-    renderPotPills();
+    refreshWizardPotAndStacks();
     if (["preflop","flop","turn","river"].includes(street)) fillAmountSelectForStreet(street);
     byId("wizStatus").textContent = "In progress";
     byId("wizStatus").className = "badgeOk";
@@ -2300,14 +2341,14 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
     const acts = wizActive.hand.wizard.streets[street].actions || [];
     acts.pop();
     renderActionList(street);
-    renderPotPills();
+    refreshWizardPotAndStacks();
   }
 
   function clearWizardStreet(street){
     if (!wizActive) return;
     wizActive.hand.wizard.streets[street].actions = [];
     renderActionList(street);
-    renderPotPills();
+    refreshWizardPotAndStacks();
   }
 
   function switchWizardTab(tab){
@@ -2323,7 +2364,7 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
     });
 
     wizActive.ui.activeStreet = tab === "result" ? "river" : tab; // pot calc uses streets; result uses latest
-    renderPotPills();
+    refreshWizardPotAndStacks();
   }
 
   // ---- Formatting for History ----
@@ -2858,7 +2899,6 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
 
     fillWizardActorSelects();
     ["preflop","flop","turn","river"].forEach(st=>fillAmountSelectForStreet(st));
-    renderStackSummary();
 
     // collapse meta
     setWizardMetaSummary(meta, heroPos, heroStackBb);
@@ -2873,7 +2913,7 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
     renderActionList("flop");
     renderActionList("turn");
     renderActionList("river");
-    renderPotPills();
+    refreshWizardPotAndStacks();
     switchWizardTab("preflop");
   };
 
@@ -2935,7 +2975,7 @@ function addWizardActionValues(street, actorId, type, toBb, afterSuccess){
       renderActionList("flop");
       renderActionList("turn");
       renderActionList("river");
-      renderPotPills();
+      refreshWizardPotAndStacks();
       switchWizardTab("preflop");
       return;
     }
