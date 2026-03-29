@@ -145,10 +145,9 @@
       top: 0;
       z-index: 30;
       padding: 14px 0 10px;
-      background: linear-gradient(180deg, rgba(8,8,10,0.92), rgba(8,8,10,0.65));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(115,116,155,0.35);
+      background: transparent;
+      backdrop-filter: none;
+      border-bottom: 1px solid rgba(115,116,155,0.28);
       margin-bottom: 8px;
     }
 
@@ -191,8 +190,8 @@
       width: 64px;
       height: 64px;
       border-radius: 18px;
-      border-color: rgba(115,116,155,0.45);
-      background: linear-gradient(145deg, rgba(115,116,155,0.2), rgba(141,108,146,0.12));
+      border-color: rgba(115,116,155,0.4);
+      background: transparent;
     }
 
     /* Hero cards — 4 dropdown boxes in ONE horizontal row on iPhone */
@@ -309,28 +308,110 @@ h1{
       color: #ffe5e8;
     }
 
-.card{
-      background:
-        linear-gradient(135deg, rgba(115,116,155,0.1) 0%, transparent 42%),
-        linear-gradient(200deg, rgba(141,108,146,0.08) 0%, transparent 45%),
-        linear-gradient(180deg, rgba(14,14,18,0.75), rgba(10,10,12,0.55));
-      border: 1px solid rgba(115,116,155,0.38);
-      border-radius: 20px;
-      box-shadow: var(--shadow), 0 0 0 1px rgba(141,108,146,0.06) inset;
-      padding: 14px;
-      margin: 12px 0;
-      backdrop-filter: blur(12px);
-      overflow: hidden;
+    /* Sections sit on Stitch dot background — structure via territory accent, not panel fills */
+    .card{
+      background: transparent;
+      border: none;
+      border-left: 3px solid var(--territory, var(--primary));
+      border-radius: 0;
+      padding: 16px 14px 16px 18px;
+      margin: 16px 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      overflow: visible;
+    }
+    .section--session{ --territory: var(--secondary); }
+    .section--quick{ --territory: var(--primary); }
+    .section--wizard{ --territory: var(--tertiary); }
+    .section--history{ --territory: var(--primary); }
+    .section--friends{ --territory: var(--tertiary); }
+    .section--detail{
+      --territory: var(--secondary);
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(117,117,139,0.22);
+      border-left: none;
+      padding-left: 0;
     }
 
     .subcard{
-      background: linear-gradient(180deg, rgba(117,117,139,0.1), rgba(115,116,155,0.05));
-      border: 1px solid rgba(117,117,139,0.32);
-      border-radius: 16px;
-      padding: 12px;
-      margin-top: 12px;
-      overflow: hidden;
+      background: transparent;
+      border: none;
+      border-top: 1px solid rgba(117,117,139,0.2);
+      border-radius: 0;
+      padding: 14px 0 0;
+      margin-top: 14px;
+      overflow: visible;
     }
+    .subcard:first-child{ border-top: none; margin-top: 0; padding-top: 0; }
+
+    .territoryLabel{
+      display:inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--territory, var(--primary));
+      margin-bottom: 6px;
+      opacity: 0.95;
+    }
+
+    .metaRowActions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+    button.metaLink{
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px dashed rgba(115,116,155,0.45);
+      background: transparent;
+      color: rgba(210,208,225,0.95);
+    }
+    button.metaLink:active{ transform: translateY(1px); }
+
+    .heroShorthandRow{ margin-top: 8px; }
+    .heroShorthandRow label{ margin-top: 0; }
+
+    .resultChips{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .resultChips .chipPick{
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      border: 1px solid rgba(117,117,139,0.4);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .resultChips .chipPick.is-on{
+      border-color: rgba(115,116,155,0.65);
+      color: #14141a;
+      background: linear-gradient(180deg, var(--btn-primary-top), var(--btn-primary-bot));
+      box-shadow: 0 0 0 2px rgba(141,108,146,0.15);
+    }
+
+    .boardDetails{ margin-top: 6px; }
+    .boardDetails > summary{
+      cursor: pointer;
+      list-style: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(200,198,215,0.95);
+      padding: 8px 0;
+      user-select: none;
+    }
+    .boardDetails > summary::-webkit-details-marker{ display: none; }
+    .boardDetails > summary::before{
+      content: "+ ";
+      color: var(--tertiary);
+      font-weight: 900;
+    }
+    .boardDetails[open] > summary::before{ content: "− "; }
 
     .rowBetween{
       display:flex;
@@ -410,7 +491,7 @@ h1{
       border-color: rgba(117,117,139,0.45);
       color: rgba(244,243,248,0.95);
     }
-    button.ghost{ background: transparent; }
+    button.ghost{ background: transparent; border-color: rgba(117,117,139,0.35); color: var(--muted); }
     button.danger{
       background: rgba(255,92,108,0.18);
       border-color: rgba(255,92,108,0.35);
@@ -425,22 +506,24 @@ h1{
     .list{ display:grid; gap: 10px; margin-top: 10px; }
 
     .item{
-      border: 1px solid rgba(117,117,139,0.28);
-      border-radius: 16px;
-      padding: 12px;
-      background: linear-gradient(180deg, rgba(115,116,155,0.08), rgba(141,108,146,0.04));
+      border: none;
+      border-left: 2px solid rgba(117,117,139,0.45);
+      border-radius: 0;
+      padding: 10px 10px 10px 12px;
+      background: transparent;
       cursor:pointer;
       overflow: hidden;
     }
     .item:hover{
-      border-color: rgba(115,116,155,0.5);
-      background: linear-gradient(180deg, rgba(115,116,155,0.14), rgba(141,108,146,0.08));
+      border-left-color: var(--primary);
+      background: rgba(115,116,155,0.06);
     }
 
     pre{
       margin: 10px 0 0;
-      background: linear-gradient(180deg, rgba(115,116,155,0.08), #0c0c10);
-      border: 1px solid rgba(117,117,139,0.35);
+      background: transparent;
+      border: none;
+      border-left: 2px solid rgba(117,117,139,0.35);
       color: var(--body);
       padding: 12px;
       border-radius: 16px;
@@ -452,10 +535,11 @@ h1{
     }
 
     .miniRow{
-      border: 1px solid rgba(141,108,146,0.28);
-      border-radius: 16px;
-      padding: 12px;
-      background: linear-gradient(135deg, rgba(141,108,146,0.08), rgba(117,117,139,0.05));
+      border: none;
+      border-left: 2px solid rgba(141,108,146,0.35);
+      border-radius: 0;
+      padding: 10px 10px 10px 12px;
+      background: transparent;
       overflow: hidden;
     }
     .miniHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
@@ -467,13 +551,12 @@ h1{
       margin-top: 10px;
     }
 .cardPick{
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 12px;
-      background:
-        radial-gradient(420px 120px at 30% 0%, var(--primary-soft), transparent 55%),
-        rgba(255,255,255,0.02);
-      box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+      border: none;
+      border-top: 1px solid rgba(117,117,139,0.22);
+      border-radius: 0;
+      padding: 12px 0;
+      background: transparent;
+      box-shadow: none;
       overflow: hidden;
     }
 .cardLine{
@@ -563,10 +646,11 @@ h1{
     }
 
     #street_result{
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(141,108,146,0.12), rgba(115,116,155,0.06));
-      border: 1px solid rgba(141,108,146,0.3);
+      padding: 12px 0 0;
+      border-radius: 0;
+      background: transparent;
+      border: none;
+      border-top: 1px solid rgba(141,108,146,0.25);
     }
     #street_result textarea{
       min-height: 120px;
@@ -587,9 +671,8 @@ h1{
 
     @media (max-width: 860px){
       .grid2, .grid3{ grid-template-columns: 1fr; }
-      /* keep hero card section compact: do NOT force single column */
       .cardsWrap{ grid-template-columns: 1fr; }
-      .card{ padding: 12px; }
+      .card{ padding: 14px 12px 14px 16px; }
     }
   </style>
 </head>
@@ -627,6 +710,7 @@ h1{
 
       <!-- Utilities (compact) -->
       <div class="utilRow" style="margin-top:10px;">
+        <button class="util" id="shareLatest" type="button">Share Latest</button>
         <button class="util" id="copyLatest" type="button">Copy Latest</button>
         <button class="util" id="exportJson" type="button">Export JSON</button>
         <button class="util danger" id="deleteAll" type="button">Delete All</button>
@@ -635,7 +719,7 @@ h1{
 
     <!-- SESSION -->
 
-    <div class="card" id="sessionCard">
+    <div class="card section--session" id="sessionCard">
       <div class="rowBetween">
         <div>
           <h2>Session</h2>
@@ -681,17 +765,21 @@ h1{
     </div>
 
     <!-- QUICK LOG -->
-    <div class="card" id="quickCard">
+    <div class="card section--quick" id="quickCard">
       <div class="rowBetween">
         <div>
+          <span class="territoryLabel">Quick log</span>
           <h2>Quick Log</h2>
-          <div class="muted">Fast capture between hands. Meta (level/blinds/stacks) is stored on this hand.</div>
+          <div class="muted">Fast capture between hands. Level & blinds persist after save for the next hand.</div>
         </div>
         <span class="badgeWarn" id="quickStatus">Ready</span>
       </div>
 
       <div class="subcard">
         <h3>Hand Meta</h3>
+        <div class="metaRowActions">
+          <button type="button" class="metaLink" id="qSameAsLast">Same as last hand</button>
+        </div>
 
         <div class="grid3">
           <div>
@@ -781,9 +869,9 @@ h1{
       <div class="grid3">
         
         <div>
-          <label>Board (optional)</label>
-          <div class="subcard" style="margin-top:6px;">
-            <div class="muted" style="margin-bottom:8px;">Select up to 5 cards (flop/turn/river)</div>
+          <details class="boardDetails" id="qBoardDetails">
+            <summary>Board (optional) — tap to add cards</summary>
+            <div class="muted" style="margin-bottom:8px;">Up to 5 cards (flop / turn / river)</div>
             <div class="heroSelectRow" aria-label="Board ranks">
               <select id="qB1Rank"></select>
               <select id="qB2Rank"></select>
@@ -799,7 +887,7 @@ h1{
               <select id="qB5Suit"></select>
             </div>
             <div class="pill" style="margin-top:10px;">Board: <b id="qBoardText">—</b></div>
-          </div>
+          </details>
         </div>
 
         <div>
@@ -823,9 +911,10 @@ h1{
     </div>
 
     <!-- WIZARD LOG -->
-    <div class="card" id="wizardCard" style="display:none;">
+    <div class="card section--wizard" id="wizardCard" style="display:none;">
       <div class="rowBetween">
         <div>
+          <span class="territoryLabel" style="color:var(--tertiary);">Wizard</span>
           <h2>Wizard Log</h2>
           <div class="muted">Structured capture with action list + auto pot + jam sizing. (Action-tree foundation)</div>
         </div>
@@ -843,6 +932,9 @@ h1{
         </div>
 
         <div id="wizMetaBody">
+          <div class="metaRowActions">
+            <button type="button" class="metaLink" id="wSameAsLast">Same as last hand</button>
+          </div>
           <div class="grid3">
             <div>
               <label>Level</label>
@@ -1201,9 +1293,10 @@ h1{
 
     
     <!-- FRIENDS -->
-    <div id="friendsTabCard" class="card" style="display:none;">
+    <div id="friendsTabCard" class="card section--friends" style="display:none;">
       <div class="rowBetween">
         <div>
+          <span class="territoryLabel" style="color:var(--tertiary);">Friends</span>
           <h2>Friends</h2>
           <div class="muted">Add friends once. Then send any hand via SMS from Hand Detail in History.</div>
         </div>
@@ -1231,9 +1324,10 @@ h1{
     </div>
 
 <!-- HISTORY -->
-    <div id="historyCard" class="card" style="display:none;">
+    <div id="historyCard" class="card section--history" style="display:none;">
       <div class="rowBetween">
         <div>
+          <span class="territoryLabel">History</span>
           <h2>History</h2>
           <div class="muted">Newest first. Each hand keeps its own level/blinds.</div>
         </div>
@@ -1242,13 +1336,14 @@ h1{
       <div id="handsList" class="list"></div>
 
 
-      <div class="card" id="detailCard" style="display:none; margin-top:12px;">
+      <div class="card section--detail" id="detailCard" style="display:none; margin-top:12px;">
         <div class="rowBetween">
           <h2 style="margin:0;">Hand Detail</h2>
           <span class="pill" id="detailMetaPill">—</span>
         </div>
 
         <div class="btns">
+          <button class="secondary" id="shareDetail" type="button">Share</button>
           <button class="secondary" id="copyDetail" type="button">Copy as text</button>
           
           <div class="pill" style="display:flex; gap:8px; align-items:center;">
@@ -1316,7 +1411,8 @@ h1{
       session: { sessionName:"", sessionDate:"", gameType:"NLH", sessionNotes:"" },
       friends: [],
       savedSessions: [],
-      hands: []
+      hands: [],
+      lastQuickMeta: null
     };
   }
 
@@ -1385,6 +1481,134 @@ h1{
   function toNum(x){
     const n = Number(String(x || "").trim());
     return Number.isFinite(n) ? n : null;
+  }
+
+  // ---- Phase 1: last meta + hero shorthand + share ----
+  function parseCardToken(t){
+    t = String(t || "").trim();
+    if (!t) return null;
+    const suitMap = { s:"s",h:"h",d:"d",c:"c", "♠":"s","♥":"h","♦":"d","♣":"c" };
+    let rank, rest;
+    if (t.startsWith("10")){ rank = "T"; rest = t.slice(2); }
+    else { rank = (t[0] || "").toUpperCase(); rest = t.slice(1); }
+    if (!RANKS.includes(rank)) return null;
+    const ch = rest[0];
+    const su = suitMap[ch] || (ch && String(ch).toLowerCase());
+    if (!["s","h","d","c"].includes(su)) return null;
+    return { rank, suit: su };
+  }
+
+  function parseTwoCardShorthand(raw){
+    const s = String(raw || "").trim();
+    if (!s) return null;
+    if (/\s/.test(s)){
+      const parts = s.split(/\s+/).filter(Boolean);
+      if (parts.length !== 2) return null;
+      const a = parseCardToken(parts[0]);
+      const b = parseCardToken(parts[1]);
+      return (a && b) ? [a, b] : null;
+    }
+    if (s.length === 4){
+      const a = parseCardToken(s.slice(0, 2));
+      const b = parseCardToken(s.slice(2, 4));
+      return (a && b) ? [a, b] : null;
+    }
+    if (s.length >= 6 && s.startsWith("10")){
+      const a = parseCardToken(s.slice(0, 3));
+      const b = parseCardToken(s.slice(3));
+      return (a && b) ? [a, b] : null;
+    }
+    return null;
+  }
+
+  function setQuickResultUI(val){
+    const allowed = ["Won", "Lost", "Chopped", "Busted"];
+    const v = allowed.includes(val) ? val : "Won";
+    const hid = byId("qResult");
+    if (hid) hid.value = v;
+    document.querySelectorAll("#qResultChips .chipPick").forEach(btn => {
+      btn.classList.toggle("is-on", btn.dataset.result === v);
+    });
+  }
+
+  function persistLastQuickMetaFromQuickForm(){
+    const data = load();
+    const meta = readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"));
+    data.lastQuickMeta = { ...meta, heroPos: byId("qHeroPos").value };
+    save(data);
+  }
+
+  function persistLastQuickMetaFromWizardForm(){
+    const data = load();
+    const meta = readHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"));
+    data.lastQuickMeta = { ...meta, heroPos: byId("wHeroPos").value };
+    save(data);
+  }
+
+  function applyLastQuickMetaToQuick(){
+    const data = load();
+    const m = data.lastQuickMeta;
+    if (!m || typeof m !== "object") return;
+    byId("qLevel").value = String(m.level ?? 1);
+    byId("qSb").value = String(m.sb ?? 200);
+    byId("qBb").value = String(m.bb ?? 400);
+    fillAnteSelect(byId("qAnte"), Number(byId("qBb").value), Number(m.bbAnte ?? 0));
+    byId("qAnte").value = String(m.bbAnte ?? 0);
+    if (m.heroPos && POSITIONS.includes(m.heroPos)) byId("qHeroPos").value = m.heroPos;
+  }
+
+  function applyLastQuickMetaToWizard(){
+    const data = load();
+    const m = data.lastQuickMeta;
+    if (!m || typeof m !== "object") return;
+    byId("wLevel").value = String(m.level ?? 1);
+    byId("wSb").value = String(m.sb ?? 200);
+    byId("wBb").value = String(m.bb ?? 400);
+    fillAnteSelect(byId("wAnte"), Number(byId("wBb").value), Number(m.bbAnte ?? 0));
+    byId("wAnte").value = String(m.bbAnte ?? 0);
+    if (m.heroPos && POSITIONS.includes(m.heroPos)) byId("wHeroPos").value = m.heroPos;
+  }
+
+  function resetQuickPreserveMeta(){
+    byId("qHeroStack").value = "";
+    byId("qPreflop").value = "";
+    byId("qPostflop").value = "";
+    setQuickBoardSelectsFromString("");
+    byId("qPotBb").value = "";
+    byId("qTurningPoint").value = "";
+    byId("quickEditHint").style.display = "none";
+    byId("quickStatus").textContent = "Ready";
+    byId("quickStatus").className = "badgeWarn";
+    editingHandId = null;
+    clearContainer("qVillainsList");
+    addVillainRow("qVillainsList", { pos: "BB", stackBb: "", note: "" });
+    setQuickResultUI("Won");
+    byId("qC1Rank").value = "A";
+    byId("qC1Suit").value = "s";
+    byId("qC2Rank").value = "K";
+    byId("qC2Suit").value = "c";
+    byId("qC1Rank").dispatchEvent(new Event("change"));
+    const sh = byId("qHeroShorthand");
+    if (sh) sh.value = "";
+    const bd = byId("qBoardDetails");
+    if (bd) bd.open = false;
+  }
+
+  async function shareHandPlain(title, text){
+    if (navigator.share){
+      try {
+        await navigator.share({ title: title || "5D hand", text });
+        return;
+      } catch (e){
+        if (e && e.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied to clipboard.");
+    } catch {
+      alert("Share and clipboard are not available here.");
+    }
   }
 
   // ---- Blind options ----
@@ -1467,6 +1691,10 @@ h1{
       f2.textContent = cardPretty(r2, s2);
 
       byId(prefix+"HeroCardsText").textContent = shorthand(r1,s1) + shorthand(r2,s2);
+      if (prefix === "q"){
+        const sh = byId("qHeroShorthand");
+        if (sh) sh.value = byId("qHeroCardsText").textContent;
+      }
     };
 
     [prefix+"C1Rank", prefix+"C1Suit", prefix+"C2Rank", prefix+"C2Suit"]
@@ -1847,23 +2075,6 @@ h1{
 
   // ---- Quick log state ----
   let editingHandId = null;
-
-  function resetQuick(){
-    byId("qResult").value = "Won";
-    byId("qHeroStack").value = "";
-    byId("qPreflop").value = "";
-    byId("qPostflop").value = "";
-    setQuickBoardSelectsFromString("");
-    byId("qPotBb").value = "";
-    byId("qTurningPoint").value = "";
-    byId("quickEditHint").style.display = "none";
-    byId("quickStatus").textContent = "Ready";
-    byId("quickStatus").className = "badgeWarn";
-    editingHandId = null;
-
-    clearContainer("qVillainsList");
-    addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
-  }
 
   // ---- Wizard engine (foundation) ----
   let wizActive = null; // current wizard hand draft
@@ -2761,7 +2972,7 @@ h1{
 
   // ---- Quick save ----
   byId("qAddVillainBtn").onclick = () => addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
-  byId("qClear").onclick = resetQuick;
+  byId("qClear").onclick = resetQuickPreserveMeta;
 
   function loadQuickForEdit(h){
     editingHandId = h.id;
@@ -2778,7 +2989,7 @@ h1{
 
     byId("qHeroPos").value = h.heroPos || "BTN";
     byId("qHeroStack").value = h.heroStackBb || "";
-    byId("qResult").value = h.result || "Won";
+    setQuickResultUI(h.result || "Won");
 
     const q = h.quick || {};
     byId("qPreflop").value = q.preflop || "";
@@ -2802,6 +3013,10 @@ h1{
     clearContainer("qVillainsList");
     (h.villains || []).forEach(v => addVillainRow("qVillainsList", v));
     if (!(h.villains || []).length) addVillainRow("qVillainsList", { pos:"BB", stackBb:"", note:"" });
+
+    const sh = byId("qHeroShorthand");
+    if (sh) sh.value = byId("qHeroCardsText").textContent;
+    if ((q.board || "").trim()){ const bd = byId("qBoardDetails"); if (bd) bd.open = true; }
   }
 
   byId("qSaveHand").onclick = () => {
@@ -2834,8 +3049,9 @@ h1{
     else data.hands.push(hand);
 
     save(data);
+    persistLastQuickMetaFromQuickForm();
     renderHands();
-    resetQuick();
+    resetQuickPreserveMeta();
     openDetail(hand.id);
   };
 
@@ -2876,11 +3092,11 @@ h1{
 
     byId("wHeroPos").value = "BTN";
     byId("wHeroStack").value = "";
-    byId("wC1Rank").value = "";
-    byId("wC1Suit").value = "";
-    byId("wC2Rank").value = "";
-    byId("wC2Suit").value = "";
-    renderHeroCardsText("w");
+    byId("wC1Rank").value = "A";
+    byId("wC1Suit").value = "s";
+    byId("wC2Rank").value = "K";
+    byId("wC2Suit").value = "c";
+    byId("wC1Rank").dispatchEvent(new Event("change"));
 
     // clear villains list
     clearContainer("wVillainsList");
@@ -2896,6 +3112,7 @@ h1{
     });
 
     switchWizardTab("preflop");
+    applyLastQuickMetaToWizard();
   }
 
   byId("wReset").onclick = () => {
@@ -3116,6 +3333,7 @@ h1{
     }
 
     save(data);
+    persistLastQuickMetaFromWizardForm();
     renderHands();
     openDetail(wizActive.hand.id);
 
@@ -3133,6 +3351,8 @@ h1{
     // meta selects
     initHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"), { level:1, sb:200, bb:400, bbAnte:0 });
     initHandMeta(byId("wLevel"), byId("wSb"), byId("wBb"), byId("wAnte"), { level:1, sb:200, bb:400, bbAnte:0 });
+    applyLastQuickMetaToQuick();
+    applyLastQuickMetaToWizard();
 
     // hero cards compact UI
     initHeroCards("q");
@@ -3145,7 +3365,7 @@ h1{
     // quick board selects
     initQuickBoardSelects();
 // villains defaults
-    resetQuick();
+    resetQuickPreserveMeta();
     clearContainer("wVillainsList");
     addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
 
@@ -3158,6 +3378,56 @@ h1{
 
   // ---- History/Detail controls wired earlier ----
   // (already set)
+
+  // ---- Phase 1 wiring (quick chips, shorthand, share, same last) ----
+  byId("qResultChips").addEventListener("click", (e) => {
+    const btn = e.target.closest(".chipPick");
+    if (!btn || !byId("qResultChips").contains(btn)) return;
+    setQuickResultUI(btn.dataset.result);
+  });
+
+  byId("qHeroShorthand").addEventListener("blur", () => {
+    const raw = byId("qHeroShorthand").value.trim();
+    if (!raw) return;
+    const pair = parseTwoCardShorthand(raw);
+    if (!pair){
+      alert("Could not parse cards. Try AsKd, Ah Kd, Th 9c, or 10h 9c.");
+      return;
+    }
+    byId("qC1Rank").value = pair[0].rank;
+    byId("qC1Suit").value = pair[0].suit;
+    byId("qC2Rank").value = pair[1].rank;
+    byId("qC2Suit").value = pair[1].suit;
+    byId("qC1Rank").dispatchEvent(new Event("change"));
+  });
+
+  byId("qSameAsLast").onclick = () => {
+    applyLastQuickMetaToQuick();
+    byId("quickStatus").textContent = "Meta applied";
+    byId("quickStatus").className = "badgeOk";
+  };
+
+  byId("wSameAsLast").onclick = () => {
+    applyLastQuickMetaToWizard();
+    byId("wizStatus").textContent = "Meta applied";
+    byId("wizStatus").className = "badgeOk";
+  };
+
+  byId("shareDetail").onclick = async () => {
+    const id = byId("detailCard").dataset.id;
+    if (!id) return alert("Open a hand first.");
+    const data = load();
+    const h = (data.hands || []).find(x => x.id === id);
+    if (!h) return;
+    await shareHandPlain("5D hand", formatHandText(data, h));
+  };
+
+  byId("shareLatest").onclick = async () => {
+    const data = load();
+    const hands = [...(data.hands || [])].sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""));
+    if (!hands.length) return alert("No hands yet.");
+    await shareHandPlain("5D hand", formatHandText(data, hands[0]));
+  };
 
   // ---- Start ----
   init();
