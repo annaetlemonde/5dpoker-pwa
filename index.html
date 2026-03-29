@@ -64,22 +64,29 @@
       --tertiary:#8D6C92;
       --neutral:#78767C;
 
-      --primary-soft:rgba(115,116,155,0.22);
-      --tertiary-soft:rgba(141,108,146,0.18);
+      --primary-soft:rgba(115,116,155,0.26);
+      --secondary-soft:rgba(117,117,139,0.22);
+      --tertiary-soft:rgba(141,108,146,0.22);
 
-      --bg0:#0a0a0c;
-      --bg1:#121214;
+      /* Stitch-style dot grid (subtle; uses brand tints) */
+      --dot-primary: rgba(115, 116, 155, 0.32);
+      --dot-secondary: rgba(117, 117, 139, 0.22);
+      --dot-tertiary: rgba(141, 108, 146, 0.18);
+      --dot-size: 20px;
+
+      --bg0:#08080a;
+      --bg1:#0e0e12;
 
       --text:#f4f3f8;
       --body:#c9c6d4;
       --muted:#9a97a8;
 
-      --border: rgba(120,118,124,0.28);
-      --border2: rgba(120,118,124,0.42);
+      --border: rgba(115,116,155,0.32);
+      --border2: rgba(117,117,139,0.45);
 
-      --chip: rgba(115,116,155,0.12);
-      --input: rgba(18,18,22,0.72);
-      --input2: rgba(115,116,155,0.14);
+      --chip: rgba(115,116,155,0.18);
+      --input: rgba(14,14,18,0.78);
+      --input2: rgba(115,116,155,0.2);
 
       --danger:#e85d6f;
       --ok:#5eb88a;
@@ -99,11 +106,29 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       font-feature-settings: "cv02","cv03","cv04","cv11";
       color: var(--body);
-      background:
-        radial-gradient(1000px 520px at 12% -8%, var(--primary-soft), transparent 58%),
-        radial-gradient(880px 480px at 92% 0%, var(--tertiary-soft), transparent 52%),
-        radial-gradient(700px 400px at 55% 12%, rgba(117,117,139,0.08), transparent 55%),
+      background-color: var(--bg0);
+      /* Dot grid (Stitch-like) + soft brand glows */
+      background-image:
+        radial-gradient(ellipse 900px 520px at 50% -15%, var(--primary-soft), transparent 55%),
+        radial-gradient(ellipse 720px 480px at 100% 25%, var(--tertiary-soft), transparent 50%),
+        radial-gradient(ellipse 640px 420px at 0% 70%, var(--secondary-soft), transparent 48%),
+        radial-gradient(circle at center, var(--dot-primary) 1px, transparent 1.2px),
+        radial-gradient(circle at center, var(--dot-tertiary) 1px, transparent 1.2px),
         linear-gradient(180deg, var(--bg0), var(--bg1));
+      background-size:
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        var(--dot-size) var(--dot-size),
+        var(--dot-size) var(--dot-size),
+        100% 100%;
+      background-position:
+        0 0,
+        0 0,
+        0 0,
+        0 0,
+        calc(var(--dot-size) / 2) calc(var(--dot-size) / 2),
+        0 0;
       -webkit-font-smoothing: antialiased;
       touch-action: manipulation;
     }
@@ -120,9 +145,10 @@
       top: 0;
       z-index: 30;
       padding: 14px 0 10px;
-      background: transparent;
-      backdrop-filter: none;
-      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(8,8,10,0.92), rgba(8,8,10,0.65));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(115,116,155,0.35);
       margin-bottom: 8px;
     }
 
@@ -165,6 +191,8 @@
       width: 64px;
       height: 64px;
       border-radius: 18px;
+      border-color: rgba(115,116,155,0.45);
+      background: linear-gradient(145deg, rgba(115,116,155,0.2), rgba(141,108,146,0.12));
     }
 
     /* Hero cards — 4 dropdown boxes in ONE horizontal row on iPhone */
@@ -222,10 +250,10 @@ h1{
       gap:6px;
       padding: 4px 10px;
       border-radius: 999px;
-      background: var(--chip);
-      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(115,116,155,0.14), rgba(117,117,139,0.08));
+      border: 1px solid rgba(117,117,139,0.38);
       font-size: 12px;
-      color: var(--muted);
+      color: rgba(220,218,232,0.88);
       white-space: nowrap;
     }
 
@@ -234,9 +262,9 @@ h1{
       font-size: 13px;
       font-weight: 600;
       color: var(--text);
-      background: var(--primary-soft);
-      border: 1px solid rgba(115,116,155,0.4);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+      background: linear-gradient(135deg, rgba(115,116,155,0.28), rgba(141,108,146,0.18));
+      border: 1px solid rgba(115,116,155,0.55);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.4), 0 0 0 1px rgba(141,108,146,0.12) inset;
     }
 
     .modeRow{
@@ -271,8 +299,9 @@ h1{
       border-radius: 999px;
       font-weight: 800;
       font-size: 12px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(117,117,139,0.4);
+      background: rgba(117,117,139,0.12);
+      color: rgba(230,228,240,0.95);
     }
     button.util.danger{
       border-color: rgba(255,92,108,0.30);
@@ -281,19 +310,22 @@ h1{
     }
 
 .card{
-      background: linear-gradient(180deg, rgba(115,116,155,0.08), rgba(255,255,255,0.02));
-      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(115,116,155,0.1) 0%, transparent 42%),
+        linear-gradient(200deg, rgba(141,108,146,0.08) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(14,14,18,0.75), rgba(10,10,12,0.55));
+      border: 1px solid rgba(115,116,155,0.38);
       border-radius: 20px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow), 0 0 0 1px rgba(141,108,146,0.06) inset;
       padding: 14px;
       margin: 12px 0;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       overflow: hidden;
     }
 
     .subcard{
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(180deg, rgba(117,117,139,0.1), rgba(115,116,155,0.05));
+      border: 1px solid rgba(117,117,139,0.32);
       border-radius: 16px;
       padding: 12px;
       margin-top: 12px;
@@ -337,9 +369,9 @@ h1{
     textarea{ min-height: 88px; resize: vertical; }
     input::placeholder, textarea::placeholder{ color: rgba(154,151,168,0.5); }
     input:focus, textarea:focus, select:focus{
-      border-color: rgba(115,116,155,0.65);
-      box-shadow: 0 0 0 4px rgba(115,116,155,0.2);
-      background: var(--input2);
+      border-color: rgba(141,108,146,0.55);
+      box-shadow: 0 0 0 3px rgba(115,116,155,0.25), 0 0 0 1px rgba(117,117,139,0.2) inset;
+      background: linear-gradient(180deg, rgba(115,116,155,0.12), var(--input2));
     }
 
     .btns{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
@@ -360,18 +392,24 @@ h1{
     }
 
     button.primary{
-      background: linear-gradient(180deg, var(--btn-primary-top), var(--btn-primary-bot));
-      border-color: rgba(115,116,155,0.45);
+      background: linear-gradient(165deg, #eceaf4 0%, var(--btn-primary-bot) 55%, #c4b4d4 100%);
+      border-color: rgba(115,116,155,0.55);
       color: #14141a;
       font-weight: 800;
+      box-shadow: 0 4px 14px rgba(141,108,146,0.18);
     }
     button.primaryAlt{
-      background: linear-gradient(135deg, #d4d2e8 0%, #b8b4d4 45%, #a39fc4 100%);
-      border-color: rgba(115,116,155,0.5);
+      background: linear-gradient(135deg, #e0dce8 0%, #b8b4d4 40%, #a898bc 100%);
+      border-color: rgba(141,108,146,0.45);
       color: #14141a;
       font-weight: 800;
+      box-shadow: 0 4px 16px rgba(115,116,155,0.2);
     }
-    button.secondary{ background: rgba(30,30,34,0.9); color: rgba(244,243,248,0.92); }
+    button.secondary{
+      background: linear-gradient(180deg, rgba(117,117,139,0.22), rgba(115,116,155,0.12));
+      border-color: rgba(117,117,139,0.45);
+      color: rgba(244,243,248,0.95);
+    }
     button.ghost{ background: transparent; }
     button.danger{
       background: rgba(255,92,108,0.18);
@@ -387,19 +425,22 @@ h1{
     .list{ display:grid; gap: 10px; margin-top: 10px; }
 
     .item{
-      border: 1px solid var(--border);
+      border: 1px solid rgba(117,117,139,0.28);
       border-radius: 16px;
       padding: 12px;
-      background: rgba(255,255,255,0.04);
+      background: linear-gradient(180deg, rgba(115,116,155,0.08), rgba(141,108,146,0.04));
       cursor:pointer;
       overflow: hidden;
     }
-    .item:hover{ border-color: rgba(255,255,255,0.22); }
+    .item:hover{
+      border-color: rgba(115,116,155,0.5);
+      background: linear-gradient(180deg, rgba(115,116,155,0.14), rgba(141,108,146,0.08));
+    }
 
     pre{
       margin: 10px 0 0;
-      background: #0e0e12;
-      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(115,116,155,0.08), #0c0c10);
+      border: 1px solid rgba(117,117,139,0.35);
       color: var(--body);
       padding: 12px;
       border-radius: 16px;
@@ -411,10 +452,10 @@ h1{
     }
 
     .miniRow{
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(141,108,146,0.28);
       border-radius: 16px;
       padding: 12px;
-      background: rgba(255,255,255,0.03);
+      background: linear-gradient(135deg, rgba(141,108,146,0.08), rgba(117,117,139,0.05));
       overflow: hidden;
     }
     .miniHeader{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
@@ -446,8 +487,8 @@ h1{
       width: 64px;
       height: 78px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+      border: 1px solid rgba(117,117,139,0.45);
+      background: linear-gradient(180deg, rgba(244,243,248,0.98), rgba(230,228,240,0.92));
       display:flex; align-items:center; justify-content:center;
       font-weight: 950;
       font-size: 18px;
@@ -468,18 +509,18 @@ h1{
     .tab{
       padding: 10px 12px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      color: var(--muted);
+      border: 1px solid rgba(117,117,139,0.35);
+      background: rgba(117,117,139,0.1);
+      color: rgba(200,198,215,0.95);
       font-weight: 900;
       cursor:pointer;
       user-select: none;
     }
     .tab.active{
       color: #14141a;
-      border-color: rgba(115,116,155,0.4);
-      background: linear-gradient(135deg, var(--btn-primary-top), #b4b0cc);
-      box-shadow: 0 0 0 4px rgba(115,116,155,0.2);
+      border-color: rgba(115,116,155,0.55);
+      background: linear-gradient(135deg, #e2e0f0 0%, var(--btn-primary-bot) 55%, #c4b8d8 100%);
+      box-shadow: 0 0 0 3px rgba(115,116,155,0.28), 0 4px 16px rgba(141,108,146,0.15);
     }
 
     .streetGrid{
@@ -493,7 +534,7 @@ h1{
 
     
     .extraEntries{ margin-top:10px; display:flex; flex-direction:column; gap:10px; }
-    .miniActionEntry{ padding:10px; border-radius:14px; border:1px dashed rgba(255,255,255,0.16); background: rgba(255,255,255,0.035); }
+    .miniActionEntry{ padding:10px; border-radius:14px; border:1px dashed rgba(115,116,155,0.4); background: rgba(117,117,139,0.08); }
     .miniBtns{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
     button.mini{ padding:9px 12px; font-size:13px; }
 .badgeOk{
@@ -515,17 +556,17 @@ h1{
     }
 
     .btnActive{
-      background: linear-gradient(135deg, #ddd9f0 0%, #c4bfd8 50%, #a8a3c4 100%) !important;
-      border-color: rgba(115,116,155,0.45) !important;
+      background: linear-gradient(135deg, #e4e2f2 0%, #c8c4dc 40%, #b8a8c8 100%) !important;
+      border-color: rgba(141,108,146,0.45) !important;
       color:#14141a !important;
-      box-shadow: 0 0 0 4px rgba(115,116,155,0.25), 0 14px 36px rgba(0,0,0,0.4);
+      box-shadow: 0 0 0 3px rgba(115,116,155,0.3), 0 12px 32px rgba(141,108,146,0.2);
     }
 
     #street_result{
       padding: 14px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(180deg, rgba(141,108,146,0.12), rgba(115,116,155,0.06));
+      border: 1px solid rgba(141,108,146,0.3);
     }
     #street_result textarea{
       min-height: 120px;
@@ -537,9 +578,9 @@ h1{
       gap:6px;
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.05);
-      color: var(--muted);
+      border: 1px solid rgba(141,108,146,0.35);
+      background: rgba(141,108,146,0.12);
+      color: rgba(220,210,228,0.95);
       font-size: 12px;
       white-space: nowrap;
     }
