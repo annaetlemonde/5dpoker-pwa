@@ -720,7 +720,121 @@ h1{
       border: 0;
     }
 
-    .quickCardLite .quickTagline{ max-width: 42ch; }
+    .quickCardLite .quickTagline{ max-width: 48ch; }
+    .quickFlow{
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .quickFeed{
+      background: rgba(115,116,155,0.06);
+      border-radius: 16px;
+      padding: 12px 14px;
+      min-height: 72px;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--body);
+    }
+    .quickFeed--empty{
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .quickFeedLine{
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(117,117,139,0.12);
+    }
+    .quickFeedLine:last-child{ border-bottom: none; }
+    .quickFeedActions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .quickTabsFlow{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .quickTabsFlow .tab{
+      padding: 9px 12px;
+      font-size: 12px;
+    }
+    .quickPane{
+      padding: 4px 0 2px;
+    }
+    .paneHint{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .paneDivider{
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 14px 0 8px;
+    }
+    .quickTapGrid{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button.flowChip{
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 100%;
+    }
+    button.flowChip.is-on{
+      border-color: rgba(0,237,100,0.55);
+      background: var(--primary-soft);
+      color: var(--text);
+      box-shadow: 0 0 0 2px rgba(0,237,100,0.15);
+    }
+    .flowSubDetails{
+      margin-top: 12px;
+      border-top: 1px solid rgba(117,117,139,0.15);
+      padding-top: 10px;
+    }
+    .flowSubDetails > summary{
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      list-style: none;
+      user-select: none;
+    }
+    .flowSubDetails > summary::-webkit-details-marker{ display: none; }
+    .flowMoreDetail > summary{
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .quickNotesMini{
+      min-height: 52px;
+      resize: vertical;
+      font-size: 15px;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .quickFooterBar{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(117,117,139,0.15);
+    }
     .quickCapture{
       display: flex;
       flex-direction: column;
@@ -1094,7 +1208,7 @@ h1{
         <div>
           <span class="territoryLabel">Quick log</span>
           <h2>Quick Log</h2>
-          <div class="muted quickTagline">Tap result, cards, seat. One note field for the story — level, blinds, and the rest stay tucked away until you need them.</div>
+          <div class="muted quickTagline">Tap through the hand — one street at a time. Your replay builds live; almost everything is optional. Save when you’re done.</div>
         </div>
         <span class="badgeWarn" id="quickStatus">Ready</span>
       </div>
@@ -1103,9 +1217,69 @@ h1{
         <button type="button" class="metaLink" id="qSameAsLast">Same as last hand</button>
       </div>
 
-      <div class="quickCapture">
-        <div class="captureBlock">
-          <span class="captureLbl">Result</span>
+      <div class="quickFlow">
+        <div>
+          <span class="captureLbl">Replay</span>
+          <div id="qLiveFeed" class="quickFeed quickFeed--empty" aria-live="polite">Tap a street tab and chip — your hand builds here.</div>
+          <div class="quickFeedActions" style="margin-top:8px;">
+            <button type="button" class="metaLink" id="qUndoLastLine">Undo last line</button>
+            <button type="button" class="metaLink" id="qClearReplay">Clear replay</button>
+          </div>
+        </div>
+
+        <div>
+          <span class="captureLbl">Street</span>
+          <div class="tabs quickTabsFlow" id="qStreetTabs" role="tablist" aria-label="Hand street">
+            <button type="button" class="tab active" data-qstreet="preflop" role="tab" aria-selected="true">Preflop</button>
+            <button type="button" class="tab" data-qstreet="flop" role="tab" aria-selected="false">Flop</button>
+            <button type="button" class="tab" data-qstreet="turn" role="tab" aria-selected="false">Turn</button>
+            <button type="button" class="tab" data-qstreet="river" role="tab" aria-selected="false">River</button>
+            <button type="button" class="tab" data-qstreet="result" role="tab" aria-selected="false">Result</button>
+          </div>
+        </div>
+
+        <div id="qPanePreflop" class="quickPane" role="tabpanel">
+          <p class="paneHint">Tap to log — no extra steps.</p>
+          <div class="quickTapGrid" id="qPreflopLogChips"></div>
+          <p class="paneDivider">Sizing (optional)</p>
+          <div class="quickTapGrid" id="qPreflopSizeChips"></div>
+        </div>
+
+        <div id="qPaneFlop" class="quickPane" style="display:none;" role="tabpanel" hidden>
+          <p class="paneHint">Board texture — max 2 tags total (tap to toggle).</p>
+          <div class="quickTapGrid" id="qFlopMainChips"></div>
+          <details class="flowSubDetails boardDetails" id="qFlopDetailsWrap">
+            <summary>Details</summary>
+            <div class="quickTapGrid" id="qFlopDetailChips" style="margin-top:10px;"></div>
+          </details>
+          <p class="paneDivider">Street actions</p>
+          <div class="quickTapGrid" id="qFlopActionChips"></div>
+        </div>
+
+        <div id="qPaneTurn" class="quickPane" style="display:none;" role="tabpanel" hidden>
+          <p class="paneHint">Turn — max 2 tags total.</p>
+          <div class="quickTapGrid" id="qTurnMainChips"></div>
+          <details class="flowSubDetails boardDetails" id="qTurnDetailsWrap">
+            <summary>Details</summary>
+            <div class="quickTapGrid" id="qTurnDetailChips" style="margin-top:10px;"></div>
+          </details>
+          <p class="paneDivider">Street actions</p>
+          <div class="quickTapGrid" id="qTurnActionChips"></div>
+        </div>
+
+        <div id="qPaneRiver" class="quickPane" style="display:none;" role="tabpanel" hidden>
+          <p class="paneHint">River — max 2 tags total.</p>
+          <div class="quickTapGrid" id="qRiverMainChips"></div>
+          <details class="flowSubDetails boardDetails" id="qRiverDetailsWrap">
+            <summary>Details</summary>
+            <div class="quickTapGrid" id="qRiverDetailChips" style="margin-top:10px;"></div>
+          </details>
+          <p class="paneDivider">Street actions</p>
+          <div class="quickTapGrid" id="qRiverActionChips"></div>
+        </div>
+
+        <div id="qPaneResult" class="quickPane" style="display:none;" role="tabpanel" hidden>
+          <p class="paneHint">Outcome — tap one.</p>
           <div class="resultChips" id="qResultChips" role="radiogroup" aria-label="Hand result">
             <button type="button" class="chipPick is-on" data-result="Won">Won</button>
             <button type="button" class="chipPick" data-result="Lost">Lost</button>
@@ -1115,160 +1289,162 @@ h1{
           <input type="hidden" id="qResult" value="Won" />
         </div>
 
-        <div class="captureBlock">
-          <span class="captureLbl">Your cards</span>
-          <div class="muted" style="font-size:12px; margin-top:4px;">Tap rank or suit — only fill what you remember.</div>
-          <div class="tapCardPairRow" aria-label="Hero cards">
-            <div class="tapCardSlot">
-              <button type="button" class="tapCardRank" id="qTapC1Rank" aria-label="First card rank">?</button>
-              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC1Suit" aria-label="First card suit">—</button>
-              <select id="qC1Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
-              <select id="qC1Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
-            </div>
-            <div class="tapCardSlot">
-              <button type="button" class="tapCardRank" id="qTapC2Rank" aria-label="Second card rank">?</button>
-              <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC2Suit" aria-label="Second card suit">—</button>
-              <select id="qC2Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
-              <select id="qC2Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
-            </div>
-          </div>
-          <div class="pill" style="margin-top:10px;">Saved as: <b id="qHeroCardsText">—</b></div>
+        <div>
+          <span class="captureLbl">Notes</span>
+          <textarea id="qHandNotes" class="quickNotesMini" placeholder="e.g. AKo UTG shove, BB calls JTo, flop T…" autocomplete="off"></textarea>
         </div>
 
-        <div class="captureBlock">
-          <span class="captureLbl">Seat &amp; stack</span>
-          <div class="rowBetween" style="align-items:flex-end; margin:0;">
-            <div class="posChips" id="qHeroPosChips" role="group" aria-label="Hero position"></div>
-            <select id="qHeroPos" class="srOnly" aria-label="Hero position (list)"></select>
-            <input id="qHeroStack" class="stackQuick" inputmode="decimal" placeholder="bb" />
-          </div>
-        </div>
+        <details class="boardDetails detailsQuiet flowMoreDetail" id="qMoreDetail">
+          <summary>Add more detail</summary>
+          <div class="muted" style="margin:8px 0 12px;">Exact cards, stacks, villains, blinds — only if you want them.</div>
 
-        <div class="captureBlock">
-          <span class="captureLbl">What happened</span>
-          <textarea id="qHandNotes" class="quickNotesArea" placeholder="Freeform: preflop through river, one stream of thought."></textarea>
-        </div>
-      </div>
-
-      <details class="boardDetails detailsQuiet" id="qSdDetails" style="margin-top:8px;">
-        <summary>Showdown &amp; their cards (optional)</summary>
-        <div class="resultChips" id="qShowdownChips" role="radiogroup" aria-label="Showdown" style="margin-top:4px;">
-          <button type="button" class="chipPick is-on" data-sd="no">No / N/A</button>
-          <button type="button" class="chipPick" data-sd="yes">Went to SD</button>
-        </div>
-        <input type="hidden" id="qShowdown" value="no" />
-        <div id="qVillainShowdownWrap" style="display:none; margin-top:10px;">
-          <label>Villain’s cards</label>
-          <input id="qVillainShowdown" type="text" inputmode="text" autocomplete="off" placeholder="AK · TT — suits optional" />
-        </div>
-      </details>
-
-      <details class="boardDetails detailsQuiet" id="qMetaBlinds" style="margin-top:8px;">
-        <summary>Level &amp; blinds (optional)</summary>
-        <div class="muted" style="margin-bottom:10px;">Skip entirely if you’re just jotting the hand. Values still apply for “Same as last” when you do fill them.</div>
-        <div class="grid2tight">
-          <div>
-            <label class="miniLbl">Level</label>
-            <select id="qLevel"></select>
-          </div>
-          <div>
-            <label class="miniLbl">Blinds</label>
-            <div class="blinds3">
-              <div>
-                <span class="miniLbl">SB</span>
-                <select id="qSb"></select>
+          <div class="captureBlock">
+            <span class="captureLbl">Your cards</span>
+            <div class="tapCardPairRow" aria-label="Hero cards">
+              <div class="tapCardSlot">
+                <button type="button" class="tapCardRank" id="qTapC1Rank" aria-label="First card rank">?</button>
+                <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC1Suit" aria-label="First card suit">—</button>
+                <select id="qC1Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+                <select id="qC1Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
               </div>
-              <div>
-                <span class="miniLbl">BB</span>
-                <select id="qBb"></select>
-              </div>
-              <div>
-                <span class="miniLbl">Ante</span>
-                <select id="qAnte"></select>
+              <div class="tapCardSlot">
+                <button type="button" class="tapCardRank" id="qTapC2Rank" aria-label="Second card rank">?</button>
+                <button type="button" class="tapCardSuit tapCardSuit--neutral" id="qTapC2Suit" aria-label="Second card suit">—</button>
+                <select id="qC2Rank" class="srOnly" aria-hidden="true" tabindex="-1"></select>
+                <select id="qC2Suit" class="srOnly" aria-hidden="true" tabindex="-1"></select>
               </div>
             </div>
+            <div class="pill" style="margin-top:8px;">Saved as: <b id="qHeroCardsText">—</b></div>
           </div>
-        </div>
-      </details>
 
-      <details class="boardDetails detailsQuiet" id="qVillainsBlock" style="margin-top:8px;">
-        <summary>Opponents (optional)</summary>
-        <div class="rowBetween" style="margin-top:8px;">
-          <span class="muted">Position + stack if you care</span>
-          <button class="secondary" id="qAddVillainBtn" type="button">+ Add</button>
-        </div>
-        <div id="qVillainsList" class="list"></div>
-      </details>
+          <div class="captureBlock">
+            <span class="captureLbl">Seat &amp; stack</span>
+            <div class="rowBetween" style="align-items:flex-end; margin:0;">
+              <div class="posChips" id="qHeroPosChips" role="group" aria-label="Hero position"></div>
+              <select id="qHeroPos" class="srOnly" aria-label="Hero position (list)"></select>
+              <input id="qHeroStack" class="stackQuick" inputmode="decimal" placeholder="bb" />
+            </div>
+          </div>
 
-      <details class="boardDetails detailsQuiet" id="qBoardDetails" style="margin-top:8px;">
-        <summary>Board, pot, turning point (optional)</summary>
-        <div class="muted" style="margin-bottom:10px;">Texture + runout tags, or exact cards — only if you remember.</div>
-        <div class="quickBoardGrid">
-          <div>
-            <label>Flop ranks</label>
-            <input id="qFlopRanks" type="text" inputmode="text" maxlength="12" placeholder="e.g. K72" autocomplete="off" />
-          </div>
-          <div>
-            <label>Flop texture</label>
-            <select id="qFlopTexture">
-              <option value="" selected>— Skip —</option>
-              <option value="rainbow">Rainbow (3 suits)</option>
-              <option value="two-tone">Two-tone (flush possible)</option>
-              <option value="monotone">Monotone (3 same suit)</option>
-              <option value="paired">Paired flop</option>
-              <option value="unknown">Not sure</option>
-            </select>
-          </div>
-          <div>
-            <label>Turn (what changed)</label>
-            <select id="qTurnRunout">
-              <option value="" selected>— No turn / skip —</option>
-              <option value="blank">Blank (bricks)</option>
-              <option value="fd">Brings flush draw</option>
-              <option value="flush">Flush completes</option>
-              <option value="pair">Pairs the board</option>
-              <option value="straight">Straight / straight draw completes</option>
-              <option value="overcard">Scary overcard</option>
-              <option value="bd">Backdoor gets there</option>
-            </select>
-          </div>
-          <div>
-            <label>River (what changed)</label>
-            <select id="qRiverRunout">
-              <option value="" selected>— No river / skip —</option>
-              <option value="blank">Blank</option>
-              <option value="flush">Flush completes</option>
-              <option value="bd">Backdoor completes</option>
-              <option value="pair">Pairs / full house scare</option>
-              <option value="straight">Straight completes</option>
-              <option value="overcard">Overcard / scare</option>
-            </select>
-          </div>
-          <div>
-            <label>Turn card (optional)</label>
-            <input id="qTurnCard" type="text" inputmode="text" maxlength="8" placeholder="e.g. Td" autocomplete="off" />
-          </div>
-          <div>
-            <label>River card (optional)</label>
-            <input id="qRiverCard" type="text" inputmode="text" maxlength="8" placeholder="e.g. 2c" autocomplete="off" />
-          </div>
-        </div>
-        <div class="pill" style="margin-top:12px;">Summary: <b id="qBoardSummary">—</b></div>
-        <div class="grid2tight" style="margin-top:12px;">
-          <div>
-            <label>Pot (bb)</label>
-            <input id="qPotBb" inputmode="decimal" placeholder="optional" />
-          </div>
-          <div>
-            <label>Turning point</label>
-            <input id="qTurningPoint" placeholder="optional" />
-          </div>
-        </div>
-      </details>
+          <details class="boardDetails detailsQuiet" id="qSdDetails" style="margin-top:8px;">
+            <summary>Showdown &amp; their cards</summary>
+            <div class="resultChips" id="qShowdownChips" role="radiogroup" aria-label="Showdown" style="margin-top:4px;">
+              <button type="button" class="chipPick is-on" data-sd="no">No / N/A</button>
+              <button type="button" class="chipPick" data-sd="yes">Went to SD</button>
+            </div>
+            <input type="hidden" id="qShowdown" value="no" />
+            <div id="qVillainShowdownWrap" style="display:none; margin-top:10px;">
+              <label>Villain’s cards</label>
+              <input id="qVillainShowdown" type="text" inputmode="text" autocomplete="off" placeholder="AK · TT — suits optional" />
+            </div>
+          </details>
 
-      <div class="btns">
-        <button class="primary" id="qSaveHand" type="button">Save hand</button>
-        <button class="secondary" id="qClear" type="button">Clear</button>
+          <details class="boardDetails detailsQuiet" id="qMetaBlinds" style="margin-top:8px;">
+            <summary>Level &amp; blinds</summary>
+            <div class="grid2tight">
+              <div>
+                <label class="miniLbl">Level</label>
+                <select id="qLevel"></select>
+              </div>
+              <div>
+                <label class="miniLbl">Blinds</label>
+                <div class="blinds3">
+                  <div>
+                    <span class="miniLbl">SB</span>
+                    <select id="qSb"></select>
+                  </div>
+                  <div>
+                    <span class="miniLbl">BB</span>
+                    <select id="qBb"></select>
+                  </div>
+                  <div>
+                    <span class="miniLbl">Ante</span>
+                    <select id="qAnte"></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="boardDetails detailsQuiet" id="qVillainsBlock" style="margin-top:8px;">
+            <summary>Opponents</summary>
+            <div class="rowBetween" style="margin-top:8px;">
+              <span class="muted">Position + stack</span>
+              <button class="secondary" id="qAddVillainBtn" type="button">+ Add</button>
+            </div>
+            <div id="qVillainsList" class="list"></div>
+          </details>
+
+          <details class="boardDetails detailsQuiet" id="qBoardDetails" style="margin-top:8px;">
+            <summary>Exact board &amp; pot</summary>
+            <div class="quickBoardGrid">
+              <div>
+                <label>Flop ranks</label>
+                <input id="qFlopRanks" type="text" inputmode="text" maxlength="12" placeholder="e.g. K72" autocomplete="off" />
+              </div>
+              <div>
+                <label>Flop texture (legacy sync)</label>
+                <select id="qFlopTexture">
+                  <option value="" selected>— Skip —</option>
+                  <option value="rainbow">Rainbow (3 suits)</option>
+                  <option value="two-tone">Two-tone (flush possible)</option>
+                  <option value="monotone">Monotone (3 same suit)</option>
+                  <option value="paired">Paired flop</option>
+                  <option value="unknown">Not sure</option>
+                </select>
+              </div>
+              <div>
+                <label>Turn runout (legacy)</label>
+                <select id="qTurnRunout">
+                  <option value="" selected>— No turn / skip —</option>
+                  <option value="blank">Blank (bricks)</option>
+                  <option value="fd">Brings flush draw</option>
+                  <option value="flush">Flush completes</option>
+                  <option value="pair">Pairs the board</option>
+                  <option value="straight">Straight / straight draw completes</option>
+                  <option value="overcard">Scary overcard</option>
+                  <option value="bd">Backdoor gets there</option>
+                </select>
+              </div>
+              <div>
+                <label>River runout (legacy)</label>
+                <select id="qRiverRunout">
+                  <option value="" selected>— No river / skip —</option>
+                  <option value="blank">Blank</option>
+                  <option value="flush">Flush completes</option>
+                  <option value="bd">Backdoor completes</option>
+                  <option value="pair">Pairs / full house scare</option>
+                  <option value="straight">Straight completes</option>
+                  <option value="overcard">Overcard / scare</option>
+                </select>
+              </div>
+              <div>
+                <label>Turn card</label>
+                <input id="qTurnCard" type="text" inputmode="text" maxlength="8" placeholder="e.g. Td" autocomplete="off" />
+              </div>
+              <div>
+                <label>River card</label>
+                <input id="qRiverCard" type="text" inputmode="text" maxlength="8" placeholder="e.g. 2c" autocomplete="off" />
+              </div>
+            </div>
+            <div class="pill" style="margin-top:12px;">Summary: <b id="qBoardSummary">—</b></div>
+            <div class="grid2tight" style="margin-top:12px;">
+              <div>
+                <label>Pot (bb)</label>
+                <input id="qPotBb" inputmode="decimal" placeholder="optional" />
+              </div>
+              <div>
+                <label>Turning point</label>
+                <input id="qTurningPoint" placeholder="optional" />
+              </div>
+            </div>
+          </details>
+        </details>
+
+        <div class="quickFooterBar">
+          <button class="primary" id="qSaveHand" type="button">Save hand</button>
+          <button class="secondary" id="qClear" type="button">Clear</button>
+        </div>
       </div>
 
       <div class="muted" id="quickEditHint" style="margin-top:10px; display:none;">
@@ -2012,6 +2188,9 @@ h1{
     if (qvb) qvb.open = false;
     const qsd = byId("qSdDetails");
     if (qsd) qsd.open = false;
+    const qmd = byId("qMoreDetail");
+    if (qmd) qmd.open = false;
+    resetQuickFlowState();
     syncQuickHeroPosChips();
   }
 
@@ -2505,6 +2684,19 @@ h1{
   function buildQuickBoardSummaryLine(meta){
     if (!meta || typeof meta !== "object") return "";
     const parts = [];
+    const stt = meta.streetTextureTags;
+    const hasFlopTags = stt && Array.isArray(stt.flop) && stt.flop.length;
+    const hasTurnTags = stt && Array.isArray(stt.turn) && stt.turn.length;
+    const hasRiverTags = stt && Array.isArray(stt.river) && stt.river.length;
+    if (hasFlopTags){
+      parts.push("Flop: " + stt.flop.map(k => tagLabelFor("flop", k)).join(" · "));
+    }
+    if (hasTurnTags){
+      parts.push("Turn: " + stt.turn.map(k => tagLabelFor("turn", k)).join(" · "));
+    }
+    if (hasRiverTags){
+      parts.push("River: " + stt.river.map(k => tagLabelFor("river", k)).join(" · "));
+    }
     const fr = (meta.flopRanks || "").trim();
     const texShort = {
       rainbow: "rainbow",
@@ -2515,9 +2707,9 @@ h1{
     };
     if (fr){
       const disp = fr.toUpperCase().split("").join("");
-      const tx = meta.flopTexture ? (texShort[meta.flopTexture] || meta.flopTexture) : "";
+      const tx = meta.flopTexture && !hasFlopTags ? (texShort[meta.flopTexture] || meta.flopTexture) : "";
       parts.push("Flop " + disp + (tx ? " " + tx : ""));
-    } else if (meta.flopTexture){
+    } else if (meta.flopTexture && !hasFlopTags){
       parts.push("Flop: " + (texShort[meta.flopTexture] || meta.flopTexture));
     }
     const run = {
@@ -2529,8 +2721,8 @@ h1{
       overcard: "overcard",
       bd: "backdoor"
     };
-    if (meta.turnRunout) parts.push("Turn " + (run[meta.turnRunout] || meta.turnRunout));
-    if (meta.riverRunout) parts.push("River " + (run[meta.riverRunout] || meta.riverRunout));
+    if (meta.turnRunout && !hasTurnTags) parts.push("Turn " + (run[meta.turnRunout] || meta.turnRunout));
+    if (meta.riverRunout && !hasRiverTags) parts.push("River " + (run[meta.riverRunout] || meta.riverRunout));
     const tc = (meta.turnCard || "").trim();
     const rc = (meta.riverCard || "").trim();
     if (tc) parts.push("Turn card " + prettyFromToken(tc));
@@ -2567,7 +2759,13 @@ h1{
   }
 
   function renderQuickBoardSummary(){
-    const line = buildQuickBoardSummaryLine(readQuickBoardMetaFromForm());
+    const base = readQuickBoardMetaFromForm();
+    base.streetTextureTags = {
+      flop: [...(quickStreetTags.flop || [])],
+      turn: [...(quickStreetTags.turn || [])],
+      river: [...(quickStreetTags.river || [])]
+    };
+    const line = buildQuickBoardSummaryLine(base);
     const el = byId("qBoardSummary");
     if (el) el.textContent = line.trim() ? line : "—";
   }
@@ -2602,6 +2800,378 @@ h1{
       return a + b + "o";
     }
     return "";
+  }
+
+  // ---- Quick Log: tap flow + live replay feed ----
+  const QUICK_STREET_TAG_LABELS = {
+    flop: {
+      rainbow: "Rainbow",
+      "two-tone": "Two-tone",
+      paired: "Paired",
+      monotone: "Monotone",
+      highCard: "High-card board",
+      lowBoard: "Low board",
+      connected: "Connected",
+      wet: "Wet / draw-heavy",
+      dry: "Dry"
+    },
+    turn: {
+      turnFlush: "Flush completed",
+      turnStraight: "Straight completed",
+      turnPaired: "Paired board",
+      turnBrick: "Brick",
+      turnOver: "Overcard",
+      turnDraw: "Draw added",
+      turnScare: "Scare card",
+      turnBlankLow: "Blank low card",
+      turnPairDraw: "Board paired + draw"
+    },
+    river: {
+      rivFlush: "Flush completed",
+      rivStraight: "Straight completed",
+      rivPaired: "Board paired",
+      rivBrick: "Brick",
+      rivMiss: "Missed draws",
+      rivOver: "Overcard",
+      rivDbPair: "Double paired",
+      rivAbsBrick: "Absolute brick",
+      rivScare: "Scare card"
+    }
+  };
+
+  let quickStreetTags = { flop: [], turn: [], river: [] };
+  let quickFeedEntries = [];
+  let quickActiveStreet = "preflop";
+
+  function tagLabelFor(street, key){
+    return (QUICK_STREET_TAG_LABELS[street] && QUICK_STREET_TAG_LABELS[street][key]) || key;
+  }
+
+  function boardLineTextForStreet(street){
+    const tags = quickStreetTags[street] || [];
+    if (!tags.length) return "";
+    const cap = street === "flop" ? "Flop" : street === "turn" ? "Turn" : "River";
+    return cap + ": " + tags.map(k => tagLabelFor(street, k)).join(" · ");
+  }
+
+  function upsertBoardLineInFeed(street){
+    const text = boardLineTextForStreet(street);
+    const idx = quickFeedEntries.findIndex(e => e.type === "boardLine" && e.street === street);
+    if (text){
+      const row = { type: "boardLine", street, text };
+      if (idx >= 0) quickFeedEntries[idx] = row;
+      else quickFeedEntries.push(row);
+    } else if (idx >= 0){
+      quickFeedEntries.splice(idx, 1);
+    }
+  }
+
+  function toggleQuickStreetTag(street, tagKey){
+    if (!quickStreetTags[street]) return;
+    const arr = quickStreetTags[street];
+    const i = arr.indexOf(tagKey);
+    if (i >= 0) arr.splice(i, 1);
+    else {
+      arr.push(tagKey);
+      while (arr.length > 2) arr.shift();
+    }
+    upsertBoardLineInFeed(street);
+    syncLegacySelectsFromStreetTags();
+    renderQuickFlowBoardChipOnStates(street);
+    renderQuickFeed();
+    renderQuickBoardSummary();
+    const st = byId("quickStatus");
+    if (st){ st.textContent = "Logging"; st.className = "badgeOk"; }
+  }
+
+  function syncLegacySelectsFromStreetTags(){
+    const f = quickStreetTags.flop;
+    const order = ["monotone", "two-tone", "rainbow", "paired"];
+    const hit = order.find(k => f.includes(k));
+    if (hit) byId("qFlopTexture").value = hit;
+
+    const turnPick = [
+      ["turnBrick", "blank"],
+      ["turnFlush", "flush"],
+      ["turnPaired", "pair"],
+      ["turnStraight", "straight"],
+      ["turnOver", "overcard"],
+      ["turnDraw", "fd"],
+      ["turnScare", "overcard"],
+      ["turnBlankLow", "blank"],
+      ["turnPairDraw", "pair"]
+    ];
+    for (const [tk, legacy] of turnPick){
+      if (quickStreetTags.turn.includes(tk)){
+        byId("qTurnRunout").value = legacy;
+        break;
+      }
+    }
+
+    const riverPick = [
+      ["rivBrick", "blank"],
+      ["rivFlush", "flush"],
+      ["rivPaired", "pair"],
+      ["rivStraight", "straight"],
+      ["rivOver", "overcard"],
+      ["rivMiss", "blank"],
+      ["rivDbPair", "pair"],
+      ["rivAbsBrick", "blank"],
+      ["rivScare", "overcard"]
+    ];
+    for (const [rk, legacy] of riverPick){
+      if (quickStreetTags.river.includes(rk)){
+        byId("qRiverRunout").value = legacy;
+        break;
+      }
+    }
+  }
+
+  function renderQuickFlowBoardChipOnStates(street){
+    const root = byId("quickCard");
+    if (!root) return;
+    root.querySelectorAll(`.flowChip[data-qkind="board"][data-qstreet="${street}"]`).forEach(btn => {
+      const tag = btn.dataset.qtag;
+      btn.classList.toggle("is-on", (quickStreetTags[street] || []).includes(tag));
+    });
+  }
+
+  function renderAllQuickFlowBoardChipStates(){
+    ["flop", "turn", "river"].forEach(renderQuickFlowBoardChipOnStates);
+  }
+
+  function appendQuickFlowLogLine(text){
+    quickFeedEntries.push({ type: "line", text: String(text || "").trim() });
+    renderQuickFeed();
+    const st = byId("quickStatus");
+    if (st){ st.textContent = "Logging"; st.className = "badgeOk"; }
+  }
+
+  function renderQuickFeed(){
+    const el = byId("qLiveFeed");
+    if (!el) return;
+    const lines = quickFeedEntries.filter(e => e.text).map(e => e.text);
+    if (!lines.length){
+      el.classList.add("quickFeed--empty");
+      el.textContent = "Tap a street tab and chip — your hand builds here.";
+      return;
+    }
+    el.classList.remove("quickFeed--empty");
+    el.innerHTML = lines.map(t =>
+      `<div class="quickFeedLine">${escapeHtml(t)}</div>`
+    ).join("");
+  }
+
+  function resetQuickFlowState(){
+    quickStreetTags = { flop: [], turn: [], river: [] };
+    quickFeedEntries = [];
+    quickActiveStreet = "preflop";
+    renderQuickFeed();
+    renderAllQuickFlowBoardChipStates();
+    syncLegacySelectsFromStreetTags();
+    const tabs = byId("qStreetTabs");
+    if (tabs){
+      tabs.querySelectorAll(".tab").forEach(t => {
+        const on = t.dataset.qstreet === "preflop";
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+    }
+    ["qPanePreflop","qPaneFlop","qPaneTurn","qPaneRiver","qPaneResult"].forEach((id, i) => {
+      const p = byId(id);
+      if (!p) return;
+      const show = id === "qPanePreflop";
+      p.style.display = show ? "" : "none";
+      p.hidden = !show;
+    });
+    renderQuickBoardSummary();
+  }
+
+  function switchQuickStreetTab(street){
+    quickActiveStreet = street;
+    const tabs = byId("qStreetTabs");
+    if (tabs){
+      tabs.querySelectorAll(".tab").forEach(t => {
+        const on = t.dataset.qstreet === street;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+    }
+    const map = {
+      preflop: "qPanePreflop",
+      flop: "qPaneFlop",
+      turn: "qPaneTurn",
+      river: "qPaneRiver",
+      result: "qPaneResult"
+    };
+    Object.entries(map).forEach(([st, pid]) => {
+      const p = byId(pid);
+      if (!p) return;
+      const show = st === street;
+      p.style.display = show ? "" : "none";
+      p.hidden = !show;
+    });
+  }
+
+  function fillQuickFlowChipGrids(){
+    const esc = (s) => escapeHtml(s);
+    const logBtn = (label, line) =>
+      `<button type="button" class="flowChip" data-qkind="log" data-qlog="${esc(line)}">${esc(label)}</button>`;
+
+    const pfMain = [
+      ["Hero fold", "Preflop: Hero fold"],
+      ["Hero call", "Preflop: Hero call"],
+      ["Hero check", "Preflop: Hero check"],
+      ["Hero limp", "Preflop: Hero limp"],
+      ["Villain fold", "Preflop: Villain fold"],
+      ["Villain call", "Preflop: Villain call"],
+      ["Villain jam", "Preflop: Villain jam"]
+    ];
+    const pfSize = [
+      ["Open 2x", "Preflop: Hero open 2x"],
+      ["Open 3x", "Preflop: Hero open 3x"],
+      ["Jam", "Preflop: Hero jam"],
+      ["3-bet", "Preflop: Hero 3-bet"]
+    ];
+    const elPF = byId("qPreflopLogChips");
+    const elSZ = byId("qPreflopSizeChips");
+    if (elPF) elPF.innerHTML = pfMain.map(([a, b]) => logBtn(a, b)).join("");
+    if (elSZ) elSZ.innerHTML = pfSize.map(([a, b]) => logBtn(a, b)).join("");
+
+    const boardChip = (street, tag, label) =>
+      `<button type="button" class="flowChip" data-qkind="board" data-qstreet="${street}" data-qtag="${esc(tag)}">${esc(label)}</button>`;
+
+    const flopM = [["rainbow","Rainbow"],["two-tone","Two-tone"],["paired","Paired"],["monotone","Monotone"]];
+    const flopD = [["highCard","High-card board"],["lowBoard","Low board"],["connected","Connected"],["wet","Wet / draw-heavy"],["dry","Dry"]];
+    const fm = byId("qFlopMainChips"), fd = byId("qFlopDetailChips");
+    if (fm) fm.innerHTML = flopM.map(([t, l]) => boardChip("flop", t, l)).join("");
+    if (fd) fd.innerHTML = flopD.map(([t, l]) => boardChip("flop", t, l)).join("");
+
+    const turnM = [["turnFlush","Flush completed"],["turnStraight","Straight completed"],["turnPaired","Paired board"],["turnBrick","Brick"]];
+    const turnD = [["turnOver","Overcard"],["turnDraw","Draw added"],["turnScare","Scare card"],["turnBlankLow","Blank low card"],["turnPairDraw","Board paired + draw"]];
+    const tm = byId("qTurnMainChips"), td = byId("qTurnDetailChips");
+    if (tm) tm.innerHTML = turnM.map(([t, l]) => boardChip("turn", t, l)).join("");
+    if (td) td.innerHTML = turnD.map(([t, l]) => boardChip("turn", t, l)).join("");
+
+    const rivM = [["rivFlush","Flush completed"],["rivStraight","Straight completed"],["rivPaired","Paired board"],["rivBrick","Brick"]];
+    const rivD = [["rivMiss","Missed draws"],["rivOver","Overcard"],["rivDbPair","Double paired"],["rivAbsBrick","Absolute brick"],["rivScare","Scare card"]];
+    const rm = byId("qRiverMainChips"), rd = byId("qRiverDetailChips");
+    if (rm) rm.innerHTML = rivM.map(([t, l]) => boardChip("river", t, l)).join("");
+    if (rd) rd.innerHTML = rivD.map(([t, l]) => boardChip("river", t, l)).join("");
+
+    const stAct = (line, short) => logBtn(short, line);
+    const flopA = [
+      ["Flop: Hero check", "Check"],
+      ["Flop: Hero bet", "Bet"],
+      ["Flop: Hero call", "Call"],
+      ["Flop: Hero fold", "Fold"],
+      ["Flop: Hero jam", "Jam"]
+    ];
+    const turnA = [
+      ["Turn: Hero check", "Check"],
+      ["Turn: Hero bet", "Bet"],
+      ["Turn: Hero call", "Call"],
+      ["Turn: Hero fold", "Fold"],
+      ["Turn: Hero jam", "Jam"]
+    ];
+    const rivA = [
+      ["River: Hero check", "Check"],
+      ["River: Hero bet", "Bet"],
+      ["River: Hero call", "Call"],
+      ["River: Hero fold", "Fold"],
+      ["River: Hero jam", "Jam"]
+    ];
+    const fa = byId("qFlopActionChips"), ta = byId("qTurnActionChips"), ra = byId("qRiverActionChips");
+    if (fa) fa.innerHTML = flopA.map(([line, s]) => stAct(line, s)).join("");
+    if (ta) ta.innerHTML = turnA.map(([line, s]) => stAct(line, s)).join("");
+    if (ra) ra.innerHTML = rivA.map(([line, s]) => stAct(line, s)).join("");
+  }
+
+  function wireQuickFlowCapture(){
+    const card = byId("quickCard");
+    if (!card) return;
+
+    card.addEventListener("click", (e) => {
+      const tab = e.target.closest("#qStreetTabs .tab");
+      if (tab && card.contains(tab)){
+        switchQuickStreetTab(tab.dataset.qstreet);
+        return;
+      }
+      const chip = e.target.closest(".flowChip");
+      if (!chip || !card.contains(chip)) return;
+      if (chip.dataset.qkind === "log"){
+        const line = chip.dataset.qlog;
+        if (line) appendQuickFlowLogLine(line);
+        return;
+      }
+      if (chip.dataset.qkind === "board"){
+        const st = chip.dataset.qstreet;
+        const tag = chip.dataset.qtag;
+        if (st && tag) toggleQuickStreetTag(st, tag);
+      }
+    });
+
+    const undo = byId("qUndoLastLine");
+    if (undo){
+      undo.onclick = () => {
+        for (let i = quickFeedEntries.length - 1; i >= 0; i--){
+          if (quickFeedEntries[i].type === "line"){
+            quickFeedEntries.splice(i, 1);
+            renderQuickFeed();
+            return;
+          }
+        }
+      };
+    }
+    const clr = byId("qClearReplay");
+    if (clr){
+      clr.onclick = () => {
+        quickFeedEntries = [];
+        quickStreetTags = { flop: [], turn: [], river: [] };
+        renderQuickFeed();
+        renderAllQuickFlowBoardChipStates();
+        syncLegacySelectsFromStreetTags();
+        renderQuickBoardSummary();
+      };
+    }
+  }
+
+  function restoreQuickStreetTagsFromMeta(meta){
+    quickStreetTags = { flop: [], turn: [], river: [] };
+    if (meta && typeof meta === "object" && meta.streetTextureTags && typeof meta.streetTextureTags === "object"){
+      ["flop", "turn", "river"].forEach(st => {
+        const arr = meta.streetTextureTags[st];
+        if (Array.isArray(arr)) quickStreetTags[st] = arr.filter(Boolean).slice(0, 2);
+      });
+      renderAllQuickFlowBoardChipStates();
+      renderQuickBoardSummary();
+      return;
+    }
+    const ft = (meta && meta.flopTexture) || "";
+    if (ft && ["rainbow", "two-tone", "paired", "monotone", "unknown"].includes(ft) && ft !== "unknown"){
+      quickStreetTags.flop = [ft];
+    }
+    const tr = (meta && meta.turnRunout) || "";
+    const trRev = { blank: "turnBrick", fd: "turnDraw", flush: "turnFlush", pair: "turnPaired", straight: "turnStraight", overcard: "turnOver", bd: "turnDraw" };
+    if (tr && trRev[tr]) quickStreetTags.turn = [trRev[tr]];
+    const rr = (meta && meta.riverRunout) || "";
+    const rrRev = { blank: "rivBrick", flush: "rivFlush", bd: "rivMiss", pair: "rivPaired", straight: "rivStraight", overcard: "rivScare" };
+    if (rr && rrRev[rr]) quickStreetTags.river = [rrRev[rr]];
+    renderAllQuickFlowBoardChipStates();
+    renderQuickBoardSummary();
+  }
+
+  function buildQuickBoardMetaForSave(){
+    syncLegacySelectsFromStreetTags();
+    const base = readQuickBoardMetaFromForm();
+    return {
+      ...base,
+      streetTextureTags: {
+        flop: [...(quickStreetTags.flop || [])],
+        turn: [...(quickStreetTags.turn || [])],
+        river: [...(quickStreetTags.river || [])]
+      }
+    };
   }
 
   // ---- Villains UI ----
@@ -3426,19 +3996,29 @@ h1{
 
     if (h.mode === "quick"){
       const q = h.quick || {};
+      const flows = Array.isArray(q.flowEntries) ? q.flowEntries : [];
+      const hasFlow = flows.some(e => e && String(e.text || "").trim());
+      if (hasFlow){
+        flows.forEach(e => {
+          const t = e && String(e.text || "").trim();
+          if (t) lines.push(t);
+        });
+      }
       const hn = (q.handNotes || "").trim();
       if (hn) lines.push("Notes: " + hn);
-      else {
+      else if (!hasFlow){
         if (q.preflop) lines.push("Preflop: " + q.preflop.trim());
         if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
       }
       let boardLine = "";
-      if (q.boardMeta && typeof q.boardMeta === "object"){
-        boardLine = buildQuickBoardSummaryLine(q.boardMeta).trim();
+      if (!hasFlow){
+        if (q.boardMeta && typeof q.boardMeta === "object"){
+          boardLine = buildQuickBoardSummaryLine(q.boardMeta).trim();
+        }
+        if (!boardLine) boardLine = (q.board || "").trim();
+        if (boardLine) lines.push("Board: " + boardLine);
       }
-      if (!boardLine) boardLine = (q.board || "").trim();
-      if (boardLine) lines.push("Board: " + boardLine);
-      if (q.postflop) lines.push("Postflop: " + q.postflop.trim());
+      if (!hasFlow && q.postflop) lines.push("Postflop: " + q.postflop.trim());
       if (q.potBb) lines.push("Pot: " + q.potBb + "bb");
       lines.push("Result: " + (h.result || "—"));
       if (q.showdown){
@@ -3773,11 +4353,27 @@ h1{
     }
     const qsd = byId("qSdDetails");
     if (qsd) qsd.open = !!(q.showdown || (q.villainShowdown || "").trim());
+    let loadedBoardMeta;
     if (q.boardMeta && typeof q.boardMeta === "object"){
+      loadedBoardMeta = q.boardMeta;
       applyQuickBoardMetaToForm(q.boardMeta);
     } else {
       const legacy = tryBoardMetaFromLegacyBoardString(q.board || "");
-      applyQuickBoardMetaToForm(legacy || { flopRanks: "", flopTexture: "", turnRunout: "", riverRunout: "" });
+      loadedBoardMeta = legacy || { flopRanks: "", flopTexture: "", turnRunout: "", riverRunout: "" };
+      applyQuickBoardMetaToForm(loadedBoardMeta);
+    }
+    restoreQuickStreetTagsFromMeta(loadedBoardMeta);
+    if (Array.isArray(q.flowEntries) && q.flowEntries.length){
+      quickFeedEntries = q.flowEntries.map(e => ({
+        type: e.type === "boardLine" ? "boardLine" : "line",
+        text: String(e.text || "").trim(),
+        street: e.street
+      })).filter(e => e.text || e.type === "boardLine");
+      renderQuickFeed();
+    } else {
+      quickFeedEntries = [];
+      ["flop", "turn", "river"].forEach(st => upsertBoardLineInFeed(st));
+      renderQuickFeed();
     }
     byId("qPotBb").value = q.potBb || "";
     byId("qTurningPoint").value = h.turningPoint || "";
@@ -3823,15 +4419,30 @@ h1{
     const bm = readQuickBoardMetaFromForm();
     const hasBoard = bm.flopRanks || bm.flopTexture || bm.turnRunout || bm.riverRunout || bm.turnCard || bm.riverCard;
     if (hasBoard || (q.board || "").trim()){ const bd = byId("qBoardDetails"); if (bd) bd.open = true; }
+    const qmd = byId("qMoreDetail");
+    if (qmd){
+      qmd.open = !!(
+        (Array.isArray(q.flowEntries) && q.flowEntries.length) ||
+        (h.villains && h.villains.length) ||
+        String(h.heroStackBb || "").trim() ||
+        byId("qC1Rank").value || byId("qC2Rank").value ||
+        hasBoard
+      );
+    }
   }
 
   byId("qSaveHand").onclick = () => {
     const data = load();
     const meta = JSON.parse(JSON.stringify(readHandMeta(byId("qLevel"), byId("qSb"), byId("qBb"), byId("qAnte"), { levelOptional: true, blindsOptional: true })));
-    const boardMeta = readQuickBoardMetaFromForm();
+    const boardMeta = buildQuickBoardMetaForSave();
     const boardSummary = buildQuickBoardSummaryLine(boardMeta);
     const sdYes = byId("qShowdown")?.value === "yes";
     const hn = (byId("qHandNotes")?.value || "").trim();
+    const flowEntries = quickFeedEntries.map(e => ({
+      type: e.type,
+      text: e.text,
+      street: e.street
+    }));
 
     const hand = {
       id: editingHandId || uuid(),
@@ -3848,6 +4459,7 @@ h1{
         preflop: hn,
         postflop: "",
         heroCombo: quickHeroComboForSave(),
+        flowEntries,
         boardMeta,
         board: boardSummary,
         potBb: byId("qPotBb").value.trim(),
@@ -4208,7 +4820,8 @@ h1{
 
     
     initQuickBoardForm();
-// villains defaults
+    fillQuickFlowChipGrids();
+    wireQuickFlowCapture();
     resetQuickPreserveMeta();
     clearContainer("wVillainsList");
     addVillainRow("wVillainsList", { pos:"BB", stackBb:"", note:"" });
